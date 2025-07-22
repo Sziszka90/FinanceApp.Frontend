@@ -1,0 +1,19 @@
+<div class="main-container">
+  <div class="modal-header">
+    <h3>Resend Confirmation Email</h3>
+  </div>
+  <loader *ngIf="loading()"></loader>
+  <form *ngIf="!loading()" class="form-container" [formGroup]="emailForm" (ngSubmit)="onSubmit()">
+    <label>Email</label>
+    <div class="form-group">
+      <input id="email" type="email" placeholder="Enter your email address" formControlName="email" />
+      <div class="error-font" *ngIf="emailForm.get('email')?.hasError('required') && emailForm.get('email')?.touched">
+        Email is required
+      </div>
+    </div>
+    <div class="button-container">
+      <button type="submit" [disabled]="emailForm.invalid" class="custom-button bounce-button">Confirm</button>
+      <button type="button" class="custom-button-inverse bounce-button" (click)="onCancel()">Cancel</button>
+    </div>
+  </form>
+</div>

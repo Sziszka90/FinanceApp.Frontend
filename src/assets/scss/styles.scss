@@ -1,0 +1,77 @@
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@forward "base/variables";
+@use "base/variables";
+
+@forward "base/typography";
+@use "base/typography";
+
+@forward "utilities/helpers";
+@use "utilities/helpers";
+
+@forward "utilities/buttons";
+@use "utilities/buttons";
+
+@forward "layout/container";
+@use "layout/container";
+
+@forward "layout/table";
+@use "layout/table";
+
+@use '@angular/material' as mat;
+
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming@use '@angular/material' as mat;
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
+  font-family: variables.$default-font;
+}
+
+body {
+    background-color: variables.$background-color;
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 100vw;
+    overflow: auto;
+}
+
+.root {
+  overflow: auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  text-decoration: none;
+  color: variables.$text-color;
+}
+
+i {
+  font-size: 1.25rem;
+  width: 100%;
+  text-align: center;
+}
+
+.mat-mdc-select-panel {
+  background-color: white !important;
+}
+
+mat-option span {
+  display: flex;
+  flex-direction: row;
+  align-items: center !important;
+  text-align: center !important;
+  justify-content: space-evenly !important;
+  margin: auto;
+}
+
+mat-calendar {
+  background-color: white !important;
+}

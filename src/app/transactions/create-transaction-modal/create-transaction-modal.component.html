@@ -1,0 +1,68 @@
+<div class="main-container">
+  <div class="modal-header">
+    <h3>Create Transaction</h3>
+    <p class="modal-description">Create the item and click on save!</p>
+  </div>
+  <form class="form-container" [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+    <label for="name">Name</label>
+    <div class="form-group">
+      <input id="name" type="text" formControlName="name" required />
+      <div class="error-message" *ngIf="transactionForm.get('name')?.invalid && transactionForm.get('name')?.touched">
+        Name is required
+      </div>
+    </div>
+    <label for="description">Description</label>
+    <div class="form-group">
+      <input id="description" type="text" formControlName="description" />
+    </div>
+    <label for="value">Value</label>
+    <div class="form-group">
+      <input id="value" type="number" formControlName="value" />
+    </div>
+    <div class="error-message" *ngIf="transactionForm.get('value')?.invalid && transactionForm.get('value')?.touched">
+      Value is required
+    </div>
+    <label for="currency">Currency</label>
+    <div class="form-group">
+      <mat-select class="select" formControlName="currency">
+        <mat-option *ngFor="let option of currencyOptions" [value]="option">
+          &#8226; {{ option }}
+        </mat-option>
+      </mat-select>
+    </div>
+    <div class="error-message" *ngIf="transactionForm.get('currency')?.invalid && transactionForm.get('currency')?.touched">
+      Currency is required
+    </div>
+    <label for="transactionDate">Transaction Date</label>
+    <div class="input-with-icon">
+      <input bsDatepicker formControlName="transactionDate" type="text" placeholder="Select a date" />
+      <i class="fa fa-calendar"></i>
+    </div>
+
+    <label for="transactionType">Transaction Type</label>
+    <div class="form-group">
+      <mat-select class="select" formControlName="transactionType">
+        <mat-option *ngFor="let option of typeOptions" [value]="option.value">
+          &#8226; {{ option.name }}
+        </mat-option>
+      </mat-select>
+    </div>
+    <div class="error-message" *ngIf="transactionForm.get('transactionType')?.invalid && transactionForm.get('transactionType')?.touched">
+      Transaction Type is required
+    </div>
+
+    <label for="group">Group</label>
+    <div class="form-group">
+      <mat-select class="select" formControlName="group">
+        <mat-option *ngFor="let option of groupOptions()" [value]="option">
+          &#8226; {{ option.name }}
+        </mat-option>
+      </mat-select>
+    </div>
+
+    <div class="button-container">
+      <button [disabled]="transactionForm.invalid" class="custom-button bounce-button" type="submit">Save</button>
+      <button class="custom-button bounce-button" type="button" (click)="onClose()">Close</button>
+    </div>
+  </form>
+</div>

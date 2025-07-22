@@ -1,0 +1,106 @@
+@use "base/variables";
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  background-color: variables.$text-color;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  border-radius: 12px;
+}
+
+.modal-header {
+  display: flex;
+  flex-direction: column ;
+  justify-content: center;
+  align-items: center;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 2rem;
+}
+
+.form-element {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.action-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  height: 100%;
+  gap: 0.5rem;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.date-picker-container input {
+  width: 100%;
+}
+
+.date-picker-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+@media (max-width: 530px) {
+  .form-container {
+    width: 80%;
+    margin: auto;
+  }
+
+  .button-container {
+    margin: 0.5rem;
+  }
+
+  mat-form-field {
+    padding: 0.5em;
+  }
+
+  .main-container {
+    margin: 1rem;
+    max-width: 100%;
+  }
+}
+
+.mat-mdc-header-cell {
+  text-align: center !important;
+}
+
+::ng-deep .mat-mdc-select-arrow {
+  display: none !important;
+}

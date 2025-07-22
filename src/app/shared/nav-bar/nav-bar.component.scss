@@ -1,0 +1,115 @@
+@use 'base/variables' as variables;
+
+.nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: variables.$green-color;
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.image {
+  width: 3.5rem;
+  height: 3rem;
+  padding-right: 10px;
+}
+
+.title {
+  display: flex;
+  color: variables.$text-color;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.custom-dropdown-minimized {
+  position: relative;
+  display: inline-block;
+}
+
+.custom-dropdown-minimized-toggle {
+  display: flex;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.custom-dropdown-menu-minimized {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  max-width: 300px;
+  background: variables.$text-color ;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  overflow-x: auto;
+}
+
+.custom-dropdown-menu {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: no-wrap;
+  gap: 2rem;
+  align-items: center;
+}
+
+.custom-dropdown-item-minimized {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #333;
+  text-decoration: none;
+}
+
+.custom-dropdown {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+a:hover {
+  color: variables.$primary-color;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.title:hover {
+  color: variables.$primary-color;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.custom-dropdown-item-minimized:hover {
+  background: #f0f0f0;
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 1rem;
+}
+
+@media (min-width: 790px) {
+  .custom-dropdown-minimized {
+    display: none
+  }
+}
+
+@media (max-width: 790px) {
+.custom-dropdown {
+  display: none;
+  }
+}

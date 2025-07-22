@@ -1,0 +1,34 @@
+<div class="main-container">
+  <div class="modal-header">
+    <h3>Update Transaction Group</h3>
+    <p class="modal-description">Update the item and click on save!</p>
+  </div>
+  <form class="form-container" [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+    <label for="name">Name</label>
+    <div class="form-group">
+      <input id="name" type="text" formControlName="name" required />
+      <div class="error-message" *ngIf="transactionForm.get('name')?.invalid && transactionForm.get('name')?.touched">
+        Name is required
+      </div>
+    </div>
+    <label for="description">Description</label>
+    <div class="form-group">
+      <input id="description" type="text" formControlName="description" />
+    </div>
+    <label class="default-font" for="groupIcon">Group Icon</label>
+    <div class="form-group">
+      <mat-select class="select" formControlName="groupIcon" required>
+        <mat-select-trigger>
+          <i class="{{ transactionForm.get('groupIcon')?.value }}"></i>
+        </mat-select-trigger>
+        <mat-option *ngFor="let option of groupIconOptions" [value]="option">
+          <i class="{{ option }}"></i>
+        </mat-option>
+      </mat-select>
+    </div>
+    <div class="button-container">
+      <button [disabled]="transactionForm.invalid" class="custom-button bounce-button" type="submit">Save</button>
+      <button class="custom-button bounce-button" type="button" (click)="onClose()">Close</button>
+    </div>
+  </form>
+</div>

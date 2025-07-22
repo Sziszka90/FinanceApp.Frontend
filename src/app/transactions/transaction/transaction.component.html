@@ -1,0 +1,126 @@
+<div class="button-container">
+  <button class="custom-button bounce-button" (click)="createTransaction()" >Create Transaction</button>
+  <button class="custom-button bounce-button" (click)="getSummary()">Show Summary</button>
+</div>
+<div *ngIf="showSummary()" class="summary default-font text-color-grey">
+  <div class="title">Sum of Transactions</div>
+  <div class="value" id="value">{{ summary()?.amount }} {{ summary()?.currency }}</div>
+</div>
+
+<div class="drag-drop-container"
+     (dragover)="onDragOver($event)"
+     (drop)="onDrop($event)">
+  <p>Drag and drop a CSV file here, or click to upload</p>
+  <input type="file" accept=".csv" (change)="onFileSelect($event)" hidden #fileInput>
+  <button class="custom-button bounce-button" type="button" (click)="fileInput.click()">Upload CSV</button>
+</div>
+
+<hr />
+
+<div class="filter-form-container">
+  <h3 class="default-font text-color-grey">Filter Transactions</h3>
+  <form [formGroup]="filterForm" class="search-container">
+    <div class="form-group">
+      <input
+        type="text"
+        placeholder="Search by name"
+        formControlName="name"
+        class="search-input"
+      />
+
+      <div class="input-with-icon">
+        <input bsDatepicker formControlName="date" type="text" placeholder="Select a date" />
+        <i class="fa fa-calendar"></i>
+      </div>
+
+      <mat-select class="select" formControlName="type">
+        <mat-option *ngFor="let option of typeOptions" [value]="option.name">
+          &#8226; {{ option.name }}
+        </mat-option>
+      </mat-select>
+    </div>
+
+    <div class="button-container">
+      <button type="button" class="custom-button bounce-button" (click)="resetFilters()">
+        Reset Filter
+      </button>
+    </div>
+  </form>
+</div>
+
+<loader *ngIf="loading()"></loader>
+<div *ngIf="!loading()">
+  <div class="table-container mat-elevation-z8" style="overflow: auto; max-height: 70vh;">
+    <div *ngIf="dataSource().data.length > 0; else noTransactions">
+      <table mat-table [dataSource]="dataSource()" matSort class="mat-elevation-z8">
+        <!-- Name Column -->
+        <ng-container class="column" matColumnDef="name">
+          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header appColumnResize> Name </th>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.name}} </td>
+        </ng-container>
+
+        <!-- Description Column -->
+        <ng-container class="column" matColumnDef="description">
+          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef> Description </th>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.description}} </td>
+        </ng-container>
+
+        <!-- Value Column -->
+        <ng-container class="column" matColumnDef="value">
+          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Value</th>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.value.amount }}</td>
+        </ng-container>
+
+        <!-- Currency Column -->
+        <ng-container class="column" matColumnDef="currency">
+          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Currency</th>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.value.currency }}</td>
+        </ng-container>
+
+        <!-- Transaction Date Column -->
+        <ng-container class="column" matColumnDef="transactionDate">
+          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Transaction Date</th>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.transactionDate | date: 'yyyy/MM/dd' }}</td>
+        </ng-container>
+
+        <!-- Transaction Type Column -->
+        <ng-container class="column" matColumnDef="transactionType">
+          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Transaction Type</th>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.transactionType }}</td>
+        </ng-container>
+
+        <!-- Group Column -->
+        <ng-container class="column" matColumnDef="group">
+          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef> Group </th>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.transactionGroup != undefined ? element.transactionGroup.name : ""}} </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container class="column" matColumnDef="actions">
+          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Actions</th>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let row">
+            <div class="action-button-container">
+              <button class="custom-small-button bounce-button" (click)="deleteTransaction(row)">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button class="custom-small-button bounce-button" (click)="editTransaction(row)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" ></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'expense': row.transactionType === 'Expense', 'income': row.transactionType !== 'Expense'}"></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<ng-template #noTransactions>
+  <div class="default-font no-transactions">
+    No transactions found.
+  </div>
+</ng-template>
+
+

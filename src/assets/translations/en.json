@@ -1,0 +1,11 @@
+{
+    "APPNAME": "Finance App",
+    "MENU": {
+        "TITLE": "Menu",
+        "HOME": "Home",
+        "TRANSACTIONS": "Transactions",
+        "TRANSACTION_GROUPS": "Transaction Groups",
+        "INVESTMENTS": "Investments",
+        "SAVINGS": "Savings"
+    }
+}

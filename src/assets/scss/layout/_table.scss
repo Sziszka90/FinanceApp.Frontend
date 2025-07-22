@@ -1,0 +1,41 @@
+@use "base/variables";
+
+.table-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  overflow-x: auto;
+  background-color: variables.$text-color;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(233, 229, 229, 0.2);
+  margin: 1rem;
+}
+
+tr {
+  &:hover {
+    background-color: variables.$green-color !important;
+  }
+  background-color: variables.$text-color !important;
+}
+
+td {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+  text-align: center !important;
+}
+
+.income {
+  background-color: variables.$income-color !important;
+}
+
+.expense {
+  background-color: variables.$expense-color !important;
+}
+
+@media (max-width: 1500px) {
+  table {
+    .default-font {
+      font-size: 0.8rem;
+    }
+  }
+}

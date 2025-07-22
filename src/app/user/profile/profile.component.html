@@ -1,0 +1,57 @@
+<div class="form-container">
+  <h3 class="default-font">Update Profile</h3>
+  <form class="form-element" [formGroup]="updateUserForm" (ngSubmit)="onSubmit()">
+    <label class="default-font" for="currency">Currency</label>
+
+    <label class="default-font" for="userName">User Name</label>
+    <div class="form-group">
+      <input
+        class="default-font"
+        id="userName"
+        type="text"
+        formControlName="userName"
+        required
+        placeholder="User Name"
+      />
+      <div class="error-font" *ngIf="updateUserForm.get('userName')?.hasError('required') && updateUserForm.get('userName')?.touched">
+        User name is required
+      </div>
+      <div class="error-font" *ngIf="updateUserForm.get('userName')?.hasError('minlength') && updateUserForm.get('userName')?.touched">
+        Minimum 2 characters required
+      </div>
+    </div>
+
+    <label class="default-font" for="password">Password</label>
+    <div class="form-group">
+      <input
+        class="default-font"
+        id="password"
+        type="password"
+        formControlName="password"
+        required
+        placeholder="Password"
+      />
+      <div class="error-font" *ngIf="updateUserForm.get('password')?.hasError('required') && updateUserForm.get('password')?.touched">
+        Password is required
+      </div>
+      <div class="error-font" *ngIf="updateUserForm.get('password')?.hasError('minlength') && updateUserForm.get('password')?.touched">
+        Minimum 8 characters required
+      </div>
+      <div class="error-font" *ngIf="updateUserForm.get('password')?.hasError('pattern') && updateUserForm.get('password')?.touched">
+        Include uppercase letter, number, and special character
+      </div>
+    </div>
+
+    <label class="default-font" for="currency">Currency</label>
+    <div class="form-group">
+      <mat-select class="select" formControlName="currency" required>
+        <mat-option *ngFor="let option of currencyOptions" [value]="option">
+          {{ option }}
+        </mat-option>
+      </mat-select>
+    </div>
+    <div class="button-container">
+      <button class="bounce-button custom-button" type="submit">Update</button>
+    </div>
+  </form>
+</div>

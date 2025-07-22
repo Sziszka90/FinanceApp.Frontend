@@ -1,0 +1,34 @@
+<div class="nav-bar">
+  <div class="logo-container">
+    <a routerLink="/">
+      <img class="image" src="../assets/icon.png" alt="icon" />
+    </a>
+    <a routerLink="/">
+      <span class="title title-font">{{ 'APPNAME' | translate }}</span>
+    </a>
+  </div>
+
+  <div class="navbar-container">
+    <div class="custom-dropdown-minimized">
+      <button class="custom-dropdown-minimized-toggle" (click)="menuToggle()">
+        <span class="material-icons">menu</span>
+      </button>
+      <div class="custom-dropdown-menu-minimized" *ngIf="showMenu()">
+        <a class="custom-dropdown-item-minimized default-font" routerLink="/" (click)="menuToggle()">{{ 'MENU.HOME' | translate }}</a>
+        <a *ngIf="userLoggedIn()" class="custom-dropdown-item-minimized default-font" routerLink="/transactions" (click)="menuToggle()">{{ 'MENU.TRANSACTIONS' | translate }}</a>
+        <a *ngIf="userLoggedIn()" class="custom-dropdown-item-minimized default-font" routerLink="/transactions-groups" (click)="menuToggle()">{{ 'MENU.TRANSACTION_GROUPS' | translate }}</a>
+      </div>
+    </div>
+    <div class="custom-dropdown">
+      <div class="custom-dropdown-menu">
+        <a class="custom-dropdown-item default-font" routerLink="/">{{ 'MENU.HOME' | translate }}</a>
+        <a *ngIf="userLoggedIn()" class="custom-dropdown-item default-font" routerLink="/transactions">{{ 'MENU.TRANSACTIONS' | translate }}</a>
+        <a *ngIf="userLoggedIn()" class="custom-dropdown-item default-font" routerLink="/transactions-groups">{{ 'MENU.TRANSACTION_GROUPS' | translate }}</a>
+      </div>
+    </div>
+    <button class="login-btn" (click)="login()">
+      <span *ngIf="!userLoggedIn()" class="material-icons">login</span>
+      <span *ngIf="userLoggedIn()" class="material-icons">account_circle</span>
+    </button>
+  </div>
+</div>

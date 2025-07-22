@@ -1,0 +1,139 @@
+@use "base/variables";
+
+.bounce-button {
+  display: inline-block;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.bounce-button:hover {
+  animation: bounce 0.6s ease infinite;
+}
+
+.custom-button {
+  padding: 1rem;
+  background-color: variables.$primary-color;
+  font-size: 1rem;
+  border: 3px solid variables.$primary-color;
+  border-radius: 20px;
+  outline: none;
+  max-width: 100%;
+  transition: border-color 0.3s;
+  align-items: center;
+  color: white;
+  width: 60%;
+  margin: 0.5rem;
+}
+
+.custom-button-inverse {
+  padding: 1rem;
+  background-color: white;
+  font-size: 1rem;
+  border: 3px solid variables.$text-color;
+  border-radius: 20px;
+  outline: none;
+  max-width: 100%;
+  transition: border-color 0.3s;
+  align-items: center;
+  color: white;
+  width: 60%;
+  margin: 0.5rem;
+  color: variables.$background-color;
+}
+
+.custom-button-inverse:active {
+  background-color: variables.$primary-color;
+}
+
+
+.custom-button:active {
+  background-color: variables.$secondary-color;
+}
+
+.custom-small-button {
+  background-color: variables.$primary-color;
+  font-size: 1rem;
+  border: 3px solid variables.$primary-color;
+  border-radius: 50%;
+  outline: none;
+  transition: border-color 0.3s;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  color: white;
+  margin: 0;
+  padding: 0.5rem;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.custom-small-button mat-icon {
+  position: relative;
+  top: 2px;
+}
+
+.custom-small-button:active {
+  background-color: variables.$secondary-color;
+}
+
+.custom-button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+  border: 1px solid #aaa;
+}
+
+.disable-button {
+  pointer-events: none;
+  color: gray;
+}
+
+.action-button {
+  margin: 1rem 1rem;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.small-action-button {
+  background-color: variables.$secondary-color;
+  color: white;
+  font-size: 0.85rem;
+  border: 2px solid variables.$secondary-color;
+  border-radius: 16px;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  outline: none;
+  margin: 0.25rem 0.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.small-action-button:hover {
+  background-color: variables.$primary-color;
+  border-color: variables.$primary-color;
+  color: white;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.small-action-button:active,
+.small-action-button:focus {
+  background-color: variables.$primary-color;
+  border-color: variables.$primary-color;
+}
+
+.small-action-button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+  border: 1px solid #aaa;
+}
+

@@ -1,0 +1,29 @@
+@use 'base/variables' as variables;
+
+h3 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 400;
+  font-size: x-large;
+  color: #2d3a4b;
+}
+
+button {
+  margin: 1rem;
+}
+
+.form-container {
+  width: 50%;
+  margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+  .custom-button {
+    width: 100%;
+  }
+
+  .form-container {
+    width: 80%;
+    margin: auto ;
+  }
+}

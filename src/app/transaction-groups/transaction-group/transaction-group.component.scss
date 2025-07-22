@@ -1,0 +1,18 @@
+@use 'base/variables' as variables;
+
+.button-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  vertical-align: middle;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.no-transaction-groups {
+  text-align: center;
+  background-color: variables.$background-color;
+  font-size: 1.5em;
+  color: variables.$text-color;
+  width: 100%;
+}

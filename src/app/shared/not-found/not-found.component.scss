@@ -1,0 +1,30 @@
+@use 'base/variables' as variables;
+
+.not-found {
+    text-align: center;
+    padding: 50px;
+  }
+
+  .not-found h1 {
+    font-size: 3em;
+    color: variables.$text-color;
+  }
+
+  .not-found p {
+    font-size: 1.2em;
+  }
+
+  .not-found .btn-home {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: variables.$green-color;
+    color: variables.$text-color;
+    text-decoration: none;
+    border-radius: 12px;
+  }
+
+  .not-found .btn-home:hover {
+    color: variables.$primary-color;
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }

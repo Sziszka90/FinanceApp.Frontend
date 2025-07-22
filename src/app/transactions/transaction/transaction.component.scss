@@ -1,0 +1,123 @@
+@use 'base/variables' as variables;
+
+.button-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.no-transactions {
+  text-align: center;
+  background-color: variables.$background-color;
+  font-size: 1.5em;
+  color: variables.$text-color;
+  width: 100%;
+}
+
+.filter-form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 1rem;
+  margin: auto;
+}
+
+mat-select {
+  margin: 0rem;
+}
+
+.sort-buttons mat-icon {
+  cursor: pointer;
+  color: variables.$primary-color;
+  font-size: small;
+}
+
+.form-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sort-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.sorting-header {
+  display: flex;
+  flex-direction: row;
+}
+
+.drag-drop-container {
+  border: 1px solid variables.$primary-color; 
+  border-radius: 8px;
+  width: 60%;
+  margin: 1rem auto;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  color: variables.$text-color;
+}
+
+.drag-drop-container:hover {
+  background-color: variables.$primary-color;
+}
+
+.drag-drop-container:hover button{
+  background-color: variables.$background-color;
+}
+
+.table-container {
+  overflow-x: auto;
+  overflow-y: auto; 
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  margin-top: 0.5rem;
+}
+
+mat-table {
+  margin-top: 2rem; 
+  min-width: 100%;
+  touch-action: pan-x pan-y;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+th.mat-header-cell {
+  position: sticky !important;
+  top: 0;
+  z-index: 2000;
+  background: #fff;
+}
+
+@media (min-width: 900px) {
+  .form-group {
+    flex-direction: row;
+    width: 100%;
+    margin: 0rem;
+  }
+
+  form {
+    width: 80%;
+  }
+}
+
+@media (max-width: 900px) {
+  .drag-drop-container {
+    width: 80%;
+  }
+}
