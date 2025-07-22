@@ -39,7 +39,7 @@ jobs:
       - name: Build and Push Frontend image
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          docker build -t ghcr.io/$OWNER/finance-app-frontend:${GITHUB_RUN_NUMBER} -f ./FinanceApp.Frontend/Frontend.Dockerfile ./FinanceApp.Frontend
+          docker build -t ghcr.io/$OWNER/finance-app-frontend:${GITHUB_RUN_NUMBER} -f ./Frontend.Dockerfile ./
           docker push ghcr.io/$OWNER/finance-app-frontend:${GITHUB_RUN_NUMBER}
 
   deploy:
