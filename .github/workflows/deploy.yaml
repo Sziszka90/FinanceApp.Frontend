@@ -28,13 +28,13 @@ jobs:
 
       - name: List environment files
         run: |
-          ls ./FinanceApp.Frontend/src/environments
+          ls ./src/environments
 
       - name: Generate environment.prod.ts from template
         run: |
           #export API_URL="${{ vars.BACKEND_URL }}"
           envsubst < src/environments/environment.prod.template.ts > src/environments/environment.prod.ts
-        working-directory: ./FinanceApp.Frontend
+        working-directory: ./
 
       - name: Build and Push Frontend image
         run: |
