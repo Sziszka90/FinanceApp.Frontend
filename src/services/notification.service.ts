@@ -30,7 +30,7 @@ export class NotificationService {
 
   startConnection(): void {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl(`https://www.finance-app.fun/notificationHub`)
+      .withUrl(`https://www.financeapp.fun/notificationHub`)
       .configureLogging(LogLevel.Information)
       .build();
 
