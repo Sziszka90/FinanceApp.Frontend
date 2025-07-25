@@ -30,8 +30,8 @@ export class NotificationService {
 
   startConnection(): void {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl(`https://www.financeapp.fun/notificationHub`, {
-        transport: HttpTransportType.LongPolling,
+      .withUrl(`/notificationHub`, {
+        transport: HttpTransportType.WebSockets,
       })
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
