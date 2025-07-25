@@ -3,7 +3,6 @@ import { HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel } from
 import { BehaviorSubject } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 import { JOIN_GROUP_METHOD, TRANSACTIONS_MATCHED_NOTIFICATION } from 'src/models/Constants/notification.const';
-import { T } from '@angular/cdk/portal-directives.d-BoG39gYN';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
@@ -32,7 +31,7 @@ export class NotificationService {
   startConnection(): void {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(`/notificationHub`, {
-        transport: HttpTransportType.WebSockets,
+        transport: HttpTransportType.LongPolling,
       })
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
