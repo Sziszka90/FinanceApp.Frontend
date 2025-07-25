@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core';
-import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { BehaviorSubject } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 import { JOIN_GROUP_METHOD, TRANSACTIONS_MATCHED_NOTIFICATION } from 'src/models/Constants/notification.const';
+import { T } from '@angular/cdk/portal-directives.d-BoG39gYN';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
@@ -30,7 +31,9 @@ export class NotificationService {
 
   startConnection(): void {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl(`/notificationHub`)
+      .withUrl(`/notificationHub`, {
+        transport: HttpTransportType.LongPolling,
+      })
       .configureLogging(LogLevel.Information)
       .build();
 
