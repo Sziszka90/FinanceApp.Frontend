@@ -82,21 +82,11 @@ For detailed upcoming features and development progress, please check our [GitHu
 ### **Styling & UI**
 
 - **SCSS** - Enhanced CSS with variables, mixins, and nesting
-- **Angular Material** - Material Design components
 - **Responsive Design** - Mobile-first approach with breakpoint management
 - **Custom Theming** - Consistent design system across the application
 
-### **Development Tools**
-
-- **Angular DevKit** - Build tools and development server
-- **TSLint/ESLint** - Code quality and consistency
-- **Prettier** - Code formatting
-- **Karma & Jasmine** - Unit testing framework
-- **Protractor/Cypress** - End-to-end testing (planned)
-
 ### **State Management & Communication**
 
-- **Angular Services** - Centralized state management
 - **HTTP Client** - RESTful API communication
 - **JWT Interceptor** - Automatic token handling
 - **Error Interceptor** - Global error handling
@@ -110,7 +100,7 @@ For detailed upcoming features and development progress, please check our [GitHu
 - **Profile Management** with editable user settings
 - **Authentication Guards** protecting routes and components
 
-### **💰 Transaction Management UI**
+### **💰 Transaction and Transaction Group Management UI**
 
 - **Transaction Lists** with sorting, filtering
 - **Create/Edit Modals** with rich form controls and validation
@@ -159,14 +149,12 @@ ng serve
 export const environment = {
   production: false,
   apiUrl: "https://localhost:5001/api",
-  appName: "Personal Finance App",
 };
 
 // src/environments/environment.prod.ts
 export const environment = {
   production: true,
   apiUrl: "https://your-api-domain.com/api",
-  appName: "Personal Finance App",
 };
 ```
 
