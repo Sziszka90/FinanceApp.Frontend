@@ -27,12 +27,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private router = inject(Router);
 
   updateUserForm : FormGroup<UserFormModel> = this.fb.group<UserFormModel>({
-    userName: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    userName: new FormControl('', [Validators.minLength(2)]),
     password: new FormControl('', [
       Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$'),
       Validators.minLength(8),
     ]),
-    currency: new FormControl(CurrencyEnum.Unknown, [Validators.required]),
+    currency: new FormControl(CurrencyEnum.Unknown),
   });
 
   user!: GetUserDto;
@@ -69,6 +69,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions?.add(subscription);
+  }
+
+  compareCategoryObjects(object1: any, object2: any) {
+    return object1 && object2 && object1.id == object2.id;
   }
 
   ngOnDestroy(): void {

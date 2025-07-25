@@ -44,7 +44,7 @@
 
     <label class="default-font" for="currency">Currency</label>
     <div class="form-group">
-      <mat-select class="select" formControlName="currency" required>
+      <mat-select class="select" formControlName="currency" [compareWith]="compareCategoryObjects" required>
         <mat-option *ngFor="let option of currencyOptions" [value]="option">
           {{ option }}
         </mat-option>
