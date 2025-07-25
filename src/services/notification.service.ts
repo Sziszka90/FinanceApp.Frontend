@@ -32,7 +32,7 @@ export class NotificationService {
   startConnection(): void {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(`/notificationHub`, {
-        transport: HttpTransportType.LongPolling,
+        transport: HttpTransportType.WebSockets,
       })
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
