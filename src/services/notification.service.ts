@@ -31,6 +31,7 @@ export class NotificationService {
   startConnection(): void {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(`/notificationHub`, {
+        accessTokenFactory: () => this.authenticationService.getToken() ?? '',
         transport: HttpTransportType.WebSockets,
       })
       .withAutomaticReconnect()
