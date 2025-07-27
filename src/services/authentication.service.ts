@@ -8,7 +8,6 @@ import { TOKEN_KEY } from 'src/models/Constants/token.const';
 import { Router } from '@angular/router';
 import { AuthenticationApiService } from './authentication.api.service';
 import { CorrelationService } from './correlation.service';
-import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root',

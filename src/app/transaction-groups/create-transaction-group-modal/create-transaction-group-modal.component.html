@@ -3,12 +3,13 @@
     <h3>Create Transaction Group</h3>
     <p class="modal-description">Create the item and click on save!</p>
   </div>
-  <form class="form-container" [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+  <loader *ngIf="loading()" class="loader"></loader>
+  <form *ngIf="!loading()" class="form-container" [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
     <label for="name">Name</label>
     <div class="form-group">
       <input id="name" type="text" formControlName="name" required />
-      <div class="error-message" *ngIf="transactionForm.get('name')?.invalid && transactionForm.get('name')?.touched">
-        Name is required
+      <div class="error-message" *ngIf="hasFieldError('name')">
+        {{ getFieldErrorMessage('name') }}
       </div>
     </div>
     <label for="description">Description</label>
@@ -25,6 +26,9 @@
           <i class="{{ option }}"></i>
         </mat-option>
       </mat-select>
+      <div class="error-message" *ngIf="hasFieldError('groupIcon')">
+        {{ getFieldErrorMessage('groupIcon') }}
+      </div>
     </div>
     <div class="button-container">
       <button [disabled]="transactionForm.invalid" class="custom-button bounce-button" type="submit">Save</button>

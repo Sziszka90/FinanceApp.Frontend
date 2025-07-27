@@ -12,6 +12,8 @@ import { UpdateTransactionGroupModalComponent } from '../update-transaction-grou
 import { trigger, transition, style, animate } from '@angular/animations';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { AuthenticationService } from 'src/services/authentication.service';
+import { ComponentErrorService } from 'src/services/component-error.service';
+import { BaseComponent } from 'src/app/shared/base-component';
 
 @Component({
   selector: 'transaction-group',
@@ -23,20 +25,9 @@ import { AuthenticationService } from 'src/services/authentication.service';
     LoaderComponent],
   templateUrl: './transaction-group.component.html',
   styleUrl: './transaction-group.component.scss',
-  animations: [
-    trigger('slideInOut', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(-40px)' }),
-        animate('300ms ease', style({ opacity: 1, transform: 'translateX(0)' })),
-      ]),
-      transition(':leave', [
-        animate('300ms ease', style({ opacity: 0, transform: 'translateX(40px)' })),
-      ]),
-    ]),
-  ]
 })
 
-export class TransactionGroupComponent implements OnInit, OnDestroy {
+export class TransactionGroupComponent extends BaseComponent implements OnInit {
   private matDialog = inject(MatDialog);
   private transactionApiService = inject(TransactionApiService);
   private authService = inject(AuthenticationService);
@@ -51,24 +42,19 @@ export class TransactionGroupComponent implements OnInit, OnDestroy {
   public transactionGroups$: Observable<GetTransactionGroupDto[]> | undefined;
   public allTransactionGroups = signal<GetTransactionGroupDto[]>([]);
 
-  private destroy$ = new Subject<void>();
-
   touchStartX = 0;
 
-  loading = signal<boolean>(false);
-
   ngOnInit(): void {
-    this.loading.set(true);
-    this.transactionGroups$ = this.transactionApiService.getAllTransactionGroups();
-    this.transactionGroups$.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (value) => {
-        this.allTransactionGroups.set(value);
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Error fetching transaction groups:', error);
-        this.loading.set(false);
+    // Using executeWithLoading for automatic loading and error handling
+    this.executeWithLoading(
+      this.transactionApiService.getAllTransactionGroups(),
+      'Transaction groups loaded successfully!',
+      'Loading transaction groups'
+    ).subscribe({
+      next: (transactionGroups) => {
+        this.allTransactionGroups.set(transactionGroups);
       }
+      // No need for error handling - executeWithLoading handles it automatically
     });
   }
 
@@ -134,10 +120,5 @@ export class TransactionGroupComponent implements OnInit, OnDestroy {
         }));
       }
     });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

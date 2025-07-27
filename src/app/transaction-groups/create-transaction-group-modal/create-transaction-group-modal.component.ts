@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -14,6 +14,9 @@ import { TransactionApiService } from '../../../services/transactions.api.servic
 import { ICONS } from 'src/models/Constants/group-icon-options.const';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
+import { BaseComponent } from 'src/app/shared/base-component';
+import { LoaderComponent } from 'src/app/shared/loader/loader.component';
+import { takeUntil } from 'rxjs';
 
 @Component({
   selector: 'transaction-modal',
@@ -22,40 +25,56 @@ import { MatIconModule } from '@angular/material/icon';
     MatSelectModule,
     MatIconModule,
     CommonModule,
+    LoaderComponent
   ],
   templateUrl: './create-transaction-group-modal.component.html',
   styleUrl: './create-transaction-group-modal.component.scss',
   standalone: true,
 })
-export class CreateTransactionGroupModalComponent implements OnInit {
+export class CreateTransactionGroupModalComponent extends BaseComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<CreateTransactionGroupModalComponent>);
   private fb = inject(FormBuilder);
   private transactionApiService = inject(TransactionApiService);
 
-  public transactionForm: FormGroup = this.fb.group({
-    name: new FormControl('', Validators.required),
+  public override formGroup: FormGroup = this.fb.group({
+    name: new FormControl('', [Validators.required, Validators.minLength(2)]),
     description: new FormControl(''),
-    groupIcon: new FormControl('')
+    groupIcon: new FormControl('', Validators.required)
   });
 
   public groupIconOptions: string[] = Object.values(ICONS);
-  public selectedIcon: string = "";
 
-  ngOnInit(): void {}
-
-  onSubmit(): void {
-    if (this.transactionForm.valid) {
-      var createdTransactionGroup = {
-        name: this.transactionForm.get('name')?.value,
-        description: this.transactionForm.get('description')?.value,
-        groupIcon: this.transactionForm.get('groupIcon')?.value
-      };
-
-      this.transactionApiService
-      .createTransactionGroup(createdTransactionGroup).subscribe((createdTransactionGroup) => {
-        this.dialogRef.close(createdTransactionGroup);
+  ngOnInit(): void {
+    if (this.groupIconOptions.length > 0) {
+      this.formGroup!.patchValue({
+        groupIcon: this.groupIconOptions.at(-1)
       });
     }
+  }
+
+  onSubmit(): void {
+    if (!this.validateForm()) {
+      return;
+    }
+
+    const createdTransactionGroup = {
+      name: this.getFieldValue('name'),
+      description: this.getFieldValue('description'),
+      groupIcon: this.getFieldValue('groupIcon')
+    };
+
+    this.transactionApiService
+      .createTransactionGroup(createdTransactionGroup)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (result) => {
+          this.showSuccess('Transaction group created successfully!');
+          this.dialogRef.close(result);
+        },
+        error: (error) => {
+          this.handleError(error, 'Creating transaction group');
+        }
+      });
   }
 
   onClose(): void {
