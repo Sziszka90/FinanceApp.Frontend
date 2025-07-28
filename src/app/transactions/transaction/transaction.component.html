@@ -1,6 +1,6 @@
 <div class="button-container">
-  <button class="custom-button bounce-button" (click)="createTransaction()" >Create Transaction</button>
-  <button class="custom-button bounce-button" (click)="getSummary()">Show Summary</button>
+  <button class="custom-button bounce-button" [disabled]="loading()" (click)="createTransaction()">Create Transaction</button>
+  <button class="custom-button bounce-button" [disabled]="loading()" (click)="getSummary()">Show Summary</button>
 </div>
 <div *ngIf="showSummary()" class="summary default-font text-color-grey">
   <div class="title">Sum of Transactions</div>
@@ -11,8 +11,12 @@
      (dragover)="onDragOver($event)"
      (drop)="onDrop($event)">
   <p>Drag and drop a CSV file here, or click to upload</p>
+  <div *ngIf="loading()" class="upload-loading">
+    <loader></loader>
+    <p>Uploading file...</p>
+  </div>
   <input type="file" accept=".csv" (change)="onFileSelect($event)" hidden #fileInput>
-  <button class="custom-button bounce-button" type="button" (click)="fileInput.click()">Upload CSV</button>
+  <button class="custom-button bounce-button" [disabled]="loading()" type="button" (click)="fileInput.click()">Upload CSV</button>
 </div>
 
 <hr />
@@ -25,15 +29,16 @@
         type="text"
         placeholder="Search by name"
         formControlName="name"
+        [disabled]="loading()"
         class="search-input"
       />
 
       <div class="input-with-icon">
-        <input bsDatepicker formControlName="date" type="text" placeholder="Select a date" />
+        <input bsDatepicker formControlName="date" [disabled]="loading()" type="text" placeholder="Select a date" />
         <i class="fa fa-calendar"></i>
       </div>
 
-      <mat-select class="select" formControlName="type">
+      <mat-select class="select" formControlName="type" [disabled]="loading()">
         <mat-option *ngFor="let option of typeOptions" [value]="option.name">
           &#8226; {{ option.name }}
         </mat-option>
@@ -41,7 +46,7 @@
     </div>
 
     <div class="button-container">
-      <button type="button" class="custom-button bounce-button" (click)="resetFilters()">
+      <button type="button" class="custom-button bounce-button" [disabled]="loading()" (click)="resetFilters()">
         Reset Filter
       </button>
     </div>
@@ -100,10 +105,10 @@
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Actions</th>
           <td class="default-font text-color-black" mat-cell *matCellDef="let row">
             <div class="action-button-container">
-              <button class="custom-small-button bounce-button" (click)="deleteTransaction(row)">
+              <button class="custom-small-button bounce-button" [disabled]="loading()" (click)="deleteTransaction(row)">
                 <mat-icon>delete</mat-icon>
               </button>
-              <button class="custom-small-button bounce-button" (click)="editTransaction(row)">
+              <button class="custom-small-button bounce-button" [disabled]="loading()" (click)="editTransaction(row)">
                 <mat-icon>edit</mat-icon>
               </button>
             </div>

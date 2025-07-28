@@ -10,7 +10,7 @@ import { AuthenticationApiService } from './authentication.api.service';
 import { CorrelationService } from './correlation.service';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class AuthenticationService {
   private platformId = inject(PLATFORM_ID);
@@ -62,11 +62,11 @@ export class AuthenticationService {
     }
 
     try {
-      const decodedToken: any = jwtDecode(token);
+      const decodedToken: { exp: number; [key: string]: unknown } = jwtDecode(token);
 
       const currentTime = Math.floor(Date.now() / 1000);
       if (decodedToken.exp < currentTime) {
-        console.log('Token has expired.');
+        console.warn('Token has expired.');
         return false;
       }
       return true;
@@ -90,7 +90,7 @@ export class AuthenticationService {
     }
 
     try {
-      const decodedToken: any = jwtDecode(token);
+      const decodedToken: { sub?: string; [key: string]: unknown } = jwtDecode(token);
       return decodedToken.sub || null;
     } catch (error) {
       console.error('Error decoding token:', error);

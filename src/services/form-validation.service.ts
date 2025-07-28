@@ -13,7 +13,7 @@ export interface FieldValidationMessages {
   providedIn: 'root'
 })
 export class FormValidationService {
-  
+
   private defaultMessages: ValidationMessage = {
     required: 'This field is required',
     email: 'Please enter a valid email address',
@@ -27,30 +27,30 @@ export class FormValidationService {
 
   hasFieldError(form: FormGroup, fieldName: string, errorType?: string): boolean {
     const field = form.get(fieldName);
-    if (!field) return false;
-    
+    if (!field) {return false;}
+
     if (errorType) {
       return field.hasError(errorType) && (field.dirty || field.touched);
     }
-    
+
     return field.invalid && (field.dirty || field.touched);
   }
 
   getFieldErrorMessage(
-    form: FormGroup, 
-    fieldName: string, 
+    form: FormGroup,
+    fieldName: string,
     customMessages?: FieldValidationMessages
   ): string {
     const field = form.get(fieldName);
-    if (!field || !field.errors) return '';
+    if (!field || !field.errors) {return '';}
 
     const fieldCustomMessages = customMessages?.[fieldName] || {};
     const errors = field.errors;
 
     for (const errorType in errors) {
-      if (errors.hasOwnProperty(errorType)) {
-        let message = fieldCustomMessages[errorType] || 
-                     this.defaultMessages[errorType] || 
+      if (Object.prototype.hasOwnProperty.call(errors, errorType)) {
+        let message = fieldCustomMessages[errorType] ||
+                     this.defaultMessages[errorType] ||
                      this.defaultMessages['custom'];
 
         // Replace placeholders with actual values
@@ -71,7 +71,7 @@ export class FormValidationService {
    * Get all validation errors for a form
    */
   getAllFormErrors(
-    form: FormGroup, 
+    form: FormGroup,
     customMessages?: FieldValidationMessages
   ): { [fieldName: string]: string } {
     const formErrors: { [fieldName: string]: string } = {};
@@ -94,7 +94,7 @@ export class FormValidationService {
       const control = form.get(fieldName);
       if (control) {
         control.markAsTouched();
-        
+
         // If it's a nested FormGroup, recursively mark as touched
         if (control instanceof FormGroup) {
           this.markAllFieldsAsTouched(control);
@@ -107,9 +107,9 @@ export class FormValidationService {
    * Get a summary of all validation errors as a single string
    */
   getValidationSummary(
-    form: FormGroup, 
+    form: FormGroup,
     customMessages?: FieldValidationMessages,
-    separator: string = ', '
+    separator = ', '
   ): string {
     const errors = this.getAllFormErrors(form, customMessages);
     return Object.values(errors).join(separator);
@@ -126,7 +126,7 @@ export class FormValidationService {
    * Get the first validation error found in the form
    */
   getFirstFormError(
-    form: FormGroup, 
+    form: FormGroup,
     customMessages?: FieldValidationMessages
   ): string {
     const errors = this.getAllFormErrors(form, customMessages);
@@ -138,7 +138,7 @@ export class FormValidationService {
    * Validate form and return formatted error messages
    */
   validateForm(
-    form: FormGroup, 
+    form: FormGroup,
     customMessages?: FieldValidationMessages
   ): {
     isValid: boolean;
@@ -146,7 +146,7 @@ export class FormValidationService {
     summary: string;
   } {
     this.markAllFieldsAsTouched(form);
-    
+
     const errors = this.getAllFormErrors(form, customMessages);
     const isValid = Object.keys(errors).length === 0;
     const summary = Object.values(errors).join(', ');
@@ -169,15 +169,15 @@ export class FormValidationService {
         }
         return null;
       },
-      
+
       phoneNumber: (control: AbstractControl): ValidationErrors | null => {
-        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
         if (control.value && !phoneRegex.test(control.value)) {
           return { phoneNumber: true };
         }
         return null;
       },
-      
+
       strongPassword: (control: AbstractControl): ValidationErrors | null => {
         const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (control.value && !strongPasswordRegex.test(control.value)) {
@@ -191,11 +191,12 @@ export class FormValidationService {
   /**
    * Private helper methods
    */
-  private replacePlaceholders(message: string, errorValue: any): string {
-    if (typeof errorValue === 'object') {
-      for (const key in errorValue) {
-        if (errorValue.hasOwnProperty(key)) {
-          message = message.replace(`{${key}}`, errorValue[key]);
+  private replacePlaceholders(message: string, errorValue: unknown): string {
+    if (typeof errorValue === 'object' && errorValue !== null) {
+      const errorObj = errorValue as Record<string, unknown>;
+      for (const key in errorObj) {
+        if (Object.prototype.hasOwnProperty.call(errorObj, key)) {
+          message = message.replace(`{${key}}`, String(errorObj[key]));
         }
       }
     }

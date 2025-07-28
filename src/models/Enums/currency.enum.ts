@@ -3,5 +3,4 @@ export enum CurrencyEnum{
     EUR,
     GBP,
     HUF,
-    Unknown
 }

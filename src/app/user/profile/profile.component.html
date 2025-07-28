@@ -1,6 +1,7 @@
-<div class="form-container">
+<loader *ngIf="loading()"></loader>
+<div *ngIf="!loading()" class="form-container">
   <h3 class="default-font">Update Profile</h3>
-  <form class="form-element" [formGroup]="updateUserForm" (ngSubmit)="onSubmit()">
+  <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
     <label class="default-font" for="currency">Currency</label>
 
     <label class="default-font" for="userName">User Name</label>
@@ -13,11 +14,8 @@
         required
         placeholder="User Name"
       />
-      <div class="error-font" *ngIf="updateUserForm.get('userName')?.hasError('required') && updateUserForm.get('userName')?.touched">
-        User name is required
-      </div>
-      <div class="error-font" *ngIf="updateUserForm.get('userName')?.hasError('minlength') && updateUserForm.get('userName')?.touched">
-        Minimum 2 characters required
+      <div class="error-font" *ngIf="hasFieldError('userName')">
+        {{ getFieldErrorMessage('userName') }}
       </div>
     </div>
 
@@ -31,14 +29,8 @@
         required
         placeholder="Password"
       />
-      <div class="error-font" *ngIf="updateUserForm.get('password')?.hasError('required') && updateUserForm.get('password')?.touched">
-        Password is required
-      </div>
-      <div class="error-font" *ngIf="updateUserForm.get('password')?.hasError('minlength') && updateUserForm.get('password')?.touched">
-        Minimum 8 characters required
-      </div>
-      <div class="error-font" *ngIf="updateUserForm.get('password')?.hasError('pattern') && updateUserForm.get('password')?.touched">
-        Include uppercase letter, number, and special character
+      <div class="error-font" *ngIf="hasFieldError('password')">
+        {{ getFieldErrorMessage('password') }}
       </div>
     </div>
 
@@ -51,7 +43,7 @@
       </mat-select>
     </div>
     <div class="button-container">
-      <button class="bounce-button custom-button" type="submit">Update</button>
+      <button class="bounce-button custom-button" type="submit" [disabled]="!isFormValid()">Update</button>
     </div>
   </form>
 </div>

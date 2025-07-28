@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateTransactionGroupModalComponent } from '../create-transaction-group-modal/create-transaction-group-modal.component';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,13 +6,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { TransactionApiService } from 'src/services/transactions.api.service';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable } from 'rxjs';
 import { GetTransactionGroupDto } from 'src/models/TransactionGroupDtos/get-transaction-group.dto';
 import { UpdateTransactionGroupModalComponent } from '../update-transaction-group-modal/update-transaction-group-modal.component';
-import { trigger, transition, style, animate } from '@angular/animations';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { AuthenticationService } from 'src/services/authentication.service';
-import { ComponentErrorService } from 'src/services/component-error.service';
 import { BaseComponent } from 'src/app/shared/base-component';
 
 @Component({
@@ -24,7 +22,7 @@ import { BaseComponent } from 'src/app/shared/base-component';
     MatTableModule,
     LoaderComponent],
   templateUrl: './transaction-group.component.html',
-  styleUrl: './transaction-group.component.scss',
+  styleUrl: './transaction-group.component.scss'
 })
 
 export class TransactionGroupComponent extends BaseComponent implements OnInit {
@@ -36,7 +34,7 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
     'name',
     'description',
     'icon',
-    'actions',
+    'actions'
   ];
 
   public transactionGroups$: Observable<GetTransactionGroupDto[]> | undefined;
@@ -45,16 +43,13 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
   touchStartX = 0;
 
   ngOnInit(): void {
-    // Using executeWithLoading for automatic loading and error handling
     this.executeWithLoading(
       this.transactionApiService.getAllTransactionGroups(),
-      'Transaction groups loaded successfully!',
       'Loading transaction groups'
     ).subscribe({
       next: (transactionGroups) => {
         this.allTransactionGroups.set(transactionGroups);
       }
-      // No need for error handling - executeWithLoading handles it automatically
     });
   }
 
@@ -67,27 +62,34 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
     const dialogRef = this.matDialog.open(
       CreateTransactionGroupModalComponent,
       {
-        autoFocus: true,
+        autoFocus: true
       }
     );
 
-    dialogRef.afterClosed()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe((createdTransactionGroup) => {
-      if (createdTransactionGroup) {
-        this.allTransactionGroups.update(groups => [...groups, createdTransactionGroup]);
+    this.executeWithLoading(
+      dialogRef.afterClosed(),
+      'Creating transaction group'
+    ).subscribe({
+      next: (createdTransactionGroup) => {
+        if (createdTransactionGroup) {
+          this.allTransactionGroups.update(groups => [...groups, createdTransactionGroup]);
+        }
       }
     });
   }
 
   deleteTransactionGroup(transactionGroup: GetTransactionGroupDto) {
-    this.transactionApiService.deleteTransactionGroup(transactionGroup.id)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
+    this.executeWithLoading(
+      this.transactionApiService.deleteTransactionGroup(transactionGroup.id),
+      'Transaction group deleted successfully!',
+      'Deleting transaction group'
+    ).subscribe({
+      next: () => {
         this.allTransactionGroups.update(groups => groups.filter(
           (group) => group.id !== transactionGroup.id
         ));
-      });
+      }
+    });
   }
 
   editTransactionGroup(transactionGroup: GetTransactionGroupDto) {
@@ -99,25 +101,28 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
       UpdateTransactionGroupModalComponent,
       {
         autoFocus: true,
-        data: transactionGroup,
+        data: transactionGroup
       }
     );
 
-    dialogRef.afterClosed()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe((updatedTransactionGroup) => {
-      if (updatedTransactionGroup) {
-        this.allTransactionGroups.update(groups => groups.map((transactionGroup) => {
-          if (transactionGroup.id === updatedTransactionGroup.id) {
-            return {
-              ...transactionGroup,
-              name: updatedTransactionGroup.name,
-              description: updatedTransactionGroup.description,
-              groupIcon: updatedTransactionGroup.groupIcon,
-            };
-          }
-          return transactionGroup;
-        }));
+    this.executeWithLoading(
+      dialogRef.afterClosed(),
+      'Updating transaction group'
+    ).subscribe({
+      next: (updatedTransactionGroup) => {
+        if (updatedTransactionGroup) {
+          this.allTransactionGroups.update(groups => groups.map((transactionGroup) => {
+            if (transactionGroup.id === updatedTransactionGroup.id) {
+              return {
+                ...transactionGroup,
+                name: updatedTransactionGroup.name,
+                description: updatedTransactionGroup.description,
+                groupIcon: updatedTransactionGroup.groupIcon
+              };
+            }
+            return transactionGroup;
+          }));
+        }
       }
     });
   }

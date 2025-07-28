@@ -1,12 +1,12 @@
 <div class="button-container">
-  <button class="custom-button bounce-button" (click)="createTransactionGroup()" >Create Transaction Group</button>
+  <button class="custom-button bounce-button" [disabled]="loading()" (click)="createTransactionGroup()">Create Transaction Group</button>
 </div>
 <loader *ngIf="loading()"></loader>
 <div *ngIf="!loading()" class="table-container">
   <div *ngIf="allTransactionGroups().length > 0; else noTransactionGroups">
     <table mat-table [dataSource]="allTransactionGroups()" class="mat-elevation-z8">
-      <!--- Note trat trese columns can be defined in any order.
-          tre actual rendered columns are set as a property on tre row definition" -->
+      <!-- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition -->
       <ng-container class="column" matColumnDef="name">
         <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Name</th>
         <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.name}} </td>
@@ -26,10 +26,10 @@
         <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Actions</th>
         <td class="default-font text-color-black" mat-cell *matCellDef="let row">
           <div class="action-button-container">
-            <button class="custom-small-button bounce-button" (click)="deleteTransactionGroup(row)">
+            <button class="custom-small-button bounce-button" [disabled]="loading()" (click)="deleteTransactionGroup(row)">
               <mat-icon>delete</mat-icon>
             </button>
-            <button class="custom-small-button bounce-button" (click)="editTransactionGroup(row)">
+            <button class="custom-small-button bounce-button" [disabled]="loading()" (click)="editTransactionGroup(row)">
               <mat-icon>edit</mat-icon>
             </button>
           </div>

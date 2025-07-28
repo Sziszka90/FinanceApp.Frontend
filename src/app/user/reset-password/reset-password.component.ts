@@ -1,50 +1,63 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { takeUntil } from 'rxjs';
 import { UserApiService } from 'src/services/user.api.service';
+import { BaseComponent } from '../../shared/base-component';
+import { LoaderComponent } from '../../shared/loader/loader.component';
 
 @Component({
   selector: 'reset-password',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss'
 })
-export class ResetPasswordComponent {
+export class ResetPasswordComponent extends BaseComponent implements OnInit {
   private router = inject(Router);
   private userApiService = inject(UserApiService);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
 
-  private token: string = "";
+  private token = '';
 
-  private $onDestroy = new Subject<void>();
-
-  public resetPasswordForm: FormGroup = this.fb.group({
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$'),
-          Validators.minLength(8),
-        ],
-      ],
-      confirmPassword: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$'),
-          Validators.minLength(8),
-        ],
-      ],
-    },
-    { validators: this.passwordsMatchValidator }
+  override formGroup: FormGroup = this.fb.group({
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$'),
+        Validators.minLength(8)
+      ]
+    ],
+    confirmPassword: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$'),
+        Validators.minLength(8)
+      ]
+    ]
+  },
+  { validators: this.passwordsMatchValidator }
   );
 
+  override customValidationMessages = {
+    password: {
+      required: 'Password is required',
+      minlength: 'Minimum 8 characters required',
+      pattern: 'Password must include at least one uppercase letter, one number, and one special character'
+    },
+    confirmPassword: {
+      required: 'Confirm password is required',
+      minlength: 'Minimum 8 characters required',
+      pattern: 'Password must include at least one uppercase letter, one number, and one special character'
+    }
+  };
+
   ngOnInit(): void {
-    this.route.queryParamMap.pipe(takeUntil(this.$onDestroy)).subscribe((params) => {
-      this.token = params.get('token') ?? "";
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+      this.token = params.get('token') ?? '';
     });
   }
 
@@ -55,18 +68,19 @@ export class ResetPasswordComponent {
     return password === confirmPassword ? null : { passwordsMismatch: true };
   }
 
-  onSubmit() {
-    if (this.resetPasswordForm.valid) {
-      const password = this.resetPasswordForm.get('password')?.value ?? "";
-      this.userApiService.updatePassword({password: password, token: this.token})
-      .pipe(takeUntil(this.$onDestroy)).subscribe(() => {
+  onSubmit(): void {
+    if (this.isFormValid()) {
+      const password = this.getFieldValue<string>('password') || '';
+
+      this.executeWithLoading(
+        this.userApiService.updatePassword({ password: password, token: this.token }),
+        'Password reset successfully',
+        'Failed to reset password'
+      ).subscribe(() => {
         this.router.navigate(['/login']);
       });
+    } else {
+      this.markAllFieldsAsTouched();
     }
-  }
-
-  ngOnDestroy(): void {
-    this.$onDestroy.next();
-    this.$onDestroy.complete();
   }
 }

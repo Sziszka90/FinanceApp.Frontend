@@ -11,10 +11,13 @@ import { ValidateTokenResponse } from 'src/models/UserDtos/validate-toke-respons
 })
 export class AuthenticationApiService {
 
-   // API base URL
+  // API base URL
   private apiUrl = environment?.apiUrl ?? '';
 
-  constructor(private http: HttpClient) { }
+  // eslint-disable-next-line no-unused-vars
+  constructor(private http: HttpClient) {
+    // Initialize HTTP client for API calls
+  }
 
   login(loginRequestDto: LoginRequestDto): Observable<LoginResponseDto> {
     return this.http.post<LoginResponseDto>(`${this.apiUrl}/api/auth/login`, loginRequestDto);

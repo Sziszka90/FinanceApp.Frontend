@@ -1,8 +1,8 @@
 <loader *ngIf="loading()"></loader>
 <div *ngIf="!loading()" class="form-container">
-  <form class="form-element" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
     <h3 class="default-font">Log In</h3>
-    <div class="error-message default-font" *ngIf="!loginValid">
+    <div class="error-message default-font" *ngIf="!loginValid()">
       The email and password were not recognized
     </div>
     <label class="default-font" for="email">User Email</label>
@@ -15,8 +15,8 @@
         placeholder="Email"
       />
       <div class="error-message default-font"
-           *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-        Please provide a valid email address
+           *ngIf="hasFieldError('email')">
+        {{ getFieldErrorMessage('email') }}
       </div>
     </div>
     <label class="default-font" for="password">Password</label>
@@ -30,12 +30,12 @@
         placeholder="Password"
       />
       <div class="error-message default-font"
-           *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-        Please provide a valid password
+           *ngIf="hasFieldError('password')">
+        {{ getFieldErrorMessage('password') }}
       </div>
     </div>
     <div class="button-container">
-      <button class="custom-button bounce-button default-font" type="submit" [disabled]="!loginForm.valid">Login</button>
+      <button class="custom-button bounce-button default-font" type="submit" [disabled]="!isFormValid()">Login</button>
       <button class="custom-button-inverse bounce-button default-font" type="button" routerLink="/registration">Registration</button>
       <button class="custom-button-inverse bounce-button" type="button" (click)="forgotPassword()">Forgot Password</button>
       <button class="small-action-button" type="button" (click)="resendConfirmationEmail()">Resend Email Confirmation</button>

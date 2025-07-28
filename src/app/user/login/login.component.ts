@@ -1,5 +1,4 @@
-import { Component, inject, OnDestroy, signal } from '@angular/core';
-import { Subscription, take } from 'rxjs';
+import { Component, inject, signal } from '@angular/core';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -8,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ForgotPasswordRequestModalComponent } from '../forgot-password-modal/forgot-password-modal.component';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { ResendConfirmationEmailModalComponent } from '../resend-email-confirmation-modal/resend-confirmation-email-modal.component';
+import { BaseComponent } from '../../shared/base-component';
 
 @Component({
   selector: 'login',
@@ -20,68 +20,65 @@ import { ResendConfirmationEmailModalComponent } from '../resend-email-confirmat
     ReactiveFormsModule,
     RouterLink,
     LoaderComponent
-  ],
+  ]
 })
-export class LoginComponent implements OnDestroy {
+export class LoginComponent extends BaseComponent {
   private authService = inject(AuthenticationService);
   private matDialog = inject(MatDialog);
   private router = inject(Router);
   private fb = inject(FormBuilder);
 
-  loginForm: FormGroup = this.fb.group({
+  override formGroup: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]]
   });
 
   loginValid = signal<boolean>(true);
-  loading = signal<boolean>(false);
 
-  loginSubscription: Subscription | undefined;
+  // Remove manual subscription management - BaseComponent handles this
+  // loginSubscription: Subscription | undefined;
 
   forgotPassword(): void {
-    const dialogRef = this.matDialog.open(ForgotPasswordRequestModalComponent, {
+    this.matDialog.open(ForgotPasswordRequestModalComponent, {
       width: '400px',
-      height: 'auto',
+      height: 'auto'
     });
   }
 
   resendConfirmationEmail(): void {
-    const dialogRef = this.matDialog.open(ResendConfirmationEmailModalComponent, {
+    this.matDialog.open(ResendConfirmationEmailModalComponent, {
       width: '400px',
-      height: 'auto',
+      height: 'auto'
     });
   }
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
+    if (this.formGroup.valid) {
       this.loginValid.set(true);
-      this.loading.set(true);
-      this.loginSubscription = this.authService
-        .login(this.loginForm.value)
-        .pipe(
-          take(1)
-        ).subscribe({
-          next: (data: { token: string }) => {
-            this.loading.set(false);
-            if (data.token == '') {
-              this.loginValid.set(false);
-            } else {
-              this.loginValid.set(true);
-              this.authService.saveToken(data.token);
-              this.authService.userLoggedIn.next(true);
-              this.router.navigate(['/']);
-            }
-          },
-          error: () => {
-            this.loading.set(false);
-          }
-        })
-    } else {
-      this.loginForm.markAllAsTouched();
-    }
-  }
 
-  ngOnDestroy(): void {
-    this.loginSubscription?.unsubscribe();
+      this.executeWithLoading(
+        this.authService.login(this.formGroup.value),
+        undefined, // no success message
+        'Login failed'
+      ).subscribe({
+        next: (data: { token: string }) => {
+          if (data.token === '') {
+            this.loginValid.set(false);
+            this.showError('Invalid login credentials');
+          } else {
+            this.loginValid.set(true);
+            this.authService.saveToken(data.token);
+            this.authService.userLoggedIn.next(true);
+            this.router.navigate(['/']);
+          }
+        },
+        error: () => {
+          this.loginValid.set(false);
+          // Error is already handled by executeWithLoading
+        }
+      });
+    } else {
+      this.formGroup.markAllAsTouched();
+    }
   }
 }

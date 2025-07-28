@@ -13,7 +13,7 @@ export class NotificationService {
   public notifications$ = this.notificationSubject.asObservable();
 
   constructor() {
-    if(this.authenticationService.isAuthenticated()) {
+    if (this.authenticationService.isAuthenticated()) {
       this.startConnection();
     } else {
       this.stopConnection();
@@ -32,7 +32,7 @@ export class NotificationService {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(`/notificationHub`, {
         accessTokenFactory: () => this.authenticationService.getToken() ?? '',
-        transport: HttpTransportType.WebSockets,
+        transport: HttpTransportType.WebSockets
       })
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)

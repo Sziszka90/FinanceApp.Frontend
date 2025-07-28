@@ -3,12 +3,13 @@
     <h3>Create Transaction</h3>
     <p class="modal-description">Create the item and click on save!</p>
   </div>
-  <form class="form-container" [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+  <loader *ngIf="loading()" class="loader"></loader>
+  <form *ngIf="!loading()" class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
     <label for="name">Name</label>
     <div class="form-group">
       <input id="name" type="text" formControlName="name" required />
-      <div class="error-message" *ngIf="transactionForm.get('name')?.invalid && transactionForm.get('name')?.touched">
-        Name is required
+      <div class="error-message" *ngIf="hasFieldError('name')">
+        {{ getFieldErrorMessage('name') }}
       </div>
     </div>
     <label for="description">Description</label>
@@ -18,9 +19,9 @@
     <label for="value">Value</label>
     <div class="form-group">
       <input id="value" type="number" formControlName="value" />
-    </div>
-    <div class="error-message" *ngIf="transactionForm.get('value')?.invalid && transactionForm.get('value')?.touched">
-      Value is required
+      <div class="error-message" *ngIf="hasFieldError('value')">
+        {{ getFieldErrorMessage('value') }}
+      </div>
     </div>
     <label for="currency">Currency</label>
     <div class="form-group">
@@ -29,14 +30,17 @@
           &#8226; {{ option }}
         </mat-option>
       </mat-select>
-    </div>
-    <div class="error-message" *ngIf="transactionForm.get('currency')?.invalid && transactionForm.get('currency')?.touched">
-      Currency is required
+      <div class="error-message" *ngIf="hasFieldError('currency')">
+        {{ getFieldErrorMessage('currency') }}
+      </div>
     </div>
     <label for="transactionDate">Transaction Date</label>
     <div class="input-with-icon">
       <input bsDatepicker formControlName="transactionDate" type="text" placeholder="Select a date" />
       <i class="fa fa-calendar"></i>
+      <div class="error-message" *ngIf="hasFieldError('transactionDate')">
+        {{ getFieldErrorMessage('transactionDate') }}
+      </div>
     </div>
 
     <label for="transactionType">Transaction Type</label>
@@ -46,9 +50,9 @@
           &#8226; {{ option.name }}
         </mat-option>
       </mat-select>
-    </div>
-    <div class="error-message" *ngIf="transactionForm.get('transactionType')?.invalid && transactionForm.get('transactionType')?.touched">
-      Transaction Type is required
+      <div class="error-message" *ngIf="hasFieldError('transactionType')">
+        {{ getFieldErrorMessage('transactionType') }}
+      </div>
     </div>
 
     <label for="group">Group</label>
@@ -61,7 +65,7 @@
     </div>
 
     <div class="button-container">
-      <button [disabled]="transactionForm.invalid" class="custom-button bounce-button" type="submit">Save</button>
+      <button [disabled]="formGroup!.invalid" class="custom-button bounce-button" type="submit">Save</button>
       <button class="custom-button bounce-button" type="button" (click)="onClose()">Close</button>
     </div>
   </form>

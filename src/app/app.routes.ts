@@ -1,4 +1,4 @@
-import { Routes, CanActivateFn } from '@angular/router';
+import { Routes, CanActivateFn, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { TransactionComponent } from './transactions/transaction/transaction.component';
 import { NotFoundComponent } from './shared/not-found/not-found.component';
 import { HomeComponent } from './shared/home/home.component';
@@ -11,7 +11,6 @@ import { ResetPasswordComponent } from './user/reset-password/reset-password.com
 import { ProfileComponent } from './user/profile/profile.component';
 import { inject } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
-import { Router, ActivatedRouteSnapshot } from '@angular/router';
 import { map } from 'rxjs';
 
 const AuthGuard: CanActivateFn = () => {
@@ -48,5 +47,5 @@ export const routes: Routes = [
   { path: 'transactions-groups', component: TransactionGroupComponent, canActivate: [AuthGuard] },
   { path: 'validation-failed', component: ValidationFailedComponent },
   { path: 'reset-password', component: ResetPasswordComponent, canActivate: [ResetPasswordGuard] },
-  { path: '**', component: NotFoundComponent },
+  { path: '**', component: NotFoundComponent }
 ];

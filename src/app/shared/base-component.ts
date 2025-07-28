@@ -1,10 +1,10 @@
-import { inject, signal, WritableSignal, OnDestroy } from '@angular/core';
+import { inject, signal, WritableSignal, OnDestroy, Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormValidationService, FieldValidationMessages } from 'src/services/form-validation.service';
 import { ComponentErrorService } from 'src/services/component-error.service';
-import { Observable, finalize, Subject, tap, catchError, throwError, takeUntil, EMPTY } from 'rxjs';
+import { Observable, finalize, Subject, tap, catchError, throwError, takeUntil } from 'rxjs';
 
-
+@Injectable()
 export abstract class BaseComponent implements OnDestroy {
   protected formValidator = inject(FormValidationService);
   protected errorHandler = inject(ComponentErrorService);
@@ -21,42 +21,42 @@ export abstract class BaseComponent implements OnDestroy {
   protected destroy$ = new Subject<void>();
 
   public hasFieldError(fieldName: string, errorType?: string): boolean {
-    if (!this.form) return false;
+    if (!this.form) {return false;}
     return this.formValidator.hasFieldError(this.form, fieldName, errorType);
   }
 
   public getFieldErrorMessage(fieldName: string): string {
-    if (!this.form) return '';
+    if (!this.form) {return '';}
     return this.formValidator.getFieldErrorMessage(
-      this.form, 
-      fieldName, 
+      this.form,
+      fieldName,
       this.customValidationMessages
     );
   }
 
   protected validateForm(): boolean {
-    if (!this.form) return false;
-    
+    if (!this.form) {return false;}
+
     const validationResult = this.formValidator.validateForm(
-      this.form, 
+      this.form,
       this.customValidationMessages
     );
-    
+
     if (!validationResult.isValid) {
       this.errorHandler.showError(`Please fix the following: ${validationResult.summary}`);
       return false;
     }
-    
+
     return true;
   }
 
   protected getFormErrors(): { [fieldName: string]: string } {
-    if (!this.form) return {};
+    if (!this.form) {return {};}
     return this.formValidator.getAllFormErrors(this.form, this.customValidationMessages);
   }
 
   protected markAllFieldsAsTouched(): void {
-    if (!this.form) return;
+    if (!this.form) {return;}
     this.formValidator.markAllFieldsAsTouched(this.form);
   }
 
@@ -65,7 +65,7 @@ export abstract class BaseComponent implements OnDestroy {
   }
 
   protected resetForm(): void {
-    if (!this.form) return;
+    if (!this.form) {return;}
     this.form.reset();
     this.form.markAsUntouched();
     this.form.markAsPristine();
@@ -79,11 +79,7 @@ export abstract class BaseComponent implements OnDestroy {
     this.errorHandler.showError(message);
   }
 
-  protected showWarning(message: string): void {
-    this.errorHandler.showWarning(message);
-  }
-
-  protected handleError(error: any, context: string): void {
+  protected handleError(error: unknown, context: string): void {
     this.errorHandler.handleError(error, context);
   }
 
@@ -97,35 +93,36 @@ export abstract class BaseComponent implements OnDestroy {
     errorContext?: string
   ): Observable<T> {
     this.setLoading(true);
-    
+
     return operation.pipe(
       takeUntil(this.destroy$),
-      tap((result) => {
+      tap(() => {
         if (successMessage) {
           this.showSuccess(successMessage);
         }
       }),
       catchError((error) => {
         this.handleError(error, errorContext || 'operation');
-        return throwError(() => error);
+        const handledError = { ...error, handled: true };
+        return throwError(() => handledError);
       }),
       finalize(() => this.setLoading(false))
     );
   }
 
-  protected getFormValue<T = any>(): T | null {
+  protected getFormValue<T = unknown>(): T | null {
     return this.form?.value as T || null;
   }
 
-  protected getFieldValue<T = any>(fieldName: string): T | null {
+  protected getFieldValue<T = unknown>(fieldName: string): T | null {
     return this.form?.get(fieldName)?.value || null;
   }
 
-  protected setFieldValue(fieldName: string, value: any): void {
+  protected setFieldValue(fieldName: string, value: unknown): void {
     this.form?.get(fieldName)?.setValue(value);
   }
 
-  protected patchFormValues(values: { [key: string]: any }): void {
+  protected patchFormValues(values: { [key: string]: unknown }): void {
     this.form?.patchValue(values);
   }
 

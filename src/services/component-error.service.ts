@@ -7,39 +7,37 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class ComponentErrorService {
   private snackBar = inject(MatSnackBar);
 
-  showError(message: string, duration: number = 5000): void {
+  showError(message: string, duration = 5000): void {
     this.snackBar.open(message, 'Close', {
       duration,
       panelClass: 'error-snackbar'
     });
   }
 
-  showSuccess(message: string, duration: number = 3000): void {
+  showSuccess(message: string, duration = 3000): void {
     this.snackBar.open(message, 'Close', {
       duration,
-      panelClass: 'success-snackbar'
+      panelClass: 'info-snackbar'
     });
   }
 
-  showWarning(message: string, duration: number = 4000): void {
-    this.snackBar.open(message, 'Close', {
-      duration,
-      panelClass: 'warning-snackbar'
-    });
-  }
-
-  getErrorMessage(error: any): string {
+  getErrorMessage(error: unknown): string {
     if (typeof error === 'string') {
       return error;
     }
-    
-    return error?.error?.message || 
-           error?.message || 
-           error?.error || 
-           'An unexpected error occurred';
+
+    if (error && typeof error === 'object') {
+      const errorObj = error as Record<string, unknown>;
+      return (errorObj['error'] as Record<string, unknown>)?.['message'] as string ||
+             errorObj['message'] as string ||
+             errorObj['error'] as string ||
+             'An unexpected error occurred';
+    }
+
+    return 'An unexpected error occurred';
   }
 
-  handleError(error: any, context?: string): void {
+  handleError(error: unknown, context?: string): void {
     const message = this.getErrorMessage(error);
     const displayMessage = context ? `${context}: ${message}` : message;
     this.showError(displayMessage);

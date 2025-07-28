@@ -1,5 +1,5 @@
-import { FormControl } from "@angular/forms";
-import { CurrencyEnum } from "../Enums/currency.enum";
+import { FormControl } from '@angular/forms';
+import { CurrencyEnum } from '../Enums/currency.enum';
 
 export interface UserFormModel {
   userName: FormControl<string | null>;

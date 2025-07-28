@@ -18,11 +18,12 @@ export class TransactionApiService {
   // API base URL
   private apiUrl = environment?.apiUrl ?? '';
 
+  // eslint-disable-next-line no-unused-vars
   constructor(private http: HttpClient) { }
 
   // Method to get data from the backend
   getAllTransactions(): Observable<GetTransactionDto[]> {
-     return this.http.get<GetTransactionDto[]>(`${this.apiUrl}/api/transactions/`);
+    return this.http.get<GetTransactionDto[]>(`${this.apiUrl}/api/transactions/`);
   }
 
   getAllTransactionsSummary(): Observable<Money> {
@@ -30,17 +31,15 @@ export class TransactionApiService {
   }
 
   createTransaction(createTransactionDto:CreateTransactionDto): Observable<GetTransactionDto> {
-    console.log(createTransactionDto);
     return this.http.post<GetTransactionDto>(`${this.apiUrl}/api/transactions/`, createTransactionDto);
   }
 
   updateTransaction(id: string, updateTransactionDto: UpdateTransactionDto): Observable<GetTransactionDto> {
-    console.log(updateTransactionDto);
     return this.http.put<GetTransactionDto>(`${this.apiUrl}/api/transactions/${id}`, updateTransactionDto);
   }
 
-  deleteTransaction(id: string): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/api/transactions/${id}`);
+  deleteTransaction(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/api/transactions/${id}`);
   }
 
   getAllTransactionGroups(): Observable<GetTransactionGroupDto[]> {
@@ -55,8 +54,14 @@ export class TransactionApiService {
     return this.http.post<GetTransactionGroupDto>(`${this.apiUrl}/api/transactiongroups/`, createTransactionGroupDto);
   }
 
-  updateTransactionGroup(id: string, updateTransactionGroupDto:UpdateTransactionGroupDto): Observable<GetTransactionGroupDto> {
-    return this.http.put<GetTransactionGroupDto>(`${this.apiUrl}/api/transactiongroups/${id}`, updateTransactionGroupDto);
+  updateTransactionGroup(
+    id: string,
+    updateTransactionGroupDto: UpdateTransactionGroupDto
+  ): Observable<GetTransactionGroupDto> {
+    return this.http.put<GetTransactionGroupDto>(
+      `${this.apiUrl}/api/transactiongroups/${id}`,
+      updateTransactionGroupDto
+    );
   }
 
   deleteTransactionGroup(id: string): Observable<void> {

@@ -1,22 +1,23 @@
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
-  Validators,
+  Validators
 } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import {
   MAT_DIALOG_DATA,
-  MatDialogRef,
+  MatDialogRef
 } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { TransactionApiService } from '../../../services/transactions.api.service';
 import { ICONS } from 'src/models/Constants/group-icon-options.const';
 import { GetTransactionGroupDto } from 'src/models/TransactionGroupDtos/get-transaction-group.dto';
-import { Subject, takeUntil } from 'rxjs';
-import { CurrencyEnum } from 'src/models/Enums/currency.enum';
+import { BaseComponent } from 'src/app/shared/base-component';
+import { FieldValidationMessages } from 'src/services/form-validation.service';
+import { LoaderComponent } from 'src/app/shared/loader/loader.component';
 
 @Component({
   selector: 'update-transaction-group-modal',
@@ -24,57 +25,60 @@ import { CurrencyEnum } from 'src/models/Enums/currency.enum';
     ReactiveFormsModule,
     MatSelectModule,
     CommonModule,
+    LoaderComponent
   ],
   templateUrl: './update-transaction-group-modal.component.html',
   styleUrl: './update-transaction-group-modal.component.scss',
-  standalone: true,
+  standalone: true
 })
-export class UpdateTransactionGroupModalComponent implements OnDestroy {
+export class UpdateTransactionGroupModalComponent extends BaseComponent {
   private dialogRef = inject(MatDialogRef<UpdateTransactionGroupModalComponent>);
   private fb = inject(FormBuilder);
   private transactionApiService = inject(TransactionApiService);
   public data = inject<GetTransactionGroupDto>(MAT_DIALOG_DATA);
 
-  transactionForm: FormGroup = this.fb.group({
-    name: new FormControl(this.data.name, Validators.required),
+  public override formGroup = this.fb.group({
+    name: new FormControl(this.data.name, [Validators.required, Validators.minLength(2)]),
     description: new FormControl(this.data.description),
-    groupIcon: new FormControl(this.data.groupIcon)
+    groupIcon: new FormControl(this.data.groupIcon, Validators.required)
   });
 
   public groupIconOptions: string[] = Object.values(ICONS);
-  currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
-    isNaN(Number(key))
-  );
-  private onDestroy$ = new Subject<void>();
+
+  public override customValidationMessages: FieldValidationMessages = {
+    name: {
+      required: 'Transaction group name is required',
+      minlength: 'Name must be at least 2 characters long'
+    },
+    groupIcon: {
+      required: 'Please select an icon for the group'
+    }
+  };
 
   onSubmit(): void {
-    if (this.transactionForm.valid) {
-      var updatedTransactionGroup = {
-        id: this.data.id,
-        name: this.transactionForm.get('name')?.value,
-        description: this.transactionForm.get('description')?.value,
-        groupIcon: this.transactionForm.get('groupIcon')?.value
-      }
-
-      this.transactionApiService
-        .updateTransactionGroup(this.data.id, updatedTransactionGroup)
-        .pipe(takeUntil(this.onDestroy$))
-        .subscribe((updatedTransactionGroup) => {
-          this.dialogRef.close(updatedTransactionGroup);
-      });
+    if (!this.validateForm()) {
+      return;
     }
-  }
 
-  compareCategoryObjects(object1: any, object2: any) {
-    return object1 && object2 && object1.id == object2.id;
+    const updatedTransactionGroup = {
+      id: this.data.id,
+      name: this.getFieldValue<string>('name')!,
+      description: this.getFieldValue<string>('description') || '',
+      groupIcon: this.getFieldValue<string>('groupIcon')!
+    };
+
+    this.executeWithLoading(
+      this.transactionApiService.updateTransactionGroup(this.data.id, updatedTransactionGroup),
+      'Transaction group updated successfully!',
+      'Updating transaction group'
+    ).subscribe({
+      next: (result) => {
+        this.dialogRef.close(result);
+      }
+    });
   }
 
   onClose(): void {
     this.dialogRef.close(false);
-  }
-
-  ngOnDestroy(): void {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
   }
 }

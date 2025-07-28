@@ -5,21 +5,21 @@ import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
 import { NotificationService } from 'src/services/notification.service';
 
 @Component({
-    selector: 'root',
-    imports: [
-        NavBarComponent,
-        RouterOutlet,
-        CommonModule
-    ],
-    templateUrl: './app.component.html',
-    styleUrl: './app.component.scss',
-    standalone: true,
+  selector: 'root',
+  imports: [
+    NavBarComponent,
+    RouterOutlet,
+    CommonModule
+  ],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss',
+  standalone: true
 })
 export class AppComponent {
   private notificationService = inject(NotificationService);
 
-  title: string = "Finance App"
-  isServer: boolean = false;
+  title = 'Finance App';
+  isServer = false;
 
   // Test method for global error handler (remove in production)
   testGlobalError(): void {

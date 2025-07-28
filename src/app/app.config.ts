@@ -1,15 +1,16 @@
 import { ApplicationConfig, ErrorHandler, importProvidersFrom, inject } from '@angular/core';
-import { provideRouter, Router } from '@angular/router';
+import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
   HttpClient,
+  HttpEvent,
   HttpHandlerFn,
   HttpInterceptorFn,
   HttpRequest,
   provideHttpClient,
-  withInterceptors,
+  withInterceptors
 } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -25,20 +26,20 @@ export const provideTranslation = () => ({
   loader: {
     provide: TranslateLoader,
     useFactory: HttpLoaderFactory,
-    deps: [HttpClient],
-  },
+    deps: [HttpClient]
+  }
 });
 
 export const provideAuthInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn
-): Observable<any> => {
+): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthenticationService);
 
   const clonedRequest = req.clone({
     setHeaders: {
-      Authorization: `Bearer ${authService.getToken()}`,
-    },
+      Authorization: `Bearer ${authService.getToken()}`
+    }
   });
 
   return next(clonedRequest);
@@ -61,5 +62,5 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom([TranslateModule.forRoot(provideTranslation())]),
     provideAnimationsAsync(),
     { provide: ErrorHandler, useClass: GlobalErrorHandlerService }
-  ],
+  ]
 };

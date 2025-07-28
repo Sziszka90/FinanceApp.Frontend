@@ -1,6 +1,6 @@
 <loader *ngIf="loading()"></loader>
 <div *ngIf="!loading()" class="form-container">
-  <form class="form-element" [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+  <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
     <h3 class="default-font">Registration</h3>
     <label class="default-font" for="userName">User Name</label>
     <div class="form-group">
@@ -12,11 +12,8 @@
         required
         placeholder="User Name"
       />
-      <div class="error-font" *ngIf="registrationForm.get('userName')?.hasError('required') && registrationForm.get('userName')?.touched">
-        User name is required
-      </div>
-      <div class="error-font" *ngIf="registrationForm.get('userName')?.hasError('minlength') && registrationForm.get('userName')?.touched">
-        Minimum 2 characters required
+      <div class="error-font" *ngIf="hasFieldError('userName')">
+        {{ getFieldErrorMessage('userName') }}
       </div>
     </div>
 
@@ -30,11 +27,8 @@
         required
         placeholder="Email"
       />
-      <div class="error-font" *ngIf="registrationForm.get('email')?.hasError('required') && registrationForm.get('email')?.touched">
-        Email is required
-      </div>
-      <div class="error-font" *ngIf="registrationForm.get('email')?.hasError('email') && registrationForm.get('email')?.touched">
-        Invalid email format
+      <div class="error-font" *ngIf="hasFieldError('email')">
+        {{ getFieldErrorMessage('email') }}
       </div>
     </div>
 
@@ -48,14 +42,8 @@
         required
         placeholder="Password"
       />
-      <div class="error-font" *ngIf="registrationForm.get('password')?.hasError('required') && registrationForm.get('password')?.touched">
-        Password is required
-      </div>
-      <div class="error-font" *ngIf="registrationForm.get('password')?.hasError('minlength') && registrationForm.get('password')?.touched">
-        Minimum 8 characters required
-      </div>
-      <div class="error-font" *ngIf="registrationForm.get('password')?.hasError('pattern') && registrationForm.get('password')?.touched">
-        Include uppercase letter, number, and special character
+      <div class="error-font" *ngIf="hasFieldError('password')">
+        {{ getFieldErrorMessage('password') }}
       </div>
     </div>
 
@@ -66,9 +54,12 @@
           {{ option }}
         </mat-option>
       </mat-select>
+      <div class="error-font" *ngIf="hasFieldError('currency')">
+        {{ getFieldErrorMessage('currency') }}
+      </div>
     </div>
 
-    <button class="custom-button bounce-button default-font" type="submit" [disabled]="registrationForm.invalid">
+    <button class="custom-button bounce-button default-font" type="submit" [disabled]="!isFormValid()">
       Register
     </button>
   </form>

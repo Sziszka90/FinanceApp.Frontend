@@ -1,8 +1,8 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, Signal, signal, ElementRef } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, Signal, signal, ElementRef } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable } from 'rxjs';
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { GetTransactionDto } from 'src/models/TransactionDtos/get-transaction.dto';
@@ -22,8 +22,8 @@ import { AuthenticationService } from 'src/services/authentication.service';
 import { CorrelationService } from 'src/services/correlation.service';
 import { v4 as uuidv4 } from 'uuid';
 import { NotificationService } from 'src/services/notification.service';
-import { error } from 'console';
 import { REFRESH_TRANSACTIONS } from 'src/models/Constants/notification.const';
+import { BaseComponent } from 'src/app/shared/base-component';
 
 @Component({
   selector: 'transaction',
@@ -40,10 +40,10 @@ import { REFRESH_TRANSACTIONS } from 'src/models/Constants/notification.const';
   ],
   templateUrl: './transaction.component.html',
   styleUrl: './transaction.component.scss',
-  standalone: true,
+  standalone: true
 })
 
-export class TransactionComponent implements OnInit, OnDestroy {
+export class TransactionComponent extends BaseComponent implements OnInit {
   private transactionApiService = inject(TransactionApiService);
   private matDialog = inject(MatDialog);
   private fb = inject(FormBuilder);
@@ -54,15 +54,14 @@ export class TransactionComponent implements OnInit, OnDestroy {
   public summary$: Observable<Money> | undefined;
   public transactions$: Observable<GetTransactionDto[]> | undefined;
   public allTransactions = signal<GetTransactionDto[]>([]);
-  public total = signal<Money>({amount: 0, currency: CurrencyEnum.EUR});
+  public total = signal<Money>({ amount: 0, currency: CurrencyEnum.EUR });
 
   public showSummary = signal<boolean>(false);
   public summary = signal<Money | null>(null);
-  public loading = signal<boolean>(false);
 
   dataSource = signal<MatTableDataSource<GetTransactionDto>>(new MatTableDataSource<GetTransactionDto>([]));
 
-  typeOptions: {name: string, value: TransactionTypeEnum}[] = [{name: "Expense", value: TransactionTypeEnum.Expense}, {name: "Income", value: TransactionTypeEnum.Income}];
+  typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
 
   filterForm: FormGroup = this.fb.group({
     name: [''],
@@ -78,10 +77,8 @@ export class TransactionComponent implements OnInit, OnDestroy {
     'transactionDate',
     'transactionType',
     'group',
-    'actions',
+    'actions'
   ];
-
-  private destroy$ = new Subject<void>();
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('tableContainer') tableContainer!: ElementRef;
@@ -100,37 +97,42 @@ export class TransactionComponent implements OnInit, OnDestroy {
       return ds;
     });
 
-    this.loading.set(true);
-
     this.loadTransactions();
 
-    this.filterForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.applyFilters());
+    this.executeWithLoading(
+      this.filterForm.valueChanges,
+      undefined,
+      'Applying filters'
+    ).subscribe({
+      next: () => this.applyFilters()
+    });
 
-    this.notificationService.notifications$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((message) => {
+    this.executeWithLoading(
+      this.notificationService.notifications$,
+      undefined,
+      'Processing notifications'
+    ).subscribe({
+      next: (message) => {
         if (message && message === REFRESH_TRANSACTIONS) {
           this.loadTransactions();
         }
-      });
+      }
+    });
   }
 
   loadTransactions() {
-    this.loading.set(true);
-    this.transactionApiService.getAllTransactions().pipe(takeUntil(this.destroy$)).subscribe({
+    this.executeWithLoading(
+      this.transactionApiService.getAllTransactions(),
+      undefined,
+      'Loading transactions'
+    ).subscribe({
       next: (value: GetTransactionDto[]) => {
-        this.loading.set(false);
         this.allTransactions.set(value);
         this.dataSource.update(ds => {
           ds.data = value;
           return ds;
         });
         this.setupCustomFilterPredicate();
-      },
-      error: (error) => {
-        this.loading.set(false);
       }
     });
   }
@@ -176,17 +178,23 @@ export class TransactionComponent implements OnInit, OnDestroy {
   }
 
   deleteTransaction(transactionDto: GetTransactionDto) {
-    this.transactionApiService.deleteTransaction(transactionDto.id).subscribe(() => {
-      this.allTransactions.update(transactions => transactions.filter((t) => t.id !== transactionDto.id));
-      this.dataSource.update(ds => {
-        ds.data = this.allTransactions();
-        return ds;
-      });
+    this.executeWithLoading(
+      this.transactionApiService.deleteTransaction(transactionDto.id),
+      'Transaction deleted successfully!',
+      'Deleting transaction'
+    ).subscribe({
+      next: () => {
+        this.allTransactions.update(transactions => transactions.filter((t) => t.id !== transactionDto.id));
+        this.dataSource.update(ds => {
+          ds.data = this.allTransactions();
+          return ds;
+        });
+      }
     });
   }
 
   editTransaction(transactionDto: GetTransactionDto) {
-    if (!this.authService.isAuthenticated()){
+    if (!this.authService.isAuthenticated()) {
       this.authService.logout();
       return;
     }
@@ -196,38 +204,42 @@ export class TransactionComponent implements OnInit, OnDestroy {
       {
         autoFocus: true,
         maxHeight: '90vh',
-        data: transactionDto,
+        data: transactionDto
       }
     );
 
-    dialogRef.afterClosed()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe((updatedTransaction: GetTransactionDto) => {
-    if (updatedTransaction) {
-        this.allTransactions?.update(transactions => transactions.map((transaction: GetTransactionDto) => {
-          if (transaction.id === updatedTransaction.id) {
-            return {
-              ...transaction,
-              name: updatedTransaction.name,
-              description: updatedTransaction.description,
-              value: updatedTransaction.value,
-              transactionDate: updatedTransaction.transactionDate,
-              transactionType: updatedTransaction.transactionType,
-              transactionGroup: updatedTransaction.transactionGroup,
-            };
-          }
-          return transaction;
-        }));
+    this.executeWithLoading(
+      dialogRef.afterClosed(),
+      undefined,
+      'Updating transaction'
+    ).subscribe({
+      next: (updatedTransaction: GetTransactionDto) => {
+        if (updatedTransaction) {
+          this.allTransactions?.update(transactions => transactions.map((transaction: GetTransactionDto) => {
+            if (transaction.id === updatedTransaction.id) {
+              return {
+                ...transaction,
+                name: updatedTransaction.name,
+                description: updatedTransaction.description,
+                value: updatedTransaction.value,
+                transactionDate: updatedTransaction.transactionDate,
+                transactionType: updatedTransaction.transactionType,
+                transactionGroup: updatedTransaction.transactionGroup
+              };
+            }
+            return transaction;
+          }));
+        }
+        this.dataSource.update(ds => {
+          ds.data = this.allTransactions();
+          return ds;
+        });
       }
-      this.dataSource.update(ds => {
-        ds.data = this.allTransactions();
-        return ds;
-      });
     });
   }
 
   createTransaction() {
-    if (!this.authService.isAuthenticated()){
+    if (!this.authService.isAuthenticated()) {
       this.authService.logout();
       return;
     }
@@ -236,12 +248,16 @@ export class TransactionComponent implements OnInit, OnDestroy {
       CreateTransactionModalComponent,
       {
         autoFocus: true,
-        maxHeight: '90vh',
+        maxHeight: '90vh'
       }
-    )
-    dialogRef.afterClosed()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((createdTransaction) => {
+    );
+
+    this.executeWithLoading(
+      dialogRef.afterClosed(),
+      undefined,
+      'Creating transaction'
+    ).subscribe({
+      next: (createdTransaction: GetTransactionDto) => {
         if (createdTransaction) {
           this.allTransactions.update(transactions => [...transactions, createdTransaction]);
           this.dataSource.update(ds => {
@@ -249,27 +265,34 @@ export class TransactionComponent implements OnInit, OnDestroy {
             return ds;
           });
         }
+      }
     });
   }
 
   resetFilters() {
     this.filterForm.reset();
     this.dataSource.update(ds => {
-      ds.filter = "";
+      ds.filter = '';
       ds.data = this.allTransactions();
       return ds;
     });
   }
 
   getSummary(): void {
-    this.transactionApiService.getAllTransactionsSummary().subscribe((data) => {
-      this.summary.set(data);
-      this.showSummary.set(true);
+    this.executeWithLoading(
+      this.transactionApiService.getAllTransactionsSummary(),
+      undefined,
+      'Loading summary'
+    ).subscribe({
+      next: (data) => {
+        this.summary.set(data);
+        this.showSummary.set(true);
 
-      // Hide the summary after 5 seconds
-      setTimeout(() => {
-        this.showSummary.set(false);
-      }, 5000);
+        // Hide the summary after 5 seconds
+        setTimeout(() => {
+          this.showSummary.set(false);
+        }, 5000);
+      }
     });
   }
 
@@ -298,26 +321,24 @@ export class TransactionComponent implements OnInit, OnDestroy {
 
   handleFile(file: File): void {
     if (file.type === 'text/csv') {
-      this.loading.set(true);
-      var requestId = uuidv4();
-      var correlationId = this.correlationService.setCorrelationId(requestId);
-      this.transactionApiService.uploadCsv(file, correlationId).subscribe({
+      const requestId = uuidv4();
+      const correlationId = this.correlationService.setCorrelationId(requestId);
+
+      this.executeWithLoading(
+        this.transactionApiService.uploadCsv(file, correlationId),
+        'CSV file uploaded successfully',
+        'Uploading CSV file'
+      ).subscribe({
         next: (transactions) => {
           this.allTransactions.set(transactions);
           this.dataSource.update(ds => {
             ds.data = transactions;
             return ds;
           });
-          this.loading.set(false);
-          console.log('CSV file uploaded successfully');
-        },
-        error: (err) => {
-          this.loading.set(false);
-          console.error('Error uploading CSV file:', err);
         }
       });
     } else {
-      console.error('Invalid file type. Please upload a CSV file.');
+      this.showError('Invalid file type. Please upload a CSV file.');
     }
   }
 
@@ -331,10 +352,5 @@ export class TransactionComponent implements OnInit, OnDestroy {
     } else if (target === bottomScroll) {
       topScroll.scrollLeft = target.scrollLeft;
     }
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

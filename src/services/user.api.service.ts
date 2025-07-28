@@ -16,6 +16,7 @@ export class UserApiService {
   // API base URL
   private apiUrl = environment?.apiUrl ?? '';
 
+  // eslint-disable-next-line no-unused-vars
   constructor(private http: HttpClient) { }
 
   register(createUserDto: CreateUserDto): Observable<GetUserDto> {
@@ -23,7 +24,7 @@ export class UserApiService {
   }
 
   getActiveUser(): Observable<GetUserDto> {
-      return this.http.get<GetUserDto>(`${this.apiUrl}/api/users`);
+    return this.http.get<GetUserDto>(`${this.apiUrl}/api/users`);
   }
 
   updateUser(updatedUser: UpdateUserDto): Observable<GetUserDto> {

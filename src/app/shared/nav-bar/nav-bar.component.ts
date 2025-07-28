@@ -6,20 +6,20 @@ import { CommonModule } from '@angular/common';
 import { AuthenticationService } from 'src/services/authentication.service';
 
 @Component({
-    selector: 'nav-bar',
-    imports: [
-      CommonModule,
-      MatIconModule,
-      TranslateModule,
-      RouterLink
-    ],
-    templateUrl: './nav-bar.component.html',
-    styleUrl: './nav-bar.component.scss',
-    standalone: true
+  selector: 'nav-bar',
+  imports: [
+    CommonModule,
+    MatIconModule,
+    TranslateModule,
+    RouterLink
+  ],
+  templateUrl: './nav-bar.component.html',
+  styleUrl: './nav-bar.component.scss',
+  standalone: true
 })
 export class NavBarComponent implements OnInit {
   private authService = inject(AuthenticationService);
-  private router = inject(Router)
+  private router = inject(Router);
   private elementRef = inject(ElementRef);
 
   showMenu = signal<boolean>(false);
@@ -33,7 +33,7 @@ export class NavBarComponent implements OnInit {
   }
 
   login() {
-    if(this.authService.isAuthenticated()){
+    if (this.authService.isAuthenticated()) {
       this.router.navigateByUrl('/logged-in');
     } else {
       this.router.navigateByUrl('/login');

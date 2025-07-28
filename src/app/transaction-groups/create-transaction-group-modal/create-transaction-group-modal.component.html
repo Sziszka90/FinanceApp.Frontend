@@ -4,7 +4,7 @@
     <p class="modal-description">Create the item and click on save!</p>
   </div>
   <loader *ngIf="loading()" class="loader"></loader>
-  <form *ngIf="!loading()" class="form-container" [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+  <form *ngIf="!loading()" class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
     <label for="name">Name</label>
     <div class="form-group">
       <input id="name" type="text" formControlName="name" required />
@@ -20,7 +20,7 @@
     <div class="form-group">
       <mat-select class="select" formControlName="groupIcon" required>
         <mat-select-trigger>
-          <i class="{{ transactionForm.get('groupIcon')?.value }}"></i>
+          <i class="{{ formGroup!.get('groupIcon')?.value }}"></i>
         </mat-select-trigger>
         <mat-option *ngFor="let option of groupIconOptions" [value]="option">
           <i class="{{ option }}"></i>
@@ -31,7 +31,7 @@
       </div>
     </div>
     <div class="button-container">
-      <button [disabled]="transactionForm.invalid" class="custom-button bounce-button" type="submit">Save</button>
+      <button [disabled]="formGroup!.invalid" class="custom-button bounce-button" type="submit">Save</button>
       <button class="custom-button bounce-button" type="button" (click)="onClose()">Close</button>
     </div>
   </form>

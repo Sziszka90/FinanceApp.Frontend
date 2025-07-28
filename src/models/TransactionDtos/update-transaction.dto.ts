@@ -1,5 +1,5 @@
-import { TransactionTypeEnum } from "../Enums/transaction-type.enum";
-import { Money } from "../Money/money.dto";
+import { TransactionTypeEnum } from '../Enums/transaction-type.enum';
+import { Money } from '../Money/money.dto';
 
 export interface UpdateTransactionDto {
     id: string,

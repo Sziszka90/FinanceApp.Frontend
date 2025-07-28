@@ -1,18 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
-  Validators,
+  Validators
 } from '@angular/forms';
-import { Subscription, take } from 'rxjs';
+import { take } from 'rxjs';
 import { Router } from '@angular/router';
 import { UserApiService } from '../../../services/user.api.service';
 import { MatSelectModule } from '@angular/material/select';
 import { LoaderComponent } from '../../shared/loader/loader.component';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
+import { BaseComponent } from '../../shared/base-component';
 
 @Component({
   selector: 'registration',
@@ -21,67 +21,72 @@ import { CurrencyEnum } from 'src/models/Enums/currency.enum';
     CommonModule,
     ReactiveFormsModule,
     MatSelectModule,
-    LoaderComponent,
-    MatSnackBarModule
+    LoaderComponent
   ],
   templateUrl: './registration.component.html',
-  styleUrls: ['./registration.component.scss'],
+  styleUrls: ['./registration.component.scss']
 })
-export class RegistrationComponent implements OnDestroy {
+export class RegistrationComponent extends BaseComponent {
   private fb = inject(FormBuilder);
-  private apiService = inject(UserApiService)
+  private apiService = inject(UserApiService);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
 
-  registrationForm: FormGroup = this.fb.group({
+  override formGroup: FormGroup = this.fb.group({
     userName: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     password: [
       '',
       [
         Validators.required,
-        Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$'),
         Validators.minLength(8),
-      ],
+        Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$')
+      ]
     ],
-    currency: ['', [Validators.required]],
+    currency: ['', [Validators.required]]
   });
 
-  loading = signal<boolean>(false);
-
-  registrationSubscription: Subscription | undefined;
+  override customValidationMessages = {
+    userName: {
+      required: 'User name is required',
+      minlength: 'Minimum 2 characters required'
+    },
+    email: {
+      required: 'Email is required',
+      email: 'Invalid email format'
+    },
+    password: {
+      required: 'Password is required',
+      minlength: 'Minimum 8 characters required',
+      pattern: 'Include uppercase letter, number, and special character'
+    },
+    currency: {
+      required: 'Currency is required'
+    }
+  };
 
   currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
     isNaN(Number(key))
   );
 
-  onSubmit() {
-    if (this.registrationForm.valid) {
-      this.loading.set(true);
-      this.registrationSubscription = this.apiService
-        .register({
-          userName: this.registrationForm.get('userName')?.value,
-          email: this.registrationForm.get('email')?.value,
-          password: this.registrationForm.get('password')?.value,
-          baseCurrency: this.registrationForm.get('currency')?.value,
-        })
-        .pipe(take(1))
-        .subscribe({
-          next: () => {
-            this.loading.set(false);
-            this.snackBar.open('Registration successful! Confirm email address', 'Close', { duration: 5000, panelClass: 'info-snackbar' });
-            this.router.navigate(['/login']);
-          },
-          error: () => {
-            this.loading.set(false);
-          }
-        });
-    } else {
-      this.registrationForm.markAllAsTouched();
-    }
-  }
+  onSubmit(): void {
+    if (this.isFormValid()) {
+      const formValue = this.getFormValue();
+      if (!formValue) {return;}
 
-  ngOnDestroy(): void {
-    this.registrationSubscription?.unsubscribe();
+      this.executeWithLoading(
+        this.apiService.register({
+          userName: this.getFieldValue('userName') || '',
+          email: this.getFieldValue('email') || '',
+          password: this.getFieldValue('password') || '',
+          baseCurrency: this.getFieldValue('currency') || CurrencyEnum.EUR
+        }).pipe(take(1)),
+        'Registration successful! Confirm email address',
+        'Registration failed'
+      ).subscribe(() => {
+        this.router.navigate(['/login']);
+      });
+    } else {
+      this.markAllFieldsAsTouched();
+    }
   }
 }

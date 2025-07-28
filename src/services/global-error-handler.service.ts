@@ -5,11 +5,20 @@ import { ComponentErrorService } from './component-error.service';
 export class GlobalErrorHandlerService implements ErrorHandler {
   private errorService = inject(ComponentErrorService);
 
-  handleError(error: any): void {
+  handleError(error: unknown): void {
     console.error('Global error caught:', error);
 
-    if (error instanceof Error || error?.error instanceof ErrorEvent) {
-      console.error('Client-side error:', error.message || error.error?.message);
+    // Check if this error was already handled by components or interceptors
+    const errorObj = error as Record<string, unknown>;
+    if (errorObj?.['handled'] || (errorObj?.['error'] as Record<string, unknown>)?.['handled']) {
+      console.warn('Error already handled by component/interceptor, skipping global handler');
+      return;
+    }
+
+    if (error instanceof Error || (errorObj?.['error'] instanceof ErrorEvent)) {
+      const message = error instanceof Error ? error.message :
+        (errorObj?.['error'] as ErrorEvent)?.message || 'Unknown error';
+      console.error('Client-side error:', message);
       this.errorService.handleError(error, 'Application Error');
     } else {
       console.error('Unhandled error:', error);

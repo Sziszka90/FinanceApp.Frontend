@@ -1,27 +1,29 @@
-import { Component, inject, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
-  Validators,
+  Validators
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import {
-  MatDialogRef,
+  MatDialogRef
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule, formatDate } from '@angular/common';
-import { Subject, take, takeUntil } from 'rxjs';
 import { GetTransactionGroupDto } from 'src/models/TransactionGroupDtos/get-transaction-group.dto';
 import { TransactionTypeEnum } from 'src/models/Enums/transaction-type.enum';
 import { MatIconModule } from '@angular/material/icon';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
+import { BaseComponent } from 'src/app/shared/base-component';
+import { FieldValidationMessages } from 'src/services/form-validation.service';
+import { LoaderComponent } from 'src/app/shared/loader/loader.component';
 
 @Component({
   selector: 'create-transaction-modal',
@@ -34,75 +36,100 @@ import { CurrencyEnum } from 'src/models/Enums/currency.enum';
     ReactiveFormsModule,
     MatSelectModule,
     CommonModule,
-    BsDatepickerModule
+    BsDatepickerModule,
+    LoaderComponent
   ],
   templateUrl: './create-transaction-modal.component.html',
   styleUrl: './create-transaction-modal.component.scss',
-  standalone: true,
+  standalone: true
 })
-export class CreateTransactionModalComponent implements OnDestroy {
+export class CreateTransactionModalComponent extends BaseComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<CreateTransactionModalComponent>);
   private fb = inject(FormBuilder);
   private transactionApiService = inject(TransactionApiService);
 
-  private onDestroy$ = new Subject<void>();
-
-  transactionForm: FormGroup = this.fb.group({
-    name: new FormControl('', Validators.required),
+  public override formGroup: FormGroup = this.fb.group({
+    name: new FormControl('', [Validators.required, Validators.minLength(2)]),
     description: new FormControl(''),
-    value: new FormControl(0, [Validators.required, Validators.min(0)]),
+    value: new FormControl(0, [Validators.required, Validators.min(0.01)]),
     currency: new FormControl('', Validators.required),
-    transactionDate: new FormControl(new Date()),
+    transactionDate: new FormControl(new Date(), Validators.required),
     transactionType: new FormControl('', Validators.required),
-    group: new FormControl(''),
+    group: new FormControl('')
   });
 
+  public override customValidationMessages: FieldValidationMessages = {
+    name: {
+      required: 'Transaction name is required',
+      minlength: 'Name must be at least 2 characters long'
+    },
+    value: {
+      required: 'Transaction amount is required',
+      min: 'Amount must be greater than 0'
+    },
+    currency: {
+      required: 'Please select a currency'
+    },
+    transactionDate: {
+      required: 'Transaction date is required'
+    },
+    transactionType: {
+      required: 'Please select a transaction type'
+    }
+  };
+
   groupOptions = signal<GetTransactionGroupDto[]>([]);
-  typeOptions: {name: string, value: TransactionTypeEnum}[] = [{name: "Expense", value: TransactionTypeEnum.Expense}, {name: "Income", value: TransactionTypeEnum.Income}];
+  typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
   currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
     isNaN(Number(key))
   );
 
   ngOnInit() {
-    this.transactionApiService
-      .getAllTransactionGroups()
-      .pipe(take(1))
-      .pipe(takeUntil(this.onDestroy$))
-      .subscribe((data) => {
+    this.executeWithLoading(
+      this.transactionApiService.getAllTransactionGroups(),
+      undefined,
+      'Loading transaction groups'
+    ).subscribe({
+      next: (data) => {
         this.groupOptions.set(data);
-        this.groupOptions.update(groups => [...groups, { id: '', name: 'No group' }]);
+        this.groupOptions.update(groups => [...groups, { id: '', name: 'No group' } as GetTransactionGroupDto]);
+      }
     });
   }
 
   onSubmit(): void {
-    if (this.transactionForm.valid) {
-      const date: Date = this.transactionForm.get('transactionDate')?.value;
-      const formattedDate = new Date(date ? formatDate(date, 'yyyy-MM-dd', 'en-US') : '');
-
-      this.transactionApiService
-        .createTransaction({
-          name: this.transactionForm.get('name')?.value,
-          description: this.transactionForm.get('description')?.value,
-          value: {
-            amount: this.transactionForm.get('value')?.value,
-            currency: this.transactionForm.get('currency')!.value,
-          },
-          transactionDate: formattedDate,
-          transactionType: this.transactionForm.get('transactionType')?.value,
-          transactionGroupId: this.transactionForm.get('group')?.value.id,
-        })
-        .pipe(take(1))
-        .pipe(takeUntil(this.onDestroy$))
-        .subscribe((createdTransaction) => this.dialogRef.close(createdTransaction));
+    if (!this.validateForm()) {
+      return;
     }
+
+    const date: Date = this.getFieldValue<Date>('transactionDate')!;
+    const formattedDate = new Date(date ? formatDate(date, 'yyyy-MM-dd', 'en-US') : '');
+    const groupValue = this.getFieldValue<GetTransactionGroupDto>('group') || null;
+
+    const createTransactionDto = {
+      name: this.getFieldValue<string>('name')!,
+      description: this.getFieldValue<string>('description') || '',
+      value: {
+        amount: this.getFieldValue<number>('value')!,
+        currency: this.getFieldValue<CurrencyEnum>('currency')!
+      },
+      transactionDate: formattedDate,
+      transactionType: this.getFieldValue<TransactionTypeEnum>('transactionType')!,
+      transactionGroupId: groupValue?.id || undefined
+    };
+
+    this.executeWithLoading(
+      this.transactionApiService.createTransaction(createTransactionDto),
+      'Transaction created successfully!',
+      'Creating transaction'
+    ).subscribe({
+      next: (result) => {
+        this.dialogRef.close(result);
+      }
+    });
   }
 
   onClose(): void {
     this.dialogRef.close(false);
-  }
-
-  ngOnDestroy(): void {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
   }
 }
