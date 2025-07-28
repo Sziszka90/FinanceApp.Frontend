@@ -59,6 +59,10 @@
       </div>
     </div>
 
+    <div class="error-message default-font" *ngIf="!registrationValid()">
+      Registration failed
+    </div>
+
     <button class="custom-button bounce-button default-font" type="submit" [disabled]="!isFormValid()">
       Register
     </button>

@@ -103,7 +103,8 @@ export abstract class BaseComponent implements OnDestroy {
       }),
       catchError((error) => {
         this.handleError(error, errorContext || 'operation');
-        const handledError = { ...error, handled: true };
+        // Mark error as handled by component to prevent interceptor fallback
+        const handledError = { ...error, handled: true, handledByComponent: true };
         return throwError(() => handledError);
       }),
       finalize(() => this.setLoading(false))

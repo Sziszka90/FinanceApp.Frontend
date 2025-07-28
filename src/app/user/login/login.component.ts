@@ -8,6 +8,7 @@ import { ForgotPasswordRequestModalComponent } from '../forgot-password-modal/fo
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { ResendConfirmationEmailModalComponent } from '../resend-email-confirmation-modal/resend-confirmation-email-modal.component';
 import { BaseComponent } from '../../shared/base-component';
+import { ErrorTrackingService } from 'src/services/error-tracking.service';
 
 @Component({
   selector: 'login',
@@ -27,6 +28,7 @@ export class LoginComponent extends BaseComponent {
   private matDialog = inject(MatDialog);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private errorTracking = inject(ErrorTrackingService);
 
   override formGroup: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -72,8 +74,10 @@ export class LoginComponent extends BaseComponent {
             this.router.navigate(['/']);
           }
         },
-        error: () => {
+        error: (error) => {
           this.loginValid.set(false);
+          // Mark error as handled by component to prevent fallback snackbar
+          this.errorTracking.markAsHandled(error);
           // Error is already handled by executeWithLoading
         }
       });

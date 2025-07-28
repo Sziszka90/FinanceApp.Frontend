@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { UserApiService } from 'src/services/user.api.service';
 import { BaseComponent } from '../../shared/base-component';
 import { LoaderComponent } from '../../shared/loader/loader.component';
+import { ErrorTrackingService } from 'src/services/error-tracking.service';
 
 @Component({
   selector: 'reset-password',
@@ -18,8 +19,11 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
   private userApiService = inject(UserApiService);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
+  private errorTracking = inject(ErrorTrackingService);
 
   private token = '';
+
+  resetPasswordValid = signal<boolean>(true);
 
   override formGroup: FormGroup = this.fb.group({
     password: [
@@ -70,14 +74,24 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isFormValid()) {
+      this.resetPasswordValid.set(true);
       const password = this.getFieldValue<string>('password') || '';
 
       this.executeWithLoading(
         this.userApiService.updatePassword({ password: password, token: this.token }),
         'Password reset successfully',
         'Failed to reset password'
-      ).subscribe(() => {
-        this.router.navigate(['/login']);
+      ).subscribe({
+        next: () => {
+          this.resetPasswordValid.set(true);
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          this.resetPasswordValid.set(false);
+          // Mark error as handled by component to prevent fallback snackbar
+          this.errorTracking.markAsHandled(error);
+          // Error is already handled by executeWithLoading
+        }
       });
     } else {
       this.markAllFieldsAsTouched();

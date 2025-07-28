@@ -11,6 +11,9 @@
         {{ getFieldErrorMessage('email') }}
       </div>
     </div>
+    <div class="error-message default-font" *ngIf="!resendEmailValid()">
+      Failed to send confirmation email
+    </div>
     <div class="button-container">
       <button type="submit" [disabled]="!isFormValid()" class="custom-button bounce-button">Confirm</button>
       <button type="button" class="custom-button-inverse bounce-button" (click)="onCancel()">Cancel</button>

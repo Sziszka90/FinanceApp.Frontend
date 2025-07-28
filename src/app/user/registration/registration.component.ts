@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -13,6 +13,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
 import { BaseComponent } from '../../shared/base-component';
+import { ErrorTrackingService } from 'src/services/error-tracking.service';
 
 @Component({
   selector: 'registration',
@@ -30,6 +31,7 @@ export class RegistrationComponent extends BaseComponent {
   private fb = inject(FormBuilder);
   private apiService = inject(UserApiService);
   private router = inject(Router);
+  private errorTracking = inject(ErrorTrackingService);
 
   override formGroup: FormGroup = this.fb.group({
     userName: ['', [Validators.required, Validators.minLength(2)]],
@@ -68,8 +70,11 @@ export class RegistrationComponent extends BaseComponent {
     isNaN(Number(key))
   );
 
+  registrationValid = signal<boolean>(true);
+
   onSubmit(): void {
     if (this.isFormValid()) {
+      this.registrationValid.set(true);
       const formValue = this.getFormValue();
       if (!formValue) {return;}
 
@@ -82,8 +87,17 @@ export class RegistrationComponent extends BaseComponent {
         }).pipe(take(1)),
         'Registration successful! Confirm email address',
         'Registration failed'
-      ).subscribe(() => {
-        this.router.navigate(['/login']);
+      ).subscribe({
+        next: () => {
+          this.registrationValid.set(true);
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          this.registrationValid.set(false);
+          // Mark error as handled by component to prevent fallback snackbar
+          this.errorTracking.markAsHandled(error);
+          // Error is already handled by executeWithLoading
+        }
       });
     } else {
       this.markAllFieldsAsTouched();
