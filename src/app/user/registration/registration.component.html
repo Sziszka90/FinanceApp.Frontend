@@ -2,6 +2,9 @@
 <div *ngIf="!loading()" class="form-container">
   <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
     <h3 class="default-font">Registration</h3>
+    <div class="error-message default-font" *ngIf="hasError()">
+      {{ errorMessage() }}
+    </div>
     <label class="default-font" for="userName">User Name</label>
     <div class="form-group">
       <input
@@ -16,7 +19,6 @@
         {{ getFieldErrorMessage('userName') }}
       </div>
     </div>
-
     <label class="default-font" for="email">Email</label>
     <div class="form-group">
       <input
@@ -31,7 +33,6 @@
         {{ getFieldErrorMessage('email') }}
       </div>
     </div>
-
     <label class="default-font" for="password">Password</label>
     <div class="form-group">
       <input
@@ -46,7 +47,6 @@
         {{ getFieldErrorMessage('password') }}
       </div>
     </div>
-
     <label class="default-font" for="currency">Currency</label>
     <div class="select">
       <mat-select formControlName="currency" required>
@@ -58,11 +58,6 @@
         {{ getFieldErrorMessage('currency') }}
       </div>
     </div>
-
-    <div class="error-message default-font" *ngIf="!registrationValid()">
-      Registration failed
-    </div>
-
     <button class="custom-button bounce-button default-font" type="submit" [disabled]="!isFormValid()">
       Register
     </button>

@@ -18,6 +18,9 @@ export abstract class BaseComponent implements OnDestroy {
 
   public loading: WritableSignal<boolean> = signal(false);
 
+  public get hasError() { return this.errorHandler.hasError; }
+  public get errorMessage() { return this.errorHandler.errorMessage; }
+
   protected destroy$ = new Subject<void>();
 
   public hasFieldError(fieldName: string, errorType?: string): boolean {
@@ -87,12 +90,17 @@ export abstract class BaseComponent implements OnDestroy {
     this.loading.set(isLoading);
   }
 
+  protected clearError(): void {
+    this.errorHandler.clearError();
+  }
+
   protected executeWithLoading<T>(
     operation: Observable<T>,
     successMessage?: string,
-    errorContext?: string
+    errorContext?: string,
   ): Observable<T> {
     this.setLoading(true);
+    this.clearError();
 
     return operation.pipe(
       takeUntil(this.destroy$),
@@ -103,8 +111,7 @@ export abstract class BaseComponent implements OnDestroy {
       }),
       catchError((error) => {
         this.handleError(error, errorContext || 'operation');
-        // Mark error as handled by component to prevent interceptor fallback
-        const handledError = { ...error, handled: true, handledByComponent: true };
+        const handledError = { ...error, handled: true };
         return throwError(() => handledError);
       }),
       finalize(() => this.setLoading(false))
@@ -140,6 +147,7 @@ export abstract class BaseComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearError();
     this.destroy$.next();
     this.destroy$.complete();
   }

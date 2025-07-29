@@ -45,7 +45,8 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
   ngOnInit(): void {
     this.executeWithLoading(
       this.transactionApiService.getAllTransactionGroups(),
-      'Loading transaction groups'
+      undefined,
+      'Loading transaction groups',
     ).subscribe({
       next: (transactionGroups) => {
         this.allTransactionGroups.set(transactionGroups);
@@ -68,7 +69,6 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
 
     this.executeWithLoading(
       dialogRef.afterClosed(),
-      'Creating transaction group'
     ).subscribe({
       next: (createdTransactionGroup) => {
         if (createdTransactionGroup) {
@@ -107,7 +107,6 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
 
     this.executeWithLoading(
       dialogRef.afterClosed(),
-      'Updating transaction group'
     ).subscribe({
       next: (updatedTransactionGroup) => {
         if (updatedTransactionGroup) {

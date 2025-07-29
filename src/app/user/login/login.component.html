@@ -2,8 +2,8 @@
 <div *ngIf="!loading()" class="form-container">
   <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
     <h3 class="default-font">Log In</h3>
-    <div class="error-message default-font" *ngIf="!loginValid()">
-      The email and password were not recognized
+    <div class="error-message default-font" *ngIf="hasError()">
+      {{ errorMessage() }}
     </div>
     <label class="default-font" for="email">User Email</label>
     <div class="form-group">

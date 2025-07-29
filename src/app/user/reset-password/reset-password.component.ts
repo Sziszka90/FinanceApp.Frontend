@@ -6,7 +6,6 @@ import { takeUntil } from 'rxjs';
 import { UserApiService } from 'src/services/user.api.service';
 import { BaseComponent } from '../../shared/base-component';
 import { LoaderComponent } from '../../shared/loader/loader.component';
-import { ErrorTrackingService } from 'src/services/error-tracking.service';
 
 @Component({
   selector: 'reset-password',
@@ -19,7 +18,6 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
   private userApiService = inject(UserApiService);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
-  private errorTracking = inject(ErrorTrackingService);
 
   private token = '';
 
@@ -74,7 +72,6 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isFormValid()) {
-      this.resetPasswordValid.set(true);
       const password = this.getFieldValue<string>('password') || '';
 
       this.executeWithLoading(
@@ -83,14 +80,7 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
         'Failed to reset password'
       ).subscribe({
         next: () => {
-          this.resetPasswordValid.set(true);
           this.router.navigate(['/login']);
-        },
-        error: (error) => {
-          this.resetPasswordValid.set(false);
-          // Mark error as handled by component to prevent fallback snackbar
-          this.errorTracking.markAsHandled(error);
-          // Error is already handled by executeWithLoading
         }
       });
     } else {

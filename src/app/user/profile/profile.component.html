@@ -1,9 +1,11 @@
 <loader *ngIf="loading()"></loader>
 <div *ngIf="!loading()" class="form-container">
   <h3 class="default-font">Update Profile</h3>
+  <div class="error-message default-font" *ngIf="hasError()">
+    {{ errorMessage() }}
+  </div>
   <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
     <label class="default-font" for="currency">Currency</label>
-
     <label class="default-font" for="userName">User Name</label>
     <div class="form-group">
       <input
@@ -18,7 +20,6 @@
         {{ getFieldErrorMessage('userName') }}
       </div>
     </div>
-
     <label class="default-font" for="password">Password</label>
     <div class="form-group">
       <input
@@ -33,7 +34,6 @@
         {{ getFieldErrorMessage('password') }}
       </div>
     </div>
-
     <label class="default-font" for="currency">Currency</label>
     <div class="form-group">
       <mat-select class="select" formControlName="currency" [compareWith]="compareCategoryObjects" required>
@@ -41,6 +41,9 @@
           {{ option }}
         </mat-option>
       </mat-select>
+      <div class="error-font" *ngIf="hasFieldError('currency')">
+        {{ getFieldErrorMessage('currency') }}
+      </div>
     </div>
     <div class="button-container">
       <button class="bounce-button custom-button" type="submit" [disabled]="!isFormValid()">Update</button>

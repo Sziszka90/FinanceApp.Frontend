@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal, WritableSignal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
@@ -6,6 +6,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class ComponentErrorService {
   private snackBar = inject(MatSnackBar);
+
+  public hasError: WritableSignal<boolean> = signal(false);
+  public errorMessage: WritableSignal<string> = signal('');
 
   showError(message: string, duration = 5000): void {
     this.snackBar.open(message, 'Close', {
@@ -39,7 +42,18 @@ export class ComponentErrorService {
 
   handleError(error: unknown, context?: string): void {
     const message = this.getErrorMessage(error);
+    this.setError(message);
     const displayMessage = context ? `${context}: ${message}` : message;
     this.showError(displayMessage);
+  }
+
+  clearError(): void {
+    this.hasError.set(false);
+    this.errorMessage.set('');
+  }
+
+  setError(message: string): void {
+    this.hasError.set(true);
+    this.errorMessage.set(message);
   }
 }

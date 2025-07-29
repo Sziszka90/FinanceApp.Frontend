@@ -1,4 +1,4 @@
-import { ApplicationConfig, ErrorHandler, importProvidersFrom, inject } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, inject } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -18,7 +18,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
-import { GlobalErrorHandlerService } from '../services/global-error-handler.service';
 import { errorInterceptor } from 'src/interceptors/error.interceptor';
 
 export const provideTranslation = () => ({
@@ -60,7 +59,6 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([provideAuthInterceptor, errorInterceptor])
     ),
     importProvidersFrom([TranslateModule.forRoot(provideTranslation())]),
-    provideAnimationsAsync(),
-    { provide: ErrorHandler, useClass: GlobalErrorHandlerService }
+    provideAnimationsAsync()
   ]
 };

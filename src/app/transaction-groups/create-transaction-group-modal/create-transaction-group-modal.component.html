@@ -3,6 +3,9 @@
     <h3>Create Transaction Group</h3>
     <p class="modal-description">Create the item and click on save!</p>
   </div>
+  <div class="error-message default-font" *ngIf="hasError()">
+    {{ errorMessage() }}
+  </div>
   <loader *ngIf="loading()" class="loader"></loader>
   <form *ngIf="!loading()" class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
     <label for="name">Name</label>

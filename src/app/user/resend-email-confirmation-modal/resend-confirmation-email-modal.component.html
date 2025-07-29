@@ -2,6 +2,9 @@
   <div class="modal-header">
     <h3>Resend Confirmation Email</h3>
   </div>
+  <div class="error-message default-font" *ngIf="hasError()">
+    {{ errorMessage() }}
+  </div>
   <loader *ngIf="loading()"></loader>
   <form *ngIf="!loading()" class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
     <label>Email</label>
@@ -10,9 +13,6 @@
       <div class="error-font" *ngIf="hasFieldError('email')">
         {{ getFieldErrorMessage('email') }}
       </div>
-    </div>
-    <div class="error-message default-font" *ngIf="!resendEmailValid()">
-      Failed to send confirmation email
     </div>
     <div class="button-container">
       <button type="submit" [disabled]="!isFormValid()" class="custom-button bounce-button">Confirm</button>

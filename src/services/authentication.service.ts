@@ -50,6 +50,7 @@ export class AuthenticationService {
 
   isAuthenticated(): boolean {
     if (!this.validateToken()) {
+      this.userLoggedIn.next(false);
       return false;
     }
     return true;
