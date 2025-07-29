@@ -61,13 +61,13 @@ export class NotificationService {
     }
 
     setTimeout(() => {
-      this.attemptConnection(token);
+      this.attemptConnection();
     }, this.connectionRetryCount === 0 ? 500 : 100);
   }
 
-  private attemptConnection(token: string): void {
+  private attemptConnection(): void {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl(`https://localhost:65030/notificationHub`, {
+      .withUrl(`/notificationHub`, {
         accessTokenFactory: () => {
           const currentToken = this.authenticationService.getToken();
           if (!currentToken || !this.authenticationService.validateToken()) {
@@ -81,7 +81,7 @@ export class NotificationService {
         withCredentials: false
       })
       .withAutomaticReconnect({
-        nextRetryDelayInMilliseconds: (retryContext: any) => {
+        nextRetryDelayInMilliseconds: (retryContext: { previousRetryCount: number; elapsedMilliseconds: number }) => {
           if (retryContext.previousRetryCount >= 5) {
             console.error('SignalR: Max retries reached, stopping reconnection attempts');
             return null;
