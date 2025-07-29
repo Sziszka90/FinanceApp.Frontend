@@ -30,7 +30,7 @@ export class NotificationService {
 
   startConnection(): void {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl(`/notificationHub`, {
+      .withUrl(`https://www.financeapp.fun/notificationHub`, {
         accessTokenFactory: () => this.authenticationService.getToken() ?? '',
         transport: HttpTransportType.WebSockets
       })
