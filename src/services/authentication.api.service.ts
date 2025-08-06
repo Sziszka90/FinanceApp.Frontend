@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { LoginResponseDto } from '../models/LoginDtos/login-response.dto';
 import { LoginRequestDto } from '../models/LoginDtos/login-request.dto';
-import { ValidateTokenResponse } from 'src/models/UserDtos/validate-toke-response.dto';
 
 @Injectable({
   providedIn: 'root'
