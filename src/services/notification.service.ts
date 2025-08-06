@@ -67,26 +67,16 @@ export class NotificationService {
 
   private attemptConnection(token: string): void {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl(`/notificationHub`, {
+      .withUrl(`https://localhost:65030/notificationHub`, {
         accessTokenFactory: () => {
           return token;
         },
-        transport: HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling,
+        transport: HttpTransportType.WebSockets, // | HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling,
         skipNegotiation: false,
-        withCredentials: true
+        withCredentials: false
       })
-      .withAutomaticReconnect({
-        nextRetryDelayInMilliseconds: (retryContext: { previousRetryCount: number; elapsedMilliseconds: number }) => {
-          if (retryContext.previousRetryCount >= 5) {
-            console.error('SignalR: Max retries reached, stopping reconnection attempts');
-            return null;
-          }
-          const delay = Math.min(1000 * Math.pow(2, retryContext.previousRetryCount), 30000);
-          const jitter = Math.random() * 1000;
-          return delay + jitter;
-        }
-      })
-      .configureLogging(LogLevel.Warning)
+      .withAutomaticReconnect([0, 2000, 10000, 30000])
+      .configureLogging(LogLevel.Debug)
       .build();
 
     this.hubConnection.on(TRANSACTIONS_MATCHED_NOTIFICATION, (message) => {
@@ -96,23 +86,31 @@ export class NotificationService {
     this.hubConnection.onclose((error) => {
       if (error) {
         console.error('SignalR Connection closed with error:', error);
-      }
-    });
-
-    this.hubConnection.onreconnecting((error) => {
-      console.warn('SignalR Reconnecting:', error);
-    });
-
-    this.hubConnection.onreconnected(() => {
-      if (this.hubConnection) {
-        this.hubConnection.invoke(JOIN_GROUP_METHOD, this.authenticationService.getUserId())
-          .catch(err => console.error('SignalR: Failed to rejoin group after reconnection:', err));
+        if (error.message && (error.message.includes('401') || error.message.includes('Unauthorized'))) {
+          console.warn('SignalR: Connection closed due to authentication error');
+          if (this.connectionRetryCount < this.maxAuthRetries) {
+            this.connectionRetryCount++;
+            console.warn(`SignalR: Will retry connection (attempt ${this.connectionRetryCount}/${this.maxAuthRetries})`);
+            setTimeout(() => {
+              this.startConnection();
+            }, 3000);
+          } else {
+            console.error('SignalR: Max retries reached, logging out user');
+            this.authenticationService.logout();
+          }
+        }
       }
     });
 
     this.hubConnection.start()
       .then(() => {
         console.warn('SignalR: Connection established successfully');
+        console.warn(`SignalR: Connection state: ${this.hubConnection?.state}`);
+        console.warn(`SignalR: Connection details:`, {
+          baseUrl: this.hubConnection?.baseUrl,
+          connectionId: this.hubConnection?.connectionId
+        });
+
         this.connectionRetryCount = 0;
         if (this.hubConnection) {
           return this.hubConnection.invoke(JOIN_GROUP_METHOD, this.authenticationService.getUserId());
