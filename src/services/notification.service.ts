@@ -71,7 +71,7 @@ export class NotificationService {
         accessTokenFactory: () => {
           return token;
         },
-        transport: HttpTransportType.WebSockets, // | HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling,
+        transport: HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling,
         skipNegotiation: false,
         withCredentials: false
       })
