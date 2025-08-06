@@ -67,7 +67,7 @@ export class NotificationService {
 
   private attemptConnection(token: string): void {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl(`https://localhost:65030/notificationHub`, {
+      .withUrl(`/notificationHub`, {
         accessTokenFactory: () => {
           return token;
         },
