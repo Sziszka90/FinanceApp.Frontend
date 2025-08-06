@@ -20,26 +20,26 @@ export class UserApiService {
   constructor(private http: HttpClient) { }
 
   register(createUserDto: CreateUserDto): Observable<GetUserDto> {
-    return this.http.post<GetUserDto>(`${this.apiUrl}/api/users`, createUserDto);
+    return this.http.post<GetUserDto>(`${this.apiUrl}/api/v1/users`, createUserDto);
   }
 
   getActiveUser(): Observable<GetUserDto> {
-    return this.http.get<GetUserDto>(`${this.apiUrl}/api/users`);
+    return this.http.get<GetUserDto>(`${this.apiUrl}/api/v1/users`);
   }
 
   updateUser(updatedUser: UpdateUserDto): Observable<GetUserDto> {
-    return this.http.put<GetUserDto>(`${this.apiUrl}/api/users`, updatedUser);
+    return this.http.put<GetUserDto>(`${this.apiUrl}/api/v1/users`, updatedUser);
   }
 
   updatePassword(updatePasswordDto: UpdatePasswordDto): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/api/users/update-password`, updatePasswordDto);
+    return this.http.patch<void>(`${this.apiUrl}/api/v1/users/password`, updatePasswordDto);
   }
 
   forgotPassword(email: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/api/users/forgot-password`, { email });
+    return this.http.post<void>(`${this.apiUrl}/api/v1/users/password-reset`, { email });
   }
 
   resendConfirmationEmail(email: string): Observable<ResendEmailConfirmationResponse> {
-    return this.http.post<ResendEmailConfirmationResponse>(`${this.apiUrl}/api/users/resend-confirmation-email`, { email });
+    return this.http.post<ResendEmailConfirmationResponse>(`${this.apiUrl}/api/v1/users/email-confirmation`, { email });
   }
 }

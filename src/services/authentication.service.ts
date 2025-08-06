@@ -8,6 +8,7 @@ import { TOKEN_KEY } from 'src/models/Constants/token.const';
 import { Router } from '@angular/router';
 import { AuthenticationApiService } from './authentication.api.service';
 import { CorrelationService } from './correlation.service';
+import { TokenApiService } from './token.api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ export class AuthenticationService {
   private platformId = inject(PLATFORM_ID);
   private router = inject(Router);
   private authApiService = inject(AuthenticationApiService);
+  private tokenApiService = inject(TokenApiService);
   private correlationService = inject(CorrelationService);
 
   private readonly tokenKey: string = TOKEN_KEY;
@@ -78,7 +80,7 @@ export class AuthenticationService {
   }
 
   validateTokenWithApi(token: string): Observable<boolean> {
-    return this.authApiService.validateToken(token).pipe(
+    return this.tokenApiService.verifyToken(token).pipe(
       map((response) => response.isValid),
       catchError(() => of(false))
     );

@@ -20,10 +20,6 @@ export class AuthenticationApiService {
   }
 
   login(loginRequestDto: LoginRequestDto): Observable<LoginResponseDto> {
-    return this.http.post<LoginResponseDto>(`${this.apiUrl}/api/auth/login`, loginRequestDto);
-  }
-
-  validateToken(token: string): Observable<ValidateTokenResponse> {
-    return this.http.post<ValidateTokenResponse>(`${this.apiUrl}/api/auth/validate-token?token=${token}`, {});
+    return this.http.post<LoginResponseDto>(`${this.apiUrl}/api/v1/auth/login`, loginRequestDto);
   }
 }

@@ -61,24 +61,19 @@ export class NotificationService {
     }
 
     setTimeout(() => {
-      this.attemptConnection();
+      this.attemptConnection(token);
     }, this.connectionRetryCount === 0 ? 500 : 100);
   }
 
-  private attemptConnection(): void {
+  private attemptConnection(token: string): void {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl(`/notificationHub`, {
+      .withUrl(`https://localhost:65030/notificationHub`, {
         accessTokenFactory: () => {
-          const currentToken = this.authenticationService.getToken();
-          if (!currentToken || !this.authenticationService.validateToken()) {
-            console.warn('SignalR: Token invalid during connection');
-            return '';
-          }
-          return currentToken;
+          return token;
         },
         transport: HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling,
         skipNegotiation: false,
-        withCredentials: false
+        withCredentials: true
       })
       .withAutomaticReconnect({
         nextRetryDelayInMilliseconds: (retryContext: { previousRetryCount: number; elapsedMilliseconds: number }) => {
