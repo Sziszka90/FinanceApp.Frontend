@@ -123,7 +123,8 @@ export abstract class BaseComponent implements OnDestroy {
   }
 
   protected getFieldValue<T = unknown>(fieldName: string): T | null {
-    return this.form?.get(fieldName)?.value || null;
+    const control = this.form?.get(fieldName);
+    return control ? control.value : null;
   }
 
   protected setFieldValue(fieldName: string, value: unknown): void {

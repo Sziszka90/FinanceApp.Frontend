@@ -111,8 +111,8 @@ export class ProfileComponent extends BaseComponent implements OnInit {
       this.executeWithLoading(
         this.userApiService.updateUser({
           id: this.user?.id,
-          userName: this.getFieldValue('userName') ?? this.user?.userName,
-          password: this.getFieldValue('password') ?? '',
+          userName: this.getFieldValue('userName') || this.user?.userName,
+          password: this.getFieldValue('password') || '',
           baseCurrency: this.getFieldValue('currency') ?? CurrencyEnum.EUR
         }).pipe(take(1)),
         'Profile updated successfully',
@@ -127,6 +127,9 @@ export class ProfileComponent extends BaseComponent implements OnInit {
   }
 
   compareCategoryObjects(object1: any, object2: any) {
-    return object1 && object2 && object1 == object2;
+    if (object1 == null || object2 == null) {
+      return false;
+    }
+    return object1.id === object2.id;
   }
 }

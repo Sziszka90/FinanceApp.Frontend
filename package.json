@@ -10,6 +10,7 @@
     "build:production": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test-coverage": "npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage",
     "serve:ssr:finance-app-frontend": "node dist/finance-app-frontend/server/server.mjs",
     "lint": "eslint src/**/*.ts src/**/*.html --no-warn-ignored",
     "lint:fix": "eslint src/**/*.ts src/**/*.html --fix --no-warn-ignored",

@@ -1,4 +1,4 @@
-@use 'base/variables' as variables;
+@use '../../../assets/scss/base/variables' as variables;
 
 h3 {
   text-align: center;
@@ -17,12 +17,14 @@ h3 {
 }
 
 @media (max-width: 600px) {
-  .custom-button {
-    width: 100%;
-  }
-
   .form-container {
     width: 80%;
     margin: auto;
+  }
+}
+
+@media (max-width: 935px) {
+    .custom-button {
+    width: 100%;
   }
 }

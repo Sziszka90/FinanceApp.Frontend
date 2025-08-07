@@ -2,7 +2,6 @@ import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { LoginRequestDto } from '../models/LoginDtos/login-request.dto';
 import { catchError, map, Observable, of, Subject } from 'rxjs';
 import { LoginResponseDto } from '../models/LoginDtos/login-response.dto';
-import { isPlatformBrowser } from '@angular/common';
 import { jwtDecode } from 'jwt-decode';
 import { TOKEN_KEY } from 'src/models/Constants/token.const';
 import { Router } from '@angular/router';
@@ -24,23 +23,16 @@ export class AuthenticationService {
   public userLoggedIn: Subject<boolean> = new Subject<boolean>();
 
   saveToken(token: string): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem(this.tokenKey, token);
-    }
+    localStorage.setItem(this.tokenKey, token);
   }
 
   getToken(): string | null {
-    if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem(this.tokenKey);
-    }
-    return null;
+    return localStorage.getItem(this.tokenKey);
   }
 
   logout(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem(this.tokenKey);
-      this.correlationService.clearAllCorrelationIds();
-    }
+    localStorage.removeItem(this.tokenKey);
+    this.correlationService.clearAllCorrelationIds();
     this.userLoggedIn.next(false);
     this.router.navigate(['/login']);
   }
