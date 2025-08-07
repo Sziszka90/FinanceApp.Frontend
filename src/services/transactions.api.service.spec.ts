@@ -316,9 +316,10 @@ describe('TransactionApiService', () => {
       const expectedUrl = `${mockEnvironment.apiUrl}/api/v1/transactiongroups/${groupId}`;
 
       it('should update existing transaction group', () => {
-        service.updateTransactionGroup(groupId, mockUpdateTransactionGroup).subscribe((group: GetTransactionGroupDto) => {
-          expect(group).toEqual(mockTransactionGroup);
-        });
+        service.updateTransactionGroup(groupId, mockUpdateTransactionGroup)
+          .subscribe((group: GetTransactionGroupDto) => {
+            expect(group).toEqual(mockTransactionGroup);
+          });
 
         const req = httpMock.expectOne(expectedUrl);
         expect(req.request.method).toBe('PUT');
@@ -359,11 +360,11 @@ describe('TransactionApiService', () => {
         const req = httpMock.expectOne(expectedUrl);
         expect(req.request.method).toBe('POST');
         expect(req.request.body).toBeInstanceOf(FormData);
-        
+
         const formData = req.request.body as FormData;
         expect(formData.get('file')).toBe(mockFile);
         expect(formData.get('correlationId')).toBe(correlationId);
-        
+
         req.flush(expectedTransactions);
       });
 

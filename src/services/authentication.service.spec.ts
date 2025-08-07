@@ -203,7 +203,7 @@ describe('AuthenticationService', () => {
   describe('API Token Validation', () => {
     it('should validate token via API and return true for valid token', (done) => {
       const testToken = 'test-token';
-      
+
       service.validateTokenWithApi(testToken).subscribe((isValid) => {
         expect(isValid).toBe(true);
         expect(tokenApiService.verifyToken).toHaveBeenCalledWith(testToken);
@@ -213,7 +213,7 @@ describe('AuthenticationService', () => {
 
     it('should return false when API validation fails', (done) => {
       tokenApiService.verifyToken.and.returnValue(of({ isValid: false }));
-      
+
       service.validateTokenWithApi('invalid-token').subscribe((isValid) => {
         expect(isValid).toBe(false);
         done();

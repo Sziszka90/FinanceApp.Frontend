@@ -71,7 +71,7 @@ describe('NotificationService', () => {
     });
 
     it('should not start connection when token is empty', () => {
-      authService.validateToken.and.returnValue(true); 
+      authService.validateToken.and.returnValue(true);
       authService.getToken.and.returnValue('   ');
       spyOn(console, 'warn');
 
@@ -104,7 +104,7 @@ describe('NotificationService', () => {
   describe('Notification Handling', () => {
     it('should emit notifications through notifications$ observable', (done) => {
       const testMessage = 'Test notification message';
-      
+
       service.notifications$.subscribe((message) => {
         if (message === testMessage) {
           expect(message).toBe(testMessage);
@@ -134,7 +134,7 @@ describe('NotificationService', () => {
       authService.validateToken.and.returnValue(true);
       authService.getToken.and.returnValue('valid-token');
       spyOn(service, 'stopConnection');
-      
+
       // Set up existing connection so stopConnection will be called
       (service as any).hubConnection = { stop: () => Promise.resolve() };
 

@@ -7,7 +7,7 @@ import { of, throwError } from 'rxjs';
  * Test utilities for Angular Finance App unit tests
  */
 export class TestUtils {
-  
+
   /**
    * Find element by CSS selector
    */
@@ -86,8 +86,8 @@ export class TestUtils {
    */
   static isElementVisible<T>(fixture: ComponentFixture<T>, selector: string): boolean {
     const element = this.findElement(fixture, selector);
-    if (!element) return false;
-    
+    if (!element) {return false;}
+
     const nativeElement = element.nativeElement;
     const style = window.getComputedStyle(nativeElement);
     return style.display !== 'none' && style.visibility !== 'hidden' && nativeElement.offsetParent !== null;
@@ -96,14 +96,14 @@ export class TestUtils {
   /**
    * Get form control value
    */
-  static getFormControlValue<T>(component: any, controlName: string): any {
+  static getFormControlValue(component: any, controlName: string): any {
     return component.formGroup?.get(controlName)?.value;
   }
 
   /**
    * Set form control value
    */
-  static setFormControlValue<T>(component: any, controlName: string, value: any): void {
+  static setFormControlValue(component: any, controlName: string, value: any): void {
     const control = component.formGroup?.get(controlName);
     if (control) {
       control.setValue(value);
@@ -114,7 +114,7 @@ export class TestUtils {
   /**
    * Check if form control has error
    */
-  static hasFormControlError<T>(component: any, controlName: string, errorType: string): boolean {
+  static hasFormControlError(component: any, controlName: string, errorType: string): boolean {
     const control = component.formGroup?.get(controlName);
     return control ? control.hasError(errorType) : false;
   }
@@ -122,7 +122,7 @@ export class TestUtils {
   /**
    * Trigger form control validation
    */
-  static triggerFormValidation<T>(component: any): void {
+  static triggerFormValidation(component: any): void {
     if (component.formGroup) {
       Object.keys(component.formGroup.controls).forEach(key => {
         component.formGroup.get(key)?.markAsTouched();
@@ -182,7 +182,7 @@ export class TestUtils {
   /**
    * Create mock API response
    */
-  static createMockApiResponse<T>(data: T, success: boolean = true) {
+  static createMockApiResponse<T>(data: T, success = true) {
     return {
       data,
       success,
@@ -194,7 +194,7 @@ export class TestUtils {
   /**
    * Simulate async error
    */
-  static simulateAsyncError(errorMessage: string = 'Test error') {
+  static simulateAsyncError(errorMessage = 'Test error') {
     return throwError(() => new Error(errorMessage));
   }
 
@@ -225,7 +225,7 @@ export class TestUtils {
   /**
    * Simulate form submission
    */
-  static submitForm<T>(fixture: ComponentFixture<T>, formSelector: string = 'form'): void {
+  static submitForm<T>(fixture: ComponentFixture<T>, formSelector = 'form'): void {
     const form = this.findElement(fixture, formSelector);
     if (form) {
       form.nativeElement.dispatchEvent(new Event('submit'));
@@ -238,10 +238,12 @@ export class TestUtils {
    */
   static mockLocalStorage() {
     const store: { [key: string]: string } = {};
-    
+
     return {
       getItem: jasmine.createSpy('getItem').and.callFake((key: string) => store[key] || null),
-      setItem: jasmine.createSpy('setItem').and.callFake((key: string, value: string) => store[key] = value),
+      setItem: jasmine.createSpy('setItem').and.callFake((key: string, value: string) => {
+        store[key] = value;
+      }),
       removeItem: jasmine.createSpy('removeItem').and.callFake((key: string) => delete store[key]),
       clear: jasmine.createSpy('clear').and.callFake(() => Object.keys(store).forEach(key => delete store[key])),
       length: Object.keys(store).length,
@@ -252,11 +254,11 @@ export class TestUtils {
   /**
    * Create JWT token for testing
    */
-  static createMockJwtToken(payload: any = {}, expiresInHours: number = 1): string {
+  static createMockJwtToken(payload: any = {}, expiresInHours = 1): string {
     const header = { alg: 'HS256', typ: 'JWT' };
     const exp = Math.floor(Date.now() / 1000) + (expiresInHours * 3600);
     const fullPayload = { exp, ...payload };
-    
+
     return `${btoa(JSON.stringify(header))}.${btoa(JSON.stringify(fullPayload))}.mock-signature`;
   }
 

@@ -253,7 +253,7 @@ describe('TokenApiService', () => {
   describe('Request Body Format', () => {
     it('should format request body with capital T in Token', () => {
       const testToken = 'test-token';
-      
+
       service.verifyToken(testToken).subscribe();
 
       const req = httpMock.expectOne((service as any).apiUrl + '/api/v1/token/validate');
@@ -264,7 +264,7 @@ describe('TokenApiService', () => {
 
     it('should preserve token exactly as provided', () => {
       const complexToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
-      
+
       service.verifyToken(complexToken).subscribe();
 
       const req = httpMock.expectOne((service as any).apiUrl + '/api/v1/token/validate');
@@ -279,7 +279,9 @@ describe('TokenApiService', () => {
       let completed = false;
 
       service.verifyToken(testToken).subscribe({
-        complete: () => completed = true
+        complete: () => {
+          completed = true;
+        }
       });
 
       const req = httpMock.expectOne((service as any).apiUrl + '/api/v1/token/validate');

@@ -137,7 +137,60 @@ export default [
     }
   },
   {
-    files: ['**/*.spec.ts'],
+    files: ['**/*.spec.ts', '**/testing/**/*.ts'],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        ecmaVersion: 2022,
+        sourceType: 'module'
+      },
+      globals: {
+        // Browser globals
+        console: 'readonly',
+        document: 'readonly',
+        window: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        fetch: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        btoa: 'readonly',
+        atob: 'readonly',
+        // DOM types
+        HTMLElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        Event: 'readonly',
+        MouseEvent: 'readonly',
+        DragEvent: 'readonly',
+        File: 'readonly',
+        FormData: 'readonly',
+        Node: 'readonly',
+        ErrorEvent: 'readonly',
+        ProgressEvent: 'readonly',
+        // Jasmine globals
+        describe: 'readonly',
+        fdescribe: 'readonly',
+        xdescribe: 'readonly',
+        it: 'readonly',
+        fit: 'readonly',
+        xit: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        expect: 'readonly',
+        fail: 'readonly',
+        pending: 'readonly',
+        spyOn: 'readonly',
+        spyOnProperty: 'readonly',
+        jasmine: 'readonly'
+      }
+    },
+    plugins: {
+      '@typescript-eslint': typescript
+    },
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',

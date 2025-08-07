@@ -1,18 +1,16 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 import { ValidateTokenResponse } from 'src/models/UserDtos/validate-toke-response.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TokenApiService {
+  private http = inject(HttpClient);
 
   private readonly apiUrl = environment?.apiUrl ?? '';
-
-  constructor(private http: HttpClient) { }
 
   verifyToken(token: string): Observable<ValidateTokenResponse> {
     if (!token || typeof token !== 'string' || token.trim() === '') {
