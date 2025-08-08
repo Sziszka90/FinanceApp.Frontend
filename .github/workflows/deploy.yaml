@@ -50,17 +50,30 @@ jobs:
         run: npm ci
 
       - name: Run tests with coverage
-        run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
-
-      - name: Check coverage threshold
         run: |
-          COVERAGE=$(grep -o '"lines":{"total":[0-9]*,"covered":[0-9]*,"skipped":[0-9]*,"pct":[0-9.]*' coverage/coverage-summary.json | grep -o '"pct":[0-9.]*' | cut -d':' -f2)
-          echo "Line coverage: $COVERAGE%"
-          if (( $(echo "$COVERAGE < 50" | bc -l) )); then
-            echo "Coverage $COVERAGE% is below 50% threshold"
-            exit 1
+          npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage 2>&1 | tee test-output.log
+          echo "::group::Coverage Summary"
+          grep -A 6 "Coverage summary" test-output.log || echo "Coverage summary not found"
+          echo "::endgroup::"
+
+          # Extract coverage percentage for Lines
+          LINES_COVERAGE=$(grep "Lines" test-output.log | grep -oP '\d+\.\d+%' | head -1)
+          echo "Lines Coverage: $LINES_COVERAGE"
+          echo "lines-coverage=$LINES_COVERAGE" >> $GITHUB_ENV
+
+          # Check if coverage is above 50%
+          LINES_PERCENTAGE=$(echo $LINES_COVERAGE | grep -oP '\d+\.\d+' | head -1)
+          if [ -n "$LINES_PERCENTAGE" ]; then
+            if (( $(echo "$LINES_PERCENTAGE >= 50" | bc -l) )); then
+              echo "✅ Coverage check passed: $LINES_COVERAGE (above 50%)"
+            else
+              echo "❌ Coverage check failed: $LINES_COVERAGE (below 50%)"
+              echo "::error::Lines coverage ($LINES_COVERAGE) is below the required 50% threshold"
+              exit 1
+            fi
           else
-            echo "Coverage $COVERAGE% meets the 50% threshold"
+            echo "⚠️ Could not extract coverage percentage"
+            echo "::warning::Could not verify coverage threshold"
           fi
 
       - name: Upload coverage reports to Codecov
@@ -68,6 +81,29 @@ jobs:
         with:
           file: ./coverage/lcov.info
           fail_ci_if_error: false
+
+      - name: Coverage Summary
+        run: |
+          echo "## 📊 Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          grep -A 6 "Coverage summary" test-output.log >> $GITHUB_STEP_SUMMARY || echo "Coverage summary not found" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Add coverage status
+          LINES_COVERAGE="${{ env.lines-coverage || 'Not found' }}"
+          echo "**Lines Coverage:** $LINES_COVERAGE" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$LINES_COVERAGE" != "Not found" ]; then
+            LINES_PERCENTAGE=$(echo $LINES_COVERAGE | grep -oP '\d+\.\d+' | head -1)
+            if [ -n "$LINES_PERCENTAGE" ]; then
+              if (( $(echo "$LINES_PERCENTAGE >= 50" | bc -l) )); then
+                echo "**Status:** ✅ Coverage check passed (above 50% threshold)" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "**Status:** ❌ Coverage check failed (below 50% threshold)" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          fi
 
   build-and-push:
     runs-on: ubuntu-latest
