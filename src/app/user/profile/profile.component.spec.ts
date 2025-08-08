@@ -2,12 +2,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
-
 import { ProfileComponent } from './profile.component';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { UserApiService } from '../../../services/user.api.service';
+import { ComponentErrorService } from '../../../services/component-error.service';
+import { FormValidationService } from '../../../services/form-validation.service';
 import { GetUserDto } from '../../../models/UserDtos/get-user.dto';
 import { CurrencyEnum } from '../../../models/Enums/currency.enum';
 import { BaseComponent } from '../../shared/base-component';
@@ -30,18 +32,32 @@ describe('ProfileComponent', () => {
     const userApiSpy = jasmine.createSpyObj('UserApiService', ['getActiveUser', 'updateUser']);
     const authSpy = jasmine.createSpyObj('AuthenticationService', ['logout']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    const errorServiceSpy = jasmine.createSpyObj('ComponentErrorService', ['showError', 'showSuccess', 'clearError', 'getErrorMessage', 'handleError'], {
+      hasError: jasmine.createSpy().and.returnValue(false),
+      errorMessage: jasmine.createSpy().and.returnValue('')
+    });
+    const formValidationSpy = jasmine.createSpyObj('FormValidationService', [
+      'hasFieldError', 
+      'getFieldErrorMessage', 
+      'validateForm', 
+      'markAllFieldsAsTouched',
+      'getAllFormErrors'
+    ]);
 
     await TestBed.configureTestingModule({
       imports: [
         ProfileComponent,
         ReactiveFormsModule,
         MatSelectModule,
+        MatSnackBarModule,
         BrowserAnimationsModule
       ],
       providers: [
         { provide: UserApiService, useValue: userApiSpy },
         { provide: AuthenticationService, useValue: authSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: ComponentErrorService, useValue: errorServiceSpy },
+        { provide: FormValidationService, useValue: formValidationSpy }
       ]
     }).compileComponents();
 
@@ -54,6 +70,21 @@ describe('ProfileComponent', () => {
     // Setup default spy returns
     userApiService.getActiveUser.and.returnValue(of(mockUser));
     userApiService.updateUser.and.returnValue(of(mockUser));
+  });
+
+  afterEach(() => {
+    // Clean up any pending timers and subscriptions
+    if (fixture) {
+      fixture.destroy();
+    }
+    // Clear any pending async operations
+    if (typeof window !== 'undefined') {
+      // Clear any pending timeouts/intervals that might have been set
+      for (let i = 1; i < 99999; i++) {
+        window.clearTimeout(i);
+        window.clearInterval(i);
+      }
+    }
   });
 
   describe('Component Initialization', () => {
@@ -272,7 +303,7 @@ describe('ProfileComponent', () => {
     });
 
     it('should handle API error on update', () => {
-      userApiService.updateUser.and.returnValue(throwError('Update Error'));
+      userApiService.updateUser.and.returnValue(throwError(() => new Error('Update Error')));
       spyOn(console, 'error');
 
       component.formGroup.get('userName')?.setValue('newusername');

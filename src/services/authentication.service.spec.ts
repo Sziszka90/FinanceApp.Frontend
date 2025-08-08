@@ -110,7 +110,8 @@ describe('AuthenticationService', () => {
     });
 
     it('should return false for malformed token', () => {
-      localStorage.setItem('authToken', 'invalid-token');
+      // Create a token with invalid base64 in the payload section
+      localStorage.setItem('authToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid_base64_@#$.signature');
       expect(service.validateToken()).toBe(false);
     });
 
@@ -195,7 +196,7 @@ describe('AuthenticationService', () => {
         done();
       });
 
-      localStorage.setItem('authToken', 'invalid-token');
+      localStorage.setItem('authToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid_base64_@#$.signature');
       service.isAuthenticated();
     });
   });
@@ -244,7 +245,7 @@ describe('AuthenticationService', () => {
     });
 
     it('should return null when token is malformed', () => {
-      localStorage.setItem('authToken', 'invalid-token');
+      localStorage.setItem('authToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid_base64_@#$.signature');
       expect(service.getUserId()).toBeNull();
     });
 

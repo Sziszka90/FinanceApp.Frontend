@@ -236,6 +236,7 @@ describe('TokenApiService', () => {
       service.verifyToken(testToken).subscribe();
 
       const req = httpMock.expectOne('https://api.example.com//api/v1/token/validate');
+      expect(req.request.url).toBe('https://api.example.com//api/v1/token/validate');
       req.flush({ isValid: true });
     });
 
@@ -246,6 +247,7 @@ describe('TokenApiService', () => {
       service.verifyToken(testToken).subscribe();
 
       const req = httpMock.expectOne('null/api/v1/token/validate');
+      expect(req.request.url).toBe('null/api/v1/token/validate');
       req.flush({ isValid: true });
     });
   });
@@ -300,6 +302,7 @@ describe('TokenApiService', () => {
       observable.subscribe();
 
       const req = httpMock.expectOne((service as any).apiUrl + '/api/v1/token/validate');
+      expect(req.request.url).toBe((service as any).apiUrl + '/api/v1/token/validate');
       req.flush({ isValid: true });
     });
 
