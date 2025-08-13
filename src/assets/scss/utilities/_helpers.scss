@@ -5,6 +5,12 @@
     color: variables.$background-color;
     border-radius: 4px;
     box-shadow: 0 4px 12px rgba(209, 189, 189, 0.2);
+    max-width: calc(100vw - 2rem);
+    width: auto;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    box-sizing: border-box;
 
     button:hover {
     background: variables.$text-color !important;
@@ -17,11 +23,32 @@
   }
 }
 
+.error-message {
+  text-align: center;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  box-sizing: border-box;
+  background-color: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #e9ecef;
+  margin-bottom: 1rem;
+  color: #6c757d;
+}
+
 .info-snackbar {
     background-color: variables.$text-color;
     color: variables.$background-color;
     border-radius: 4px;
     box-shadow: 0 4px 12px rgba(209, 189, 189, 0.2);
+    max-width: calc(100vw - 2rem);
+    width: auto;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    box-sizing: border-box;
 
     button:hover {
     background: variables.$text-color !important;

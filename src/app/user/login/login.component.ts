@@ -35,14 +35,14 @@ export class LoginComponent extends BaseComponent {
 
   forgotPassword(): void {
     this.matDialog.open(ForgotPasswordRequestModalComponent, {
-      width: '400px',
+      width: '600px',
       height: 'auto'
     });
   }
 
   resendConfirmationEmail(): void {
     this.matDialog.open(ResendConfirmationEmailModalComponent, {
-      width: '400px',
+      width: '600px',
       height: 'auto'
     });
   }

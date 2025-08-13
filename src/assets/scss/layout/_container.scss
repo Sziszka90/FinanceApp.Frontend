@@ -7,9 +7,10 @@
   text-align: center;
   align-items: center;
   background-color: variables.$text-color;
-  padding: 2rem 1.5rem;
+  padding: 2rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   border-radius: 12px;
+  width: 100%;
 }
 
 .modal-header {
@@ -31,8 +32,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin: 2rem;
+  justify-content: flex-start;
+  padding: 1rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .form-element {
@@ -40,7 +45,6 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: 1rem;
 }
 
 .form-group {
@@ -79,7 +83,7 @@
 
 @media (max-width: 530px) {
   .form-container {
-    width: 80%;
+    width: 100%;
     margin: auto;
   }
 
@@ -92,7 +96,6 @@
   }
 
   .main-container {
-    margin: 1rem;
     max-width: 100%;
   }
 }

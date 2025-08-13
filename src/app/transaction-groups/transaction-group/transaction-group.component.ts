@@ -101,6 +101,7 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
       UpdateTransactionGroupModalComponent,
       {
         autoFocus: true,
+        height: 'auto',
         data: transactionGroup
       }
     );

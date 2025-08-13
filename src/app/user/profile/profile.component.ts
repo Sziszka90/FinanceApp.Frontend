@@ -118,7 +118,6 @@ export class ProfileComponent extends BaseComponent implements OnInit {
         'Profile updated successfully',
         'Failed to update profile'
       ).subscribe(() => {
-        this.authService.logout();
         this.router.navigate(['/']);
       });
     } else {
@@ -130,6 +129,6 @@ export class ProfileComponent extends BaseComponent implements OnInit {
     if (object1 == null || object2 == null) {
       return false;
     }
-    return object1.id === object2.id;
+    return object1 === object2;
   }
 }
