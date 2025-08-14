@@ -11,7 +11,7 @@
      (dragover)="onDragOver($event)"
      (drop)="onDrop($event)">
   <p>Drag and drop a CSV file here, or click to upload</p>
-  <div *ngIf="loading()" class="upload-loading">
+  <div *ngIf="importLoading()" class="upload-loading">
     <loader></loader>
     <p>Uploading file...</p>
   </div>

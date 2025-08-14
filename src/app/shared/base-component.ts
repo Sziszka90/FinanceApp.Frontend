@@ -98,8 +98,11 @@ export abstract class BaseComponent implements OnDestroy {
     operation: Observable<T>,
     successMessage?: string,
     errorContext?: string,
+    showLoader: boolean = true
   ): Observable<T> {
-    this.setLoading(true);
+    if (showLoader) {
+      this.setLoading(true);
+    }
     this.clearError();
 
     return operation.pipe(
@@ -114,7 +117,11 @@ export abstract class BaseComponent implements OnDestroy {
         const handledError = { ...error, handled: true };
         return throwError(() => handledError);
       }),
-      finalize(() => this.setLoading(false))
+      finalize(() => {
+        if (showLoader) {
+          this.setLoading(false);
+        }
+      })
     );
   }
 

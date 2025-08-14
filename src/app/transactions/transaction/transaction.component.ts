@@ -59,6 +59,8 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   public showSummary = signal<boolean>(false);
   public summary = signal<Money | null>(null);
 
+  public importLoading = signal<boolean>(false);
+
   dataSource = signal<MatTableDataSource<GetTransactionDto>>(new MatTableDataSource<GetTransactionDto>([]));
 
   typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
@@ -178,16 +180,23 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   }
 
   deleteTransaction(transactionDto: GetTransactionDto) {
+    this.allTransactions.update(transactions => transactions.filter((t) => t.id !== transactionDto.id));
+
     this.executeWithLoading(
       this.transactionApiService.deleteTransaction(transactionDto.id),
       'Transaction deleted successfully!',
-      'Deleting transaction'
+      'Deleting transaction',
+      false
     ).subscribe({
-      next: () => {
-        this.allTransactions.update(transactions => transactions.filter((t) => t.id !== transactionDto.id));
-        this.dataSource.update(ds => {
-          ds.data = this.allTransactions();
-          return ds;
+      error: () => {
+        this.executeWithLoading(
+          this.transactionApiService.getAllTransactions(),
+          undefined,
+          'Loading transactions',
+        ).subscribe({
+          next: (transactions) => {
+            this.allTransactions.set(transactions);
+          }
         });
       }
     });
@@ -324,6 +333,8 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       const requestId = uuidv4();
       const correlationId = this.correlationService.setCorrelationId(requestId);
 
+      this.importLoading.set(true);
+
       this.executeWithLoading(
         this.transactionApiService.uploadCsv(file, correlationId),
         'CSV file uploaded successfully',
@@ -335,6 +346,9 @@ export class TransactionComponent extends BaseComponent implements OnInit {
             ds.data = transactions;
             return ds;
           });
+        },
+        complete: () => {
+          this.importLoading.set(false);
         }
       });
     } else {

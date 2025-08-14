@@ -79,15 +79,26 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
   }
 
   deleteTransactionGroup(transactionGroup: GetTransactionGroupDto) {
+    this.allTransactionGroups.update(groups => groups.filter(
+      (group) => group.id !== transactionGroup.id
+    ));
+
     this.executeWithLoading(
       this.transactionApiService.deleteTransactionGroup(transactionGroup.id),
       'Transaction group deleted successfully!',
-      'Deleting transaction group'
+      'Deleting transaction group',
+      false
     ).subscribe({
-      next: () => {
-        this.allTransactionGroups.update(groups => groups.filter(
-          (group) => group.id !== transactionGroup.id
-        ));
+      error: () => {
+        this.executeWithLoading(
+          this.transactionApiService.getAllTransactionGroups(),
+          undefined,
+          'Loading transaction groups',
+        ).subscribe({
+          next: (transactionGroups) => {
+            this.allTransactionGroups.set(transactionGroups);
+          }
+        });
       }
     });
   }
