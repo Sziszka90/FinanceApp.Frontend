@@ -92,7 +92,8 @@ jobs:
 
       - name: Generate environment.prod.ts from template
         run: |
-          export API_URL="${{ vars.BACKEND_URL }}"
+          #export API_URL="${{ vars.BACKEND_URL }}"
+          export API_URL=""
           envsubst < src/environments/environment.prod.template.ts > src/environments/environment.prod.ts
         working-directory: ./
 
