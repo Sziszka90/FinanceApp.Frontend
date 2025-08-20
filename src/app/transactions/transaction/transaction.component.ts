@@ -181,6 +181,10 @@ export class TransactionComponent extends BaseComponent implements OnInit {
 
   deleteTransaction(transactionDto: GetTransactionDto) {
     this.allTransactions.update(transactions => transactions.filter((t) => t.id !== transactionDto.id));
+    this.dataSource.update(ds => {
+      ds.data = this.allTransactions();
+      return ds;
+    });
 
     this.executeWithLoading(
       this.transactionApiService.deleteTransaction(transactionDto.id),
