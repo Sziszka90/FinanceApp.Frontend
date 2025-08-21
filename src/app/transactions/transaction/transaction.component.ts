@@ -130,10 +130,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
     ).subscribe({
       next: (value: GetTransactionDto[]) => {
         this.allTransactions.set(value);
-        this.dataSource.update(ds => {
-          ds.data = value;
-          return ds;
-        });
+        this.dataSource.set(new MatTableDataSource<GetTransactionDto>(value));
         this.setupCustomFilterPredicate();
       }
     });
@@ -193,15 +190,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       false
     ).subscribe({
       error: () => {
-        this.executeWithLoading(
-          this.transactionApiService.getAllTransactions(),
-          undefined,
-          'Loading transactions',
-        ).subscribe({
-          next: (transactions) => {
-            this.allTransactions.set(transactions);
-          }
-        });
+        this.loadTransactions();
       }
     });
   }

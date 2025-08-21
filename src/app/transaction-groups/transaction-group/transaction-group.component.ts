@@ -4,7 +4,7 @@ import { CreateTransactionGroupModalComponent } from '../create-transaction-grou
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { Observable } from 'rxjs';
 import { GetTransactionGroupDto } from 'src/models/TransactionGroupDtos/get-transaction-group.dto';
@@ -40,9 +40,15 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
   public transactionGroups$: Observable<GetTransactionGroupDto[]> | undefined;
   public allTransactionGroups = signal<GetTransactionGroupDto[]>([]);
 
+  dataSource = signal<MatTableDataSource<GetTransactionGroupDto>>(new MatTableDataSource<GetTransactionGroupDto>([]));
+
   touchStartX = 0;
 
   ngOnInit(): void {
+    this.loadTransactionGroups();
+  }
+
+  loadTransactionGroups(): void {
     this.executeWithLoading(
       this.transactionApiService.getAllTransactionGroups(),
       undefined,
@@ -50,6 +56,7 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
     ).subscribe({
       next: (transactionGroups) => {
         this.allTransactionGroups.set(transactionGroups);
+        this.dataSource.set(new MatTableDataSource<GetTransactionGroupDto>(transactionGroups));
       }
     });
   }
@@ -90,15 +97,7 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
       false
     ).subscribe({
       error: () => {
-        this.executeWithLoading(
-          this.transactionApiService.getAllTransactionGroups(),
-          undefined,
-          'Loading transaction groups',
-        ).subscribe({
-          next: (transactionGroups) => {
-            this.allTransactionGroups.set(transactionGroups);
-          }
-        });
+        this.loadTransactionGroups();
       }
     });
   }
