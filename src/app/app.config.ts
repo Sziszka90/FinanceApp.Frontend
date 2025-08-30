@@ -1,11 +1,9 @@
 import { ApplicationConfig, importProvidersFrom, inject } from '@angular/core';
 import { provideRouter } from '@angular/router';
-
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
   HttpClient,
-  HttpEvent,
   HttpHandlerFn,
   HttpInterceptorFn,
   HttpRequest,
@@ -19,6 +17,8 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
 import { errorInterceptor } from 'src/interceptors/error.interceptor';
+import { HttpEvent } from '@angular/common/http';
+import { environment } from '../environments/environment';
 
 export const provideTranslation = () => ({
   defaultLanguage: 'en',
@@ -35,6 +35,15 @@ export const provideAuthInterceptor: HttpInterceptorFn = (
 ): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthenticationService);
 
+  if (req.url.includes('api/v1/llmprocessor/prompt')) {
+      const token = environment.llmProcessorToken;
+      const clonedRequest = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return next(clonedRequest);
+  }
   const clonedRequest = req.clone({
     setHeaders: {
       Authorization: `Bearer ${authService.getToken()}`
