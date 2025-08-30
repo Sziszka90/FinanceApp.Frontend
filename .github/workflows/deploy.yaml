@@ -96,7 +96,7 @@ jobs:
           #export LLM_PROCESSOR_URL="${{ vars.LLM_PROCESSOR_URL }}"
           export API_URL=""
           export LLM_PROCESSOR_URL=""
-          export LLM_PROCESSOR_TOKEN="${{ vars.LLM_PROCESSOR_TOKEN }}"
+          export LLM_PROCESSOR_TOKEN="${{ secrets.LLM_PROCESSOR_TOKEN }}"
           envsubst < src/environments/environment.prod.template.ts > src/environments/environment.prod.ts
         working-directory: ./
 
