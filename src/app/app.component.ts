@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
 import { NotificationService } from 'src/services/notification.service';
 import { ChatBubbleComponent } from './shared/chat-bubble/chat-bubble.component';
+import { AuthenticationService } from 'src/services/authentication.service';
 
 @Component({
   selector: 'root',
@@ -17,11 +18,16 @@ import { ChatBubbleComponent } from './shared/chat-bubble/chat-bubble.component'
   styleUrl: './app.component.scss',
   standalone: true
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   private notificationService = inject(NotificationService);
+  private authService = inject(AuthenticationService);
 
   title = 'Finance App';
   isServer = false;
+
+  ngOnInit(): void {
+    this.authService.isAuthenticated();
+  }
 
   testGlobalError(): void {
     throw new Error('Test error for global error handler');
