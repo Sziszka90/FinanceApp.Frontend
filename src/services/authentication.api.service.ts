@@ -10,13 +10,9 @@ import { LoginRequestDto } from '../models/LoginDtos/login-request.dto';
 })
 export class AuthenticationApiService {
 
-  // API base URL
   private apiUrl = environment?.apiUrl ?? '';
 
-  // eslint-disable-next-line no-unused-vars
-  constructor(private http: HttpClient) {
-    // Initialize HTTP client for API calls
-  }
+  constructor(private http: HttpClient) {}
 
   login(loginRequestDto: LoginRequestDto): Observable<LoginResponseDto> {
     return this.http.post<LoginResponseDto>(`${this.apiUrl}/api/v1/auth/login`, loginRequestDto);

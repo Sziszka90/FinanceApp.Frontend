@@ -21,14 +21,11 @@ export class AppComponent {
   title = 'Finance App';
   isServer = false;
 
-  // Test method for global error handler (remove in production)
   testGlobalError(): void {
     throw new Error('Test error for global error handler');
   }
 
-  // Test method for network error (remove in production)
   testNetworkError(): void {
-    // This would trigger a network error
     fetch('http://invalid-url-that-does-not-exist.com')
       .catch(error => {
         throw new Error('Network error test: ' + error.message);
