@@ -5,7 +5,6 @@ import { LlmProcessorApiService } from 'src/services/llmprocessor.api.service';
 import { v4 as uuidv4 } from 'uuid';
 import { UserApiService } from 'src/services/user.api.service';
 import { take } from 'rxjs';
-import { AuthenticationApiService } from 'src/services/authentication.api.service';
 import { AuthenticationService } from 'src/services/authentication.service';
 
 @Component({
@@ -45,22 +44,23 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.userApiService.getActiveUser().pipe(take(1)).subscribe({
-      next: user => {
-        if (user) {
-          this.userId = user.id;
-          this.userName = user.userName;
-          this.messages.push({ text: `Hi ${this.userName}! How can I assist you today?`, sender: 'assistant' });
-        }
-      },
-      error: () => {
-        this.showChatBubble = false;
-      }
-    });
-
     this.authService.userLoggedIn.pipe().subscribe({
       next: loggedIn => {
         this.showChatBubble = loggedIn;
+        if(loggedIn) {
+          this.userApiService.getActiveUser().pipe(take(1)).subscribe({
+            next: user => {
+              if (user) {
+                this.userId = user.id;
+                this.userName = user.userName;
+                this.messages.push({ text: `Hi ${this.userName}! How can I assist you today?`, sender: 'assistant' });
+              }
+            },
+            error: () => {
+              this.showChatBubble = false;
+            }
+          });
+        }
       }
     });
   }
