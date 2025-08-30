@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -9,10 +9,8 @@ import { LoginRequestDto } from '../models/LoginDtos/login-request.dto';
   providedIn: 'root'
 })
 export class AuthenticationApiService {
-
+  private http = inject(HttpClient);
   private apiUrl = environment?.apiUrl ?? '';
-
-  constructor(private http: HttpClient) {}
 
   login(loginRequestDto: LoginRequestDto): Observable<LoginResponseDto> {
     return this.http.post<LoginResponseDto>(`${this.apiUrl}/api/v1/auth/login`, loginRequestDto);
