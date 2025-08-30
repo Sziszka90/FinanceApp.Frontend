@@ -39,8 +39,18 @@ export class AuthenticationService {
 
   login(loginRequestDto: LoginRequestDto): Observable<LoginResponseDto> {
     this.correlationService.clearAllCorrelationIds();
-    this.userLoggedIn.next(true);
-    return this.authApiService.login(loginRequestDto);
+    return new Observable<LoginResponseDto>(observer => {
+      this.authApiService.login(loginRequestDto).subscribe({
+        next: (response) => {
+          this.userLoggedIn.next(true);
+          observer.next(response);
+          observer.complete();
+        },
+        error: (err) => {
+          observer.error(err);
+        }
+      });
+    });
   }
 
   isAuthenticated(): boolean {
