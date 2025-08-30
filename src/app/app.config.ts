@@ -35,7 +35,7 @@ export const provideAuthInterceptor: HttpInterceptorFn = (
 ): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthenticationService);
 
-  if (req.url.includes('api/v1/llmprocessor/prompt')) {
+  if (req.url.includes('llmprocessor/prompt')) {
     const token = environment.llmProcessorToken;
     const clonedRequest = req.clone({
       setHeaders: {
