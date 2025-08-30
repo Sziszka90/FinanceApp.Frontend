@@ -3,13 +3,15 @@ import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
 import { NotificationService } from 'src/services/notification.service';
+import { ChatBubbleComponent } from './shared/chat-bubble/chat-bubble.component';
 
 @Component({
   selector: 'root',
   imports: [
     NavBarComponent,
     RouterOutlet,
-    CommonModule
+    CommonModule,
+    ChatBubbleComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

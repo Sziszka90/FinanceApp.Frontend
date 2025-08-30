@@ -39,6 +39,7 @@ export class AuthenticationService {
 
   login(loginRequestDto: LoginRequestDto): Observable<LoginResponseDto> {
     this.correlationService.clearAllCorrelationIds();
+    this.userLoggedIn.next(true);
     return this.authApiService.login(loginRequestDto);
   }
 
@@ -47,6 +48,7 @@ export class AuthenticationService {
       this.userLoggedIn.next(false);
       return false;
     }
+    this.userLoggedIn.next(true);
     return true;
   }
 

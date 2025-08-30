@@ -1,0 +1,30 @@
+<div *ngIf="showChatBubble" #chatBubble class="chat-bubble" [class.open]="showBubble"
+     [ngStyle]="{bottom: bubblePosition.bottom + 'px', right: bubblePosition.right + 'px'}">
+  <button class="chat-toggle"
+    (click)="toggleBubble()"
+    (mousedown)="onDragStart($event)"
+    (touchstart)="onTouchStart($event)"
+    (touchmove)="onTouchMove($event)"
+    (touchend)="onTouchEnd($event)">
+    💬
+  </button>
+  <div class="chat-window" *ngIf="showBubble">
+    <div class="chat-header default-font">Chat</div>
+    <div *ngIf="loading" class="chat-loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+    <div class="chat-body" #chatBody>
+      <div *ngFor="let msg of messages">
+        <div [ngClass]="{'chat-message': true, 'user': msg.sender === 'user', 'assistant': msg.sender === 'assistant'}">
+          {{ msg.text }}
+        </div>
+      </div>
+    </div>
+    <div class="chat-footer default-font">
+      <textarea [(ngModel)]="message" placeholder="Type your message..." (keydown)="onTextareaKeydown($event)"></textarea>
+      <button (click)="sendMessage()" [disabled]="loading || !message.trim()">Send</button>
+    </div>
+  </div>
+</div>

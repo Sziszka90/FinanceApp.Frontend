@@ -93,7 +93,10 @@ jobs:
       - name: Generate environment.prod.ts from template
         run: |
           #export API_URL="${{ vars.BACKEND_URL }}"
+          #export LLM_PROCESSOR_URL="${{ vars.LLM_PROCESSOR_URL }}"
           export API_URL=""
+          export LLM_PROCESSOR_URL=""
+          export LLM_PROCESSOR_TOKEN="${{ vars.LLM_PROCESSOR_TOKEN }}"
           envsubst < src/environments/environment.prod.template.ts > src/environments/environment.prod.ts
         working-directory: ./
 
