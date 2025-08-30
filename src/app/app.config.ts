@@ -8,7 +8,8 @@ import {
   HttpInterceptorFn,
   HttpRequest,
   provideHttpClient,
-  withInterceptors
+  withInterceptors,
+  HttpEvent
 } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -17,7 +18,6 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
 import { errorInterceptor } from 'src/interceptors/error.interceptor';
-import { HttpEvent } from '@angular/common/http';
 import { environment } from '../environments/environment';
 
 export const provideTranslation = () => ({
@@ -36,13 +36,13 @@ export const provideAuthInterceptor: HttpInterceptorFn = (
   const authService = inject(AuthenticationService);
 
   if (req.url.includes('api/v1/llmprocessor/prompt')) {
-      const token = environment.llmProcessorToken;
-      const clonedRequest = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      return next(clonedRequest);
+    const token = environment.llmProcessorToken;
+    const clonedRequest = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return next(clonedRequest);
   }
   const clonedRequest = req.clone({
     setHeaders: {
