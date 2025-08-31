@@ -50,8 +50,8 @@
         class="select" 
         formControlName="type" 
         [class.disabled]="loading()">
-        <mat-option *ngFor="let option of typeOptions" [value]="option.name">
-          &#8226; {{ option.name }}
+        <mat-option *ngFor="let option of typeOptions" [value]="option.Name">
+          &#8226; {{ option.Name }}
         </mat-option>
       </mat-select>
     </div>
@@ -72,43 +72,43 @@
         <!-- Name Column -->
         <ng-container class="column" matColumnDef="name">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header appColumnResize> Name </th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.name}} </td>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Name}} </td>
         </ng-container>
 
         <!-- Description Column -->
         <ng-container class="column" matColumnDef="description">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef> Description </th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.description}} </td>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Description}} </td>
         </ng-container>
 
         <!-- Value Column -->
         <ng-container class="column" matColumnDef="value">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Value</th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.value.amount }}</td>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.Value.Amount }}</td>
         </ng-container>
 
         <!-- Currency Column -->
         <ng-container class="column" matColumnDef="currency">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Currency</th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.value.currency }}</td>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.Value.Currency }}</td>
         </ng-container>
 
         <!-- Transaction Date Column -->
         <ng-container class="column" matColumnDef="transactionDate">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Transaction Date</th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.transactionDate | date: 'yyyy/MM/dd' }}</td>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.TransactionDate | date: 'yyyy/MM/dd' }}</td>
         </ng-container>
 
         <!-- Transaction Type Column -->
         <ng-container class="column" matColumnDef="transactionType">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Transaction Type</th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.transactionType }}</td>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.TransactionType }}</td>
         </ng-container>
 
         <!-- Group Column -->
         <ng-container class="column" matColumnDef="group">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef> Group </th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.transactionGroup != undefined ? element.transactionGroup.name : ""}} </td>
+          <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.TransactionGroup != undefined ? element.TransactionGroup.Name : ""}} </td>
         </ng-container>
 
         <!-- Actions Column -->
@@ -127,7 +127,7 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" ></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'expense': row.transactionType === 'Expense', 'income': row.transactionType !== 'Expense'}"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'expense': row.TransactionType === 'Expense', 'income': row.TransactionType !== 'Expense'}"></tr>
       </table>
     </div>
   </div>

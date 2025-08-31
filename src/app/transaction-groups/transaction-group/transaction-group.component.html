@@ -9,17 +9,17 @@
           The actual rendered columns are set as a property on the row definition -->
       <ng-container class="column" matColumnDef="name">
         <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Name</th>
-        <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.name}} </td>
+        <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Name}} </td>
       </ng-container>
 
       <ng-container class="column" matColumnDef="description">
         <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Description</th>
-        <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.description}} </td>
+        <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Description}} </td>
       </ng-container>
 
       <ng-container class="column" matColumnDef="icon">
         <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Icon</th>
-        <td class="default-font text-color-black" mat-cell *matCellDef="let element"><i class="{{element.groupIcon}}"></i></td>
+        <td class="default-font text-color-black" mat-cell *matCellDef="let element"><i class="{{element.GroupIcon}}"></i></td>
       </ng-container>
 
       <ng-container class="column" matColumnDef="actions">
