@@ -10,10 +10,10 @@ describe('LlmProcessorApiService', () => {
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        providers: [LlmProcessorApiService]
-      });
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [LlmProcessorApiService]
+    });
     service = TestBed.inject(LlmProcessorApiService);
     httpMock = TestBed.inject(HttpTestingController);
   });
