@@ -108,7 +108,7 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
     ).subscribe({
       next: (data) => {
         this.groupOptions.set(data);
-        this.groupOptions.update(groups => [...groups, { id: '', name: 'No group' } as GetTransactionGroupDto]);
+        this.groupOptions.update(groups => [...groups, { Id: '', Name: 'No group' } as GetTransactionGroupDto]);
       }
     });
   }
@@ -126,16 +126,16 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
     }
 
     const updatedTransaction: UpdateTransactionDto = {
-      id: this.data.id,
-      name: this.getFieldValue<string>('name')!,
-      description: this.getFieldValue<string>('description') || '',
-      value: {
-        amount: this.getFieldValue<number>('value')!,
-        currency: this.getFieldValue<CurrencyEnum>('currency')!
+      Id: this.data.id,
+      Name: this.getFieldValue<string>('name')!,
+      Description: this.getFieldValue<string>('description') || '',
+      Value: {
+        Amount: this.getFieldValue<number>('value')!,
+        Currency: this.getFieldValue<CurrencyEnum>('currency')!
       },
-      transactionType: this.getFieldValue<TransactionTypeEnum>('transactionType')!,
-      transactionDate: transactionDate,
-      transactionGroupId: this.getFieldValue<GetTransactionGroupDto>('group')?.id || undefined
+      TransactionType: this.getFieldValue<TransactionTypeEnum>('transactionType')!,
+      TransactionDate: transactionDate,
+      TransactionGroupId: this.getFieldValue<GetTransactionGroupDto>('group')?.Id || undefined
     };
 
     this.executeWithLoading(

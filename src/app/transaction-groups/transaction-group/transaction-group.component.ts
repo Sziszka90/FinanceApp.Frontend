@@ -87,11 +87,11 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
 
   deleteTransactionGroup(transactionGroup: GetTransactionGroupDto) {
     this.allTransactionGroups.update(groups => groups.filter(
-      (group) => group.id !== transactionGroup.id
+      (group) => group.Id !== transactionGroup.Id
     ));
 
     this.executeWithLoading(
-      this.transactionApiService.deleteTransactionGroup(transactionGroup.id),
+      this.transactionApiService.deleteTransactionGroup(transactionGroup.Id),
       'Transaction group deleted successfully!',
       'Deleting transaction group',
       false
@@ -122,12 +122,12 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
       next: (updatedTransactionGroup) => {
         if (updatedTransactionGroup) {
           this.allTransactionGroups.update(groups => groups.map((transactionGroup) => {
-            if (transactionGroup.id === updatedTransactionGroup.id) {
+            if (transactionGroup.Id === updatedTransactionGroup.Id) {
               return {
                 ...transactionGroup,
-                name: updatedTransactionGroup.name,
-                description: updatedTransactionGroup.description,
-                groupIcon: updatedTransactionGroup.groupIcon
+                Name: updatedTransactionGroup.Name,
+                Description: updatedTransactionGroup.Description,
+                GroupIcon: updatedTransactionGroup.GroupIcon
               };
             }
             return transactionGroup;

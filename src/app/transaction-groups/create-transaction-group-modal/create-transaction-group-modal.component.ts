@@ -68,9 +68,9 @@ export class CreateTransactionGroupModalComponent extends BaseComponent implemen
     }
 
     const createdTransactionGroup = {
-      name: this.getFieldValue<string>('name') ?? '',
-      description: this.getFieldValue<string>('description') ?? '',
-      groupIcon: this.getFieldValue<string>('groupIcon') ?? ''
+      Name: this.getFieldValue<string>('name') ?? '',
+      Description: this.getFieldValue<string>('description') ?? '',
+      GroupIcon: this.getFieldValue<string>('groupIcon') ?? ''
     };
 
     this.executeWithLoading(

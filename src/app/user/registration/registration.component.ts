@@ -75,10 +75,10 @@ export class RegistrationComponent extends BaseComponent {
 
       this.executeWithLoading(
         this.apiService.register({
-          userName: this.getFieldValue('userName') || '',
-          email: this.getFieldValue('email') || '',
-          password: this.getFieldValue('password') || '',
-          baseCurrency: this.getFieldValue('currency') || CurrencyEnum.EUR
+          UserName: this.getFieldValue('userName') || '',
+          Email: this.getFieldValue('Email') || '',
+          Password: this.getFieldValue('Password') || '',
+          BaseCurrency: this.getFieldValue('Currency') || CurrencyEnum.EUR
         }).pipe(take(1)),
         'Registration successful! Confirm email address',
         'Registration failed'

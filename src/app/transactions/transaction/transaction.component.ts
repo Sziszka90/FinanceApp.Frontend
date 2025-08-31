@@ -54,7 +54,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   public summary$: Observable<Money> | undefined;
   public transactions$: Observable<GetTransactionDto[]> | undefined;
   public allTransactions = signal<GetTransactionDto[]>([]);
-  public total = signal<Money>({ amount: 0, currency: CurrencyEnum.EUR });
+  public total = signal<Money>({ Amount: 0, Currency: CurrencyEnum.EUR });
 
   public showSummary = signal<boolean>(false);
   public summary = signal<Money | null>(null);
@@ -89,10 +89,10 @@ export class TransactionComponent extends BaseComponent implements OnInit {
     this.dataSource.update(ds => {
       ds.sortingDataAccessor = (item, property) => {
         switch (property) {
-          case 'value': return item.value.amount;
-          case 'currency': return item.value.currency;
-          case 'transactionDate': return new Date(item.transactionDate);
-          case 'group': return item.transactionGroup?.name ?? '';
+          case 'value': return item.Value.Amount;
+          case 'currency': return item.Value.Currency;
+          case 'transactionDate': return new Date(item.TransactionDate);
+          case 'group': return item.TransactionGroup?.Name ?? '';
           default: return (item as any)[property];
         }
       };
@@ -151,12 +151,12 @@ export class TransactionComponent extends BaseComponent implements OnInit {
         const filterObj = JSON.parse(filter);
         const { name, date, type } = filterObj;
 
-        return (!name || data.name.toLowerCase().includes(name.toLowerCase())) &&
+        return (!name || data.Name.toLowerCase().includes(name.toLowerCase())) &&
               (!date || (
-                data.transactionDate &&
-                new Date(data.transactionDate).toISOString().slice(0, 10) === date
+                data.TransactionDate &&
+                new Date(data.TransactionDate).toISOString().slice(0, 10) === date
               )) &&
-              (!type || data.transactionType === type);
+              (!type || data.TransactionType === type);
       };
       return ds; // important: return the same object
     });
@@ -177,14 +177,14 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   }
 
   deleteTransaction(transactionDto: GetTransactionDto) {
-    this.allTransactions.update(transactions => transactions.filter((t) => t.id !== transactionDto.id));
+    this.allTransactions.update(transactions => transactions.filter((t) => t.Id !== transactionDto.Id));
     this.dataSource.update(ds => {
       ds.data = this.allTransactions();
       return ds;
     });
 
     this.executeWithLoading(
-      this.transactionApiService.deleteTransaction(transactionDto.id),
+      this.transactionApiService.deleteTransaction(transactionDto.Id),
       'Transaction deleted successfully!',
       'Deleting transaction',
       false
@@ -218,15 +218,15 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       next: (updatedTransaction: GetTransactionDto) => {
         if (updatedTransaction) {
           this.allTransactions?.update(transactions => transactions.map((transaction: GetTransactionDto) => {
-            if (transaction.id === updatedTransaction.id) {
+            if (transaction.Id === updatedTransaction.Id) {
               return {
                 ...transaction,
-                name: updatedTransaction.name,
-                description: updatedTransaction.description,
-                value: updatedTransaction.value,
-                transactionDate: updatedTransaction.transactionDate,
-                transactionType: updatedTransaction.transactionType,
-                transactionGroup: updatedTransaction.transactionGroup
+                Name: updatedTransaction.Name,
+                Description: updatedTransaction.Description,
+                Value: updatedTransaction.Value,
+                TransactionDate: updatedTransaction.TransactionDate,
+                TransactionType: updatedTransaction.TransactionType,
+                TransactionGroup: updatedTransaction.TransactionGroup
               };
             }
             return transaction;

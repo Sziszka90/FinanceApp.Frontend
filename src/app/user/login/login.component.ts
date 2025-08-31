@@ -54,11 +54,11 @@ export class LoginComponent extends BaseComponent {
         undefined, // no success message
         'Login failed'
       ).subscribe({
-        next: (data: { token: string }) => {
-          if (data.token === '') {
+        next: (data: { Token: string }) => {
+          if (data.Token === '') {
             this.showError('Invalid login credentials');
           } else {
-            this.authService.saveToken(data.token);
+            this.authService.saveToken(data.Token);
             this.authService.userLoggedIn.next(true);
             this.router.navigate(['/']);
           }

@@ -74,7 +74,7 @@ export class AuthenticationService {
 
   validateTokenWithApi(token: string): Observable<boolean> {
     return this.tokenApiService.verifyToken(token).pipe(
-      map((response) => response.isValid),
+      map((response) => response.IsValid),
       catchError(() => of(false))
     );
   }

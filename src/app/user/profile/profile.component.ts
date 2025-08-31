@@ -65,21 +65,21 @@ export class ProfileComponent extends BaseComponent implements OnInit {
   }
 
   override formGroup: FormGroup<UserFormModel> = this.fb.group<UserFormModel>({
-    userName: new FormControl('', [Validators.minLength(2)]),
-    password: new FormControl('', [this.optionalStrongPassword.bind(this)]),
-    currency: new FormControl(CurrencyEnum.EUR)
+    UserName: new FormControl('', [Validators.minLength(2)]),
+    Password: new FormControl('', [this.optionalStrongPassword.bind(this)]),
+    Currency: new FormControl(CurrencyEnum.EUR)
   });
 
   override customValidationMessages = {
-    userName: {
+    UserName: {
       required: 'User name is required',
       minlength: 'Minimum 2 characters required'
     },
-    password: {
+    Password: {
       minlength: 'Password must be at least 8 characters long',
       pattern: 'Password must include uppercase letter, number, and special character'
     },
-    currency: {
+    Currency: {
       required: 'Currency is required'
     }
   };
@@ -97,8 +97,8 @@ export class ProfileComponent extends BaseComponent implements OnInit {
     ).subscribe((user) => {
       this.user = user;
       this.formGroup.patchValue({
-        userName: user.userName,
-        currency: user.baseCurrency
+        UserName: user.UserName,
+        Currency: user.BaseCurrency
       });
     });
   }
@@ -110,10 +110,10 @@ export class ProfileComponent extends BaseComponent implements OnInit {
 
       this.executeWithLoading(
         this.userApiService.updateUser({
-          id: this.user?.id,
-          userName: this.getFieldValue('userName') || this.user?.userName,
-          password: this.getFieldValue('password') || '',
-          baseCurrency: this.getFieldValue('currency') ?? CurrencyEnum.EUR
+          Id: this.user?.Id,
+          UserName: this.getFieldValue('UserName') || this.user?.UserName,
+          Password: this.getFieldValue('Password') || '',
+          BaseCurrency: this.getFieldValue('Currency') ?? CurrencyEnum.EUR
         }).pipe(take(1)),
         'Profile updated successfully',
         'Failed to update profile'

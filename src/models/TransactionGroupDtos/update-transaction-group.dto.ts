@@ -1,8 +1,8 @@
 
 export interface UpdateTransactionGroupDto {
-    id: string,
-    name: string,
-    description?: string,
-    groupIcon?: string,
+    Id: string,
+    Name: string,
+    Description?: string,
+    GroupIcon?: string,
 }
 

@@ -64,18 +64,18 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
   }
 
   passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
-    const password = control.get('password')?.value;
-    const confirmPassword = control.get('confirmPassword')?.value;
+    const password = control.get('Password')?.value;
+    const confirmPassword = control.get('ConfirmPassword')?.value;
 
     return password === confirmPassword ? null : { passwordsMismatch: true };
   }
 
   onSubmit(): void {
     if (this.isFormValid()) {
-      const password = this.getFieldValue<string>('password') || '';
+      const password = this.getFieldValue<string>('Password') || '';
 
       this.executeWithLoading(
-        this.userApiService.updatePassword({ password: password, token: this.token }),
+        this.userApiService.updatePassword({ Password: password, Token: this.token }),
         'Password reset successfully',
         'Failed to reset password'
       ).subscribe({

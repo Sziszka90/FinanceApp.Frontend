@@ -1,5 +1,5 @@
 
 export interface ResendEmailConfirmationResponse {
-  isSuccess: boolean;
-  message: string;
+  IsSuccess: boolean;
+  Message: string;
 }

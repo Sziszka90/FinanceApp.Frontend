@@ -51,8 +51,8 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
           this.userApiService.getActiveUser().pipe(take(1)).subscribe({
             next: user => {
               if (user) {
-                this.userId = user.id;
-                this.userName = user.userName;
+                this.userId = user.Id;
+                this.userName = user.UserName;
                 this.messages.push({ text: `Hi ${this.userName}! How can I assist you today?`, sender: 'assistant' });
               }
             },

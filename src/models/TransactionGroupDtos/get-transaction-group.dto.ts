@@ -1,7 +1,7 @@
 
 export interface GetTransactionGroupDto {
-    id: string;
-    name: string;
-    description?: string;
-    groupIcon?: string;
+    Id: string;
+    Name: string;
+    Description?: string;
+    GroupIcon?: string;
 }

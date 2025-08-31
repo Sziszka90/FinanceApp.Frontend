@@ -38,9 +38,9 @@ export class UpdateTransactionGroupModalComponent extends BaseComponent {
   public data = inject<GetTransactionGroupDto>(MAT_DIALOG_DATA);
 
   public override formGroup = this.fb.group({
-    name: new FormControl(this.data.name, [Validators.required, Validators.minLength(2)]),
-    description: new FormControl(this.data.description),
-    groupIcon: new FormControl(this.data.groupIcon, Validators.required)
+    Name: new FormControl(this.data.Name, [Validators.required, Validators.minLength(2)]),
+    Description: new FormControl(this.data.Description),
+    GroupIcon: new FormControl(this.data.GroupIcon, Validators.required)
   });
 
   public groupIconOptions: string[] = Object.values(ICONS);
@@ -61,14 +61,14 @@ export class UpdateTransactionGroupModalComponent extends BaseComponent {
     }
 
     const updatedTransactionGroup = {
-      id: this.data.id,
-      name: this.getFieldValue<string>('name')!,
-      description: this.getFieldValue<string>('description') || '',
-      groupIcon: this.getFieldValue<string>('groupIcon')!
+      Id: this.data.Id,
+      Name: this.getFieldValue<string>('name')!,
+      Description: this.getFieldValue<string>('description') || '',
+      GroupIcon: this.getFieldValue<string>('groupIcon')!
     };
 
     this.executeWithLoading(
-      this.transactionApiService.updateTransactionGroup(this.data.id, updatedTransactionGroup),
+      this.transactionApiService.updateTransactionGroup(this.data.Id, updatedTransactionGroup),
       'Transaction group updated successfully!',
       'Updating transaction group'
     ).subscribe({

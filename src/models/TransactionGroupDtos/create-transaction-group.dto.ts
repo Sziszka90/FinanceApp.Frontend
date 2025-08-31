@@ -1,6 +1,6 @@
 
 export interface CreateTransactionGroupDto {
-    name: string,
-    description?: string,
-    groupIcon?: string,
+    Name: string,
+    Description?: string,
+    GroupIcon?: string,
 }

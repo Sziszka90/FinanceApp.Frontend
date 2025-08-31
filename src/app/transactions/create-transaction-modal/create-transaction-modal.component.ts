@@ -79,7 +79,7 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
   };
 
   groupOptions = signal<GetTransactionGroupDto[]>([]);
-  typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
+  typeOptions: {Name: string, Value: TransactionTypeEnum}[] = [{ Name: 'Expense', Value: TransactionTypeEnum.Expense }, { Name: 'Income', Value: TransactionTypeEnum.Income }];
   currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
     isNaN(Number(key))
   );
@@ -92,7 +92,7 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
     ).subscribe({
       next: (data) => {
         this.groupOptions.set(data);
-        this.groupOptions.update(groups => [...groups, { id: '', name: 'No group' } as GetTransactionGroupDto]);
+        this.groupOptions.update(groups => [...groups, { Id: '', Name: 'No group' } as GetTransactionGroupDto]);
       }
     });
   }
@@ -107,15 +107,15 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
     const groupValue = this.getFieldValue<GetTransactionGroupDto>('group') || null;
 
     const createTransactionDto = {
-      name: this.getFieldValue<string>('name')!,
-      description: this.getFieldValue<string>('description') || '',
-      value: {
-        amount: this.getFieldValue<number>('value')!,
-        currency: this.getFieldValue<CurrencyEnum>('currency')!
+      Name: this.getFieldValue<string>('name')!,
+      Description: this.getFieldValue<string>('description') || '',
+      Value: {
+        Amount: this.getFieldValue<number>('value')!,
+        Currency: this.getFieldValue<CurrencyEnum>('currency')!
       },
-      transactionDate: formattedDate,
-      transactionType: this.getFieldValue<TransactionTypeEnum>('transactionType')!,
-      transactionGroupId: groupValue?.id || undefined
+      TransactionDate: formattedDate,
+      TransactionType: this.getFieldValue<TransactionTypeEnum>('transactionType')!,
+      TransactionGroupId: groupValue?.Id || undefined
     };
 
     this.executeWithLoading(

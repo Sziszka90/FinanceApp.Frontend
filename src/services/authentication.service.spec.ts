@@ -18,16 +18,16 @@ describe('AuthenticationService', () => {
   let router: jasmine.SpyObj<Router>;
 
   const mockLoginRequest: LoginRequestDto = {
-    email: 'test@example.com',
-    password: 'password123'
+    Email: 'test@example.com',
+    Password: 'password123'
   };
 
   const mockLoginResponse: LoginResponseDto = {
-    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJleHAiOjk5OTk5OTk5OTl9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+    Token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJleHAiOjk5OTk5OTk5OTl9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
   };
 
   const mockValidateTokenResponse: ValidateTokenResponse = {
-    isValid: true
+    IsValid: true
   };
 
   beforeEach(() => {
@@ -213,7 +213,7 @@ describe('AuthenticationService', () => {
     });
 
     it('should return false when API validation fails', (done) => {
-      tokenApiService.verifyToken.and.returnValue(of({ isValid: false }));
+      tokenApiService.verifyToken.and.returnValue(of({ IsValid: false }));
 
       service.validateTokenWithApi('invalid-token').subscribe((isValid) => {
         expect(isValid).toBe(false);

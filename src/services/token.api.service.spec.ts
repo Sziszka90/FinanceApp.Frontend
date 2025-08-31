@@ -43,7 +43,7 @@ describe('TokenApiService', () => {
     const expectedUrl = `${mockEnvironment.apiUrl}/api/v1/token/validate`;
 
     it('should send POST request to validate endpoint', () => {
-      const mockResponse: ValidateTokenResponse = { isValid: true };
+      const mockResponse: ValidateTokenResponse = { IsValid: true };
 
       service.verifyToken(testToken).subscribe((response) => {
         expect(response).toEqual(mockResponse);
@@ -56,10 +56,10 @@ describe('TokenApiService', () => {
     });
 
     it('should return valid token response', () => {
-      const mockResponse: ValidateTokenResponse = { isValid: true };
+      const mockResponse: ValidateTokenResponse = { IsValid: true };
 
       service.verifyToken(testToken).subscribe((response) => {
-        expect(response.isValid).toBe(true);
+        expect(response.IsValid).toBe(true);
       });
 
       const req = httpMock.expectOne(expectedUrl);
@@ -67,10 +67,10 @@ describe('TokenApiService', () => {
     });
 
     it('should return invalid token response', () => {
-      const mockResponse: ValidateTokenResponse = { isValid: false };
+      const mockResponse: ValidateTokenResponse = { IsValid: false };
 
       service.verifyToken(testToken).subscribe((response) => {
-        expect(response.isValid).toBe(false);
+        expect(response.IsValid).toBe(false);
       });
 
       const req = httpMock.expectOne(expectedUrl);

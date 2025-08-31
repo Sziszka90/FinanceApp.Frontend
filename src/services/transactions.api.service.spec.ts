@@ -20,56 +20,56 @@ describe('TransactionApiService', () => {
   };
 
   const mockMoney: Money = {
-    amount: 100,
-    currency: CurrencyEnum.EUR
+    Amount: 100,
+    Currency: CurrencyEnum.EUR
   };
 
   const mockTransaction: GetTransactionDto = {
-    id: '123',
-    name: 'Test Transaction',
-    description: 'Test Description',
-    value: mockMoney,
-    transactionType: TransactionTypeEnum.Income,
-    transactionDate: new Date()
+    Id: '123',
+    Name: 'Test Transaction',
+    Description: 'Test Description',
+    Value: mockMoney,
+    TransactionType: TransactionTypeEnum.Income,
+    TransactionDate: new Date()
   };
 
   const mockCreateTransaction: CreateTransactionDto = {
-    name: 'New Transaction',
-    description: 'New Description',
-    value: { amount: 50, currency: CurrencyEnum.USD },
-    transactionType: TransactionTypeEnum.Expense,
-    transactionDate: new Date(),
-    transactionGroupId: '789'
+    Name: 'New Transaction',
+    Description: 'New Description',
+    Value: { Amount: 50, Currency: CurrencyEnum.USD },
+    TransactionType: TransactionTypeEnum.Expense,
+    TransactionDate: new Date(),
+    TransactionGroupId: '789'
   };
 
   const mockUpdateTransaction: UpdateTransactionDto = {
-    id: '123',
-    name: 'Updated Transaction',
-    description: 'Updated Description',
-    value: { amount: 75, currency: CurrencyEnum.GBP },
-    transactionType: TransactionTypeEnum.Income,
-    transactionDate: new Date(),
-    transactionGroupId: '456'
+    Id: '123',
+    Name: 'Updated Transaction',
+    Description: 'Updated Description',
+    Value: { Amount: 75, Currency: CurrencyEnum.GBP },
+    TransactionType: TransactionTypeEnum.Income,
+    TransactionDate: new Date(),
+    TransactionGroupId: '456'
   };
 
   const mockTransactionGroup: GetTransactionGroupDto = {
-    id: '456',
-    name: 'Test Group',
-    description: 'Test Group Description',
-    groupIcon: 'home'
+    Id: '456',
+    Name: 'Test Group',
+    Description: 'Test Group Description',
+    GroupIcon: 'home'
   };
 
   const mockCreateTransactionGroup: CreateTransactionGroupDto = {
-    name: 'New Group',
-    description: 'New Group Description',
-    groupIcon: 'shopping'
+    Name: 'New Group',
+    Description: 'New Group Description',
+    GroupIcon: 'shopping'
   };
 
   const mockUpdateTransactionGroup: UpdateTransactionGroupDto = {
-    id: '456',
-    name: 'Updated Group',
-    description: 'Updated Group Description',
-    groupIcon: 'savings'
+    Id: '456',
+    Name: 'Updated Group',
+    Description: 'Updated Group Description',
+    GroupIcon: 'savings'
   };
 
   beforeEach(() => {
@@ -145,7 +145,7 @@ describe('TransactionApiService', () => {
       const expectedUrl = `${mockEnvironment.apiUrl}/api/v1/transactions/summary`;
 
       it('should retrieve transactions summary', () => {
-        const mockSummary: Money = { amount: 1000, currency: CurrencyEnum.EUR };
+        const mockSummary: Money = { Amount: 1000, Currency: CurrencyEnum.EUR };
 
         service.getAllTransactionsSummary().subscribe((summary: Money) => {
           expect(summary).toEqual(mockSummary);
@@ -155,12 +155,12 @@ describe('TransactionApiService', () => {
         expect(req.request.method).toBe('GET');
         req.flush(mockSummary);
       });
-
+      
       it('should handle empty summary', () => {
-        const emptySummary: Money = { amount: 0, currency: CurrencyEnum.EUR };
+        const emptySummary: Money = { Amount: 0, Currency: CurrencyEnum.EUR };
 
         service.getAllTransactionsSummary().subscribe((summary: Money) => {
-          expect(summary.amount).toBe(0);
+          expect(summary.Amount).toBe(0);
         });
 
         const req = httpMock.expectOne(expectedUrl);
@@ -287,7 +287,7 @@ describe('TransactionApiService', () => {
       it('should retrieve specific transaction group by ID', () => {
         service.getTransactionGroup(groupId).subscribe((group: GetTransactionGroupDto) => {
           expect(group).toEqual(mockTransactionGroup);
-          expect(group.id).toBe(groupId);
+          expect(group.Id).toBe(groupId);
         });
 
         const req = httpMock.expectOne(expectedUrl);
@@ -515,14 +515,14 @@ describe('TransactionApiService', () => {
       req.flush([mockTransaction]);
 
       // Update
-      service.updateTransaction(mockTransaction.id, mockUpdateTransaction).subscribe();
-      req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactions/${mockTransaction.id}`);
+      service.updateTransaction(mockTransaction.Id, mockUpdateTransaction).subscribe();
+      req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactions/${mockTransaction.Id}`);
       expect(req.request.method).toBe('PUT');
       req.flush(mockTransaction);
 
       // Delete
-      service.deleteTransaction(mockTransaction.id).subscribe();
-      req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactions/${mockTransaction.id}`);
+      service.deleteTransaction(mockTransaction.Id).subscribe();
+      req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactions/${mockTransaction.Id}`);
       expect(req.request.method).toBe('DELETE');
       req.flush(null, { status: 204, statusText: 'No Content' });
     });
@@ -541,20 +541,20 @@ describe('TransactionApiService', () => {
       req.flush([mockTransactionGroup]);
 
       // Read one
-      service.getTransactionGroup(mockTransactionGroup.id).subscribe();
-      req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactiongroups/${mockTransactionGroup.id}`);
+      service.getTransactionGroup(mockTransactionGroup.Id).subscribe();
+      req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactiongroups/${mockTransactionGroup.Id}`);
       expect(req.request.method).toBe('GET');
       req.flush(mockTransactionGroup);
 
       // Update
-      service.updateTransactionGroup(mockTransactionGroup.id, mockUpdateTransactionGroup).subscribe();
-      req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactiongroups/${mockTransactionGroup.id}`);
+      service.updateTransactionGroup(mockTransactionGroup.Id, mockUpdateTransactionGroup).subscribe();
+      req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactiongroups/${mockTransactionGroup.Id}`);
       expect(req.request.method).toBe('PUT');
       req.flush(mockTransactionGroup);
 
       // Delete
-      service.deleteTransactionGroup(mockTransactionGroup.id).subscribe();
-      req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactiongroups/${mockTransactionGroup.id}`);
+      service.deleteTransactionGroup(mockTransactionGroup.Id).subscribe();
+      req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactiongroups/${mockTransactionGroup.Id}`);
       expect(req.request.method).toBe('DELETE');
       req.flush(null, { status: 204, statusText: 'No Content' });
     });
@@ -578,12 +578,12 @@ describe('TransactionApiService', () => {
   describe('Edge Cases', () => {
     it('should handle empty strings gracefully', () => {
       const transactionWithEmptyStrings = {
-        name: '',
-        description: '',
-        value: mockMoney,
-        transactionType: TransactionTypeEnum.Income,
-        transactionDate: new Date(),
-        transactionGroupId: ''
+        Name: '',
+        Description: '',
+        Value: mockMoney,
+        TransactionType: TransactionTypeEnum.Income,
+        TransactionDate: new Date(),
+        TransactionGroupId: ''
       };
 
       service.createTransaction(transactionWithEmptyStrings).subscribe();
