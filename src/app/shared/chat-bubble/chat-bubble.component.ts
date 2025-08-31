@@ -53,7 +53,9 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
               if (user) {
                 this.userId = user.Id;
                 this.userName = user.UserName;
-                this.messages.push({ text: `Hi ${this.userName}! How can I assist you today?`, sender: 'assistant' });
+                if(this.messages.length === 0) {
+                  this.messages.push({ text: `Hi ${this.userName}! How can I assist you today?`, sender: 'assistant' });
+                }
               }
             },
             error: () => {
