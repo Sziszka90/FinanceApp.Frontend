@@ -24,7 +24,7 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
   resetPasswordValid = signal<boolean>(true);
 
   override formGroup: FormGroup = this.fb.group({
-    password: [
+    Password: [
       '',
       [
         Validators.required,
@@ -32,7 +32,7 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
         Validators.minLength(8)
       ]
     ],
-    confirmPassword: [
+    ConfirmPassword: [
       '',
       [
         Validators.required,
@@ -45,12 +45,12 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
   );
 
   override customValidationMessages = {
-    password: {
+    Password: {
       required: 'Password is required',
       minlength: 'Minimum 8 characters required',
       pattern: 'Password must include at least one uppercase letter, one number, and one special character'
     },
-    confirmPassword: {
+    ConfirmPassword: {
       required: 'Confirm password is required',
       minlength: 'Minimum 8 characters required',
       pattern: 'Password must include at least one uppercase letter, one number, and one special character'

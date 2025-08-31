@@ -66,9 +66,9 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
 
   filterForm: FormGroup = this.fb.group({
-    name: [''],
-    date: [''],
-    type: []
+    Name: [''],
+    Date: [''],
+    Type: []
   });
 
   displayedColumns: string[] = [
@@ -149,25 +149,25 @@ export class TransactionComponent extends BaseComponent implements OnInit {
     this.dataSource.update(ds => {
       ds.filterPredicate = (data: GetTransactionDto, filter: string) => {
         const filterObj = JSON.parse(filter);
-        const { name, date, type } = filterObj;
+        const { Name, Date, Type } = filterObj;
 
-        return (!name || data.Name.toLowerCase().includes(name.toLowerCase())) &&
-              (!date || (
+        return (!Name || data.Name.toLowerCase().includes(Name.toLowerCase())) &&
+              (!Date || (
                 data.TransactionDate &&
-                new Date(data.TransactionDate).toISOString().slice(0, 10) === date
+                new Date(data.TransactionDate).toISOString().slice(0, 10) === Date
               )) &&
-              (!type || data.TransactionType === type);
+              (!Type || data.TransactionType === Type);
       };
       return ds; // important: return the same object
     });
   }
 
   applyFilters() {
-    const { name, date, type } = this.filterForm.value;
-    const formattedDate = date ? formatDate(date, 'yyyy-MM-dd', 'en-US') : '';
+    const { Name, Date, Type } = this.filterForm.value;
+    const formattedDate = Date ? formatDate(Date, 'yyyy-MM-dd', 'en-US') : '';
 
     this.dataSource.update(ds => {
-      ds.filter = JSON.stringify({ name, date: formattedDate, type });
+      ds.filter = JSON.stringify({ Name, Date: formattedDate, Type });
       return ds;
     });
 

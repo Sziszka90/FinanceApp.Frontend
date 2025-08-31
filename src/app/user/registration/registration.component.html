@@ -5,57 +5,57 @@
     <div class="error-message default-font" *ngIf="hasError()">
       {{ errorMessage() }}
     </div>
-    <label class="default-font" for="userName">User Name</label>
+    <label class="default-font" for="UserName">User Name</label>
     <div class="form-group">
       <input
         class="default-font"
-        id="userName"
+        id="UserName"
         type="text"
-        formControlName="userName"
+        formControlName="UserName"
         required
         placeholder="User Name"
       />
-      <div class="error-font" *ngIf="hasFieldError('userName')">
-        {{ getFieldErrorMessage('userName') }}
+      <div class="error-font" *ngIf="hasFieldError('UserName')">
+        {{ getFieldErrorMessage('UserName') }}
       </div>
     </div>
-    <label class="default-font" for="email">Email</label>
+    <label class="default-font" for="Email">Email</label>
     <div class="form-group">
       <input
         class="default-font"
-        id="email"
+        id="Email"
         type="text"
-        formControlName="email"
+        formControlName="Email"
         required
         placeholder="Email"
       />
-      <div class="error-font" *ngIf="hasFieldError('email')">
-        {{ getFieldErrorMessage('email') }}
+      <div class="error-font" *ngIf="hasFieldError('Email')">
+        {{ getFieldErrorMessage('Email') }}
       </div>
     </div>
-    <label class="default-font" for="password">Password</label>
+    <label class="default-font" for="Password">Password</label>
     <div class="form-group">
       <input
         class="default-font"
-        id="password"
+        id="Password"
         type="password"
-        formControlName="password"
+        formControlName="Password"
         required
         placeholder="Password"
       />
-      <div class="error-font" *ngIf="hasFieldError('password')">
-        {{ getFieldErrorMessage('password') }}
+      <div class="error-font" *ngIf="hasFieldError('Password')">
+        {{ getFieldErrorMessage('Password') }}
       </div>
     </div>
-    <label class="default-font" for="currency">Currency</label>
+    <label class="default-font" for="Currency">Currency</label>
     <div class="select">
-      <mat-select formControlName="currency" required>
+      <mat-select formControlName="Currency" required>
         <mat-option *ngFor="let option of currencyOptions" [value]="option">
           {{ option }}
         </mat-option>
       </mat-select>
-      <div class="error-font" *ngIf="hasFieldError('currency')">
-        {{ getFieldErrorMessage('currency') }}
+      <div class="error-font" *ngIf="hasFieldError('Currency')">
+        {{ getFieldErrorMessage('Currency') }}
       </div>
     </div>
     <button class="custom-button bounce-button default-font" type="submit" [disabled]="!isFormValid()">

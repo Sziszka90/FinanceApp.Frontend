@@ -5,33 +5,33 @@
     <div class="error-message default-font" *ngIf="hasError()">
       {{ errorMessage() }}
     </div>
-    <label class="default-font" for="email">User Email</label>
+    <label class="default-font" for="Email">User Email</label>
     <div class="form-group">
       <input
         class="default-font"
-        id="email"
-        formControlName="email"
+        id="Email"
+        formControlName="Email"
         required
         placeholder="Email"
       />
       <div class="error-message default-font"
-           *ngIf="hasFieldError('email')">
-        {{ getFieldErrorMessage('email') }}
+           *ngIf="hasFieldError('Email')">
+        {{ getFieldErrorMessage('Email') }}
       </div>
     </div>
-    <label class="default-font" for="password">Password</label>
+    <label class="default-font" for="Password">Password</label>
     <div class="form-group">
       <input
         class="default-font"
-        id="password"
+        id="Password"
         type="password"
-        formControlName="password"
+        formControlName="Password"
         required
         placeholder="Password"
       />
       <div class="error-message default-font"
-           *ngIf="hasFieldError('password')">
-        {{ getFieldErrorMessage('password') }}
+           *ngIf="hasFieldError('Password')">
+        {{ getFieldErrorMessage('Password') }}
       </div>
     </div>
     <div class="button-container">

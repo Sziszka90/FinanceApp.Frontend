@@ -29,8 +29,8 @@ export class LoginComponent extends BaseComponent {
   private fb = inject(FormBuilder);
 
   override formGroup: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]]
+    Email: ['', [Validators.required, Validators.email]],
+    Password: ['', [Validators.required]]
   });
 
   forgotPassword(): void {
@@ -51,7 +51,7 @@ export class LoginComponent extends BaseComponent {
     if (this.formGroup.valid) {
       this.executeWithLoading(
         this.authService.login(this.formGroup.value),
-        undefined, // no success message
+        undefined,
         'Login failed'
       ).subscribe({
         next: (data: { Token: string }) => {

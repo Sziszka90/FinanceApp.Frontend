@@ -37,19 +37,19 @@ export class CreateTransactionGroupModalComponent extends BaseComponent implemen
   private transactionApiService = inject(TransactionApiService);
 
   public override formGroup: FormGroup = this.fb.group({
-    name: new FormControl('', [Validators.required, Validators.minLength(2)]),
-    description: new FormControl(''),
-    groupIcon: new FormControl('', Validators.required)
+    Name: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    Description: new FormControl(''),
+    GroupIcon: new FormControl('', Validators.required)
   });
 
   public groupIconOptions: string[] = Object.values(ICONS);
 
   public override customValidationMessages: FieldValidationMessages = {
-    name: {
+    Name: {
       required: 'Transaction group name is required',
       minlength: 'Name must be at least 2 characters long'
     },
-    groupIcon: {
+    GroupIcon: {
       required: 'Please select an icon for the group'
     }
   };
@@ -57,7 +57,7 @@ export class CreateTransactionGroupModalComponent extends BaseComponent implemen
   ngOnInit(): void {
     if (this.groupIconOptions.length > 0) {
       this.formGroup!.patchValue({
-        groupIcon: this.groupIconOptions.at(-1)
+        GroupIcon: this.groupIconOptions.at(-1)
       });
     }
   }
@@ -68,9 +68,9 @@ export class CreateTransactionGroupModalComponent extends BaseComponent implemen
     }
 
     const createdTransactionGroup = {
-      Name: this.getFieldValue<string>('name') ?? '',
-      Description: this.getFieldValue<string>('description') ?? '',
-      GroupIcon: this.getFieldValue<string>('groupIcon') ?? ''
+      Name: this.getFieldValue<string>('Name') ?? '',
+      Description: this.getFieldValue<string>('Description') ?? '',
+      GroupIcon: this.getFieldValue<string>('GroupIcon') ?? ''
     };
 
     this.executeWithLoading(

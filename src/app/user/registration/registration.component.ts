@@ -32,9 +32,9 @@ export class RegistrationComponent extends BaseComponent {
   private router = inject(Router);
 
   override formGroup: FormGroup = this.fb.group({
-    userName: ['', [Validators.required, Validators.minLength(2)]],
-    email: ['', [Validators.required, Validators.email]],
-    password: [
+    UserName: ['', [Validators.required, Validators.minLength(2)]],
+    Email: ['', [Validators.required, Validators.email]],
+    Password: [
       '',
       [
         Validators.required,
@@ -42,24 +42,24 @@ export class RegistrationComponent extends BaseComponent {
         Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$')
       ]
     ],
-    currency: ['', [Validators.required]]
+    Currency: ['', [Validators.required]]
   });
 
   override customValidationMessages = {
-    userName: {
+    UserName: {
       required: 'User name is required',
       minlength: 'Minimum 2 characters required'
     },
-    email: {
+    Email: {
       required: 'Email is required',
       email: 'Invalid email format'
     },
-    password: {
+    Password: {
       required: 'Password is required',
       minlength: 'Minimum 8 characters required',
       pattern: 'Include uppercase letter, number, and special character'
     },
-    currency: {
+    Currency: {
       required: 'Currency is required'
     }
   };
@@ -75,7 +75,7 @@ export class RegistrationComponent extends BaseComponent {
 
       this.executeWithLoading(
         this.apiService.register({
-          UserName: this.getFieldValue('userName') || '',
+          UserName: this.getFieldValue('UserName') || '',
           Email: this.getFieldValue('Email') || '',
           Password: this.getFieldValue('Password') || '',
           BaseCurrency: this.getFieldValue('Currency') || CurrencyEnum.EUR

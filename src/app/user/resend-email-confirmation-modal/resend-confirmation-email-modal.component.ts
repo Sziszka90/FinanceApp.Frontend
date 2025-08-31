@@ -18,11 +18,11 @@ export class ResendConfirmationEmailModalComponent extends BaseComponent {
   private fb = inject(FormBuilder);
 
   override formGroup: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]]
+    Email: ['', [Validators.required, Validators.email]]
   });
 
   override customValidationMessages = {
-    email: {
+    Email: {
       required: 'Email is required',
       email: 'Please provide a valid email address'
     }
@@ -30,7 +30,7 @@ export class ResendConfirmationEmailModalComponent extends BaseComponent {
 
   onSubmit(): void {
     if (this.isFormValid()) {
-      const email = this.getFieldValue<string>('email') || '';
+      const email = this.getFieldValue<string>('Email') || '';
 
       this.executeWithLoading(
         this.userApiService.resendConfirmationEmail(email),

@@ -49,31 +49,31 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
   private transactionApiService = inject(TransactionApiService);
 
   public override formGroup: FormGroup = this.fb.group({
-    name: new FormControl('', [Validators.required, Validators.minLength(2)]),
-    description: new FormControl(''),
-    value: new FormControl(0, [Validators.required, Validators.min(0.01)]),
-    currency: new FormControl('', Validators.required),
-    transactionDate: new FormControl(new Date(), Validators.required),
-    transactionType: new FormControl('', Validators.required),
-    group: new FormControl('')
+    Name: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    Description: new FormControl(''),
+    Value: new FormControl(0, [Validators.required, Validators.min(0.01)]),
+    Currency: new FormControl('', Validators.required),
+    TransactionDate: new FormControl(new Date(), Validators.required),
+    TransactionType: new FormControl('', Validators.required),
+    Group: new FormControl('')
   });
 
   public override customValidationMessages: FieldValidationMessages = {
-    name: {
+    Name: {
       required: 'Transaction name is required',
       minlength: 'Name must be at least 2 characters long'
     },
-    value: {
+    Value: {
       required: 'Transaction amount is required',
       min: 'Amount must be greater than 0'
     },
-    currency: {
+    Currency: {
       required: 'Please select a currency'
     },
-    transactionDate: {
+    TransactionDate: {
       required: 'Transaction date is required'
     },
-    transactionType: {
+    TransactionType: {
       required: 'Please select a transaction type'
     }
   };
@@ -102,19 +102,19 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
       return;
     }
 
-    const date: Date = this.getFieldValue<Date>('transactionDate')!;
+    const date: Date = this.getFieldValue<Date>('TransactionDate')!;
     const formattedDate = new Date(date ? formatDate(date, 'yyyy-MM-dd', 'en-US') : '');
-    const groupValue = this.getFieldValue<GetTransactionGroupDto>('group') || null;
+    const groupValue = this.getFieldValue<GetTransactionGroupDto>('Group') || null;
 
     const createTransactionDto = {
-      Name: this.getFieldValue<string>('name')!,
-      Description: this.getFieldValue<string>('description') || '',
+      Name: this.getFieldValue<string>('Name')!,
+      Description: this.getFieldValue<string>('Description') || '',
       Value: {
-        Amount: this.getFieldValue<number>('value')!,
-        Currency: this.getFieldValue<CurrencyEnum>('currency')!
+        Amount: this.getFieldValue<number>('Value')!,
+        Currency: this.getFieldValue<CurrencyEnum>('Currency')!
       },
       TransactionDate: formattedDate,
-      TransactionType: this.getFieldValue<TransactionTypeEnum>('transactionType')!,
+      TransactionType: this.getFieldValue<TransactionTypeEnum>('TransactionType')!,
       TransactionGroupId: groupValue?.Id || undefined
     };
 

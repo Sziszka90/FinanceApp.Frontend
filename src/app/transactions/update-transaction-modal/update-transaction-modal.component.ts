@@ -51,19 +51,19 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
   public data = inject(MAT_DIALOG_DATA);
 
   public override formGroup: FormGroup = this.fb.group({
-    name: new FormControl(this.data.name, [Validators.required, Validators.minLength(2)]),
-    description: new FormControl(this.data.description),
-    value: new FormControl(this.data.value.amount, [
+    Name: new FormControl(this.data.name, [Validators.required, Validators.minLength(2)]),
+    Description: new FormControl(this.data.description),
+    Value: new FormControl(this.data.value.amount, [
       Validators.required,
       Validators.min(0.01)
     ]),
-    currency: new FormControl(this.data.value.currency, Validators.required),
-    transactionDate: new FormControl(this.data.transactionDate, Validators.required),
-    transactionType: new FormControl(
+    Currency: new FormControl(this.data.value.currency, Validators.required),
+    TransactionDate: new FormControl(this.data.transactionDate, Validators.required),
+    TransactionType: new FormControl(
       null,
       [Validators.required, enumValidator(TransactionTypeEnum)]
     ),
-    group: new FormControl(
+    Group: new FormControl(
       this.data.transactionGroup != null
         ? this.data.transactionGroup
         : null
@@ -71,21 +71,21 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
   });
 
   public override customValidationMessages: FieldValidationMessages = {
-    name: {
+    Name: {
       required: 'Transaction name is required',
       minlength: 'Name must be at least 2 characters long'
     },
-    value: {
+    Value: {
       required: 'Transaction amount is required',
       min: 'Amount must be greater than 0'
     },
-    currency: {
+    Currency: {
       required: 'Please select a currency'
     },
-    transactionDate: {
+    TransactionDate: {
       required: 'Transaction date is required'
     },
-    transactionType: {
+    TransactionType: {
       required: 'Please select a transaction type'
     }
   };
@@ -96,10 +96,10 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
   );
 
   ngOnInit(): void {
-    this.formGroup!.get('group')?.setValue(this.data.transactionGroup);
-    this.formGroup!.get('currency')?.setValue(this.data.value.currency);
-    this.formGroup!.get('transactionType')?.setValue(this.data.transactionType);
-    this.formGroup!.get('transactionDate')?.setValue(new Date(this.data.transactionDate));
+  this.formGroup!.get('Group')?.setValue(this.data.transactionGroup);
+  this.formGroup!.get('Currency')?.setValue(this.data.value.currency);
+  this.formGroup!.get('TransactionType')?.setValue(this.data.transactionType);
+  this.formGroup!.get('TransactionDate')?.setValue(new Date(this.data.transactionDate));
 
     this.executeWithLoading(
       this.transactionApiService.getAllTransactionGroups(),
@@ -120,22 +120,22 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
 
     let transactionDate = undefined;
 
-    const date: Date = this.getFieldValue<Date>('transactionDate')!;
+    const date: Date = this.getFieldValue<Date>('TransactionDate')!;
     if (date && date.getFullYear() !== 1) {
       transactionDate = date;
     }
 
     const updatedTransaction: UpdateTransactionDto = {
       Id: this.data.id,
-      Name: this.getFieldValue<string>('name')!,
-      Description: this.getFieldValue<string>('description') || '',
+      Name: this.getFieldValue<string>('Name')!,
+      Description: this.getFieldValue<string>('Description') || '',
       Value: {
-        Amount: this.getFieldValue<number>('value')!,
-        Currency: this.getFieldValue<CurrencyEnum>('currency')!
+        Amount: this.getFieldValue<number>('Value')!,
+        Currency: this.getFieldValue<CurrencyEnum>('Currency')!
       },
-      TransactionType: this.getFieldValue<TransactionTypeEnum>('transactionType')!,
+      TransactionType: this.getFieldValue<TransactionTypeEnum>('TransactionType')!,
       TransactionDate: transactionDate,
-      TransactionGroupId: this.getFieldValue<GetTransactionGroupDto>('group')?.Id || undefined
+      TransactionGroupId: this.getFieldValue<GetTransactionGroupDto>('Group')?.Id || undefined
     };
 
     this.executeWithLoading(

@@ -19,11 +19,11 @@ export class ForgotPasswordRequestModalComponent extends BaseComponent {
   private fb = inject(FormBuilder);
 
   public override formGroup: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]]
+    Email: ['', [Validators.required, Validators.email]]
   });
 
   public override customValidationMessages: FieldValidationMessages = {
-    email: {
+    Email: {
       required: 'Email address is required',
       email: 'Please enter a valid email address'
     }
@@ -34,7 +34,7 @@ export class ForgotPasswordRequestModalComponent extends BaseComponent {
       return;
     }
 
-    const email = this.getFieldValue<string>('email')!;
+    const email = this.getFieldValue<string>('Email')!;
 
     this.executeWithLoading(
       this.userApiService.forgotPassword(email),

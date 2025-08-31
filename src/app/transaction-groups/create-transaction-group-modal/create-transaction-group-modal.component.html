@@ -8,29 +8,29 @@
   </div>
   <loader *ngIf="loading()" class="loader"></loader>
   <form *ngIf="!loading()" class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
-    <label for="name">Name</label>
+    <label for="Name">Name</label>
     <div class="form-group">
-      <input id="name" type="text" formControlName="name" required />
-      <div class="error-message" *ngIf="hasFieldError('name')">
-        {{ getFieldErrorMessage('name') }}
+      <input id="Name" type="text" formControlName="Name" required />
+      <div class="error-message" *ngIf="hasFieldError('Name')">
+        {{ getFieldErrorMessage('Name') }}
       </div>
     </div>
-    <label for="description">Description</label>
+    <label for="Description">Description</label>
     <div class="form-group">
-      <input id="description" type="text" formControlName="description" />
+      <input id="Description" type="text" formControlName="Description" />
     </div>
-    <label class="default-font" for="groupIcon">Group Icon</label>
+    <label class="default-font" for="GroupIcon">Group Icon</label>
     <div class="form-group">
-      <mat-select class="select" formControlName="groupIcon" required>
+      <mat-select class="select" formControlName="GroupIcon" required>
         <mat-select-trigger>
-          <i class="{{ formGroup!.get('groupIcon')?.value }}"></i>
+          <i class="{{ formGroup!.get('GroupIcon')?.value }}"></i>
         </mat-select-trigger>
         <mat-option *ngFor="let option of groupIconOptions" [value]="option">
           <i class="{{ option }}"></i>
         </mat-option>
       </mat-select>
-      <div class="error-message" *ngIf="hasFieldError('groupIcon')">
-        {{ getFieldErrorMessage('groupIcon') }}
+      <div class="error-message" *ngIf="hasFieldError('GroupIcon')">
+        {{ getFieldErrorMessage('GroupIcon') }}
       </div>
     </div>
     <div class="button-container">

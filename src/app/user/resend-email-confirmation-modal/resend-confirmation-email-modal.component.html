@@ -7,11 +7,11 @@
   </div>
   <loader *ngIf="loading()"></loader>
   <form *ngIf="!loading()" class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
-    <label>Email</label>
+    <label for="Email">Email</label>
     <div class="form-group">
-      <input id="email" type="email" placeholder="Enter your email address" formControlName="email" />
-      <div class="error-font" *ngIf="hasFieldError('email')">
-        {{ getFieldErrorMessage('email') }}
+      <input id="Email" type="email" placeholder="Enter your email address" formControlName="Email" />
+      <div class="error-font" *ngIf="hasFieldError('Email')">
+        {{ getFieldErrorMessage('Email') }}
       </div>
     </div>
     <div class="button-container">
