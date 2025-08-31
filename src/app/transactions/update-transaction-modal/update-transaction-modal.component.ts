@@ -51,21 +51,21 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
   public data = inject(MAT_DIALOG_DATA);
 
   public override formGroup: FormGroup = this.fb.group({
-    Name: new FormControl(this.data.name, [Validators.required, Validators.minLength(2)]),
-    Description: new FormControl(this.data.description),
-    Value: new FormControl(this.data.value.amount, [
+    Name: new FormControl(this.data.Name, [Validators.required, Validators.minLength(2)]),
+    Description: new FormControl(this.data.Description),
+    Value: new FormControl(this.data.Value.Amount, [
       Validators.required,
       Validators.min(0.01)
     ]),
-    Currency: new FormControl(this.data.value.currency, Validators.required),
-    TransactionDate: new FormControl(this.data.transactionDate, Validators.required),
+    Currency: new FormControl(this.data.Value.Currency, Validators.required),
+    TransactionDate: new FormControl(this.data.TransactionDate, Validators.required),
     TransactionType: new FormControl(
       null,
       [Validators.required, enumValidator(TransactionTypeEnum)]
     ),
     Group: new FormControl(
-      this.data.transactionGroup != null
-        ? this.data.transactionGroup
+      this.data.TransactionGroup != null
+        ? this.data.TransactionGroup
         : null
     )
   });
@@ -90,16 +90,16 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
     }
   };
   groupOptions = signal<GetTransactionGroupDto[]>([]);
-  typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
+  typeOptions: {Name: string, Value: TransactionTypeEnum}[] = [{ Name: 'Expense', Value: TransactionTypeEnum.Expense }, { Name: 'Income', Value: TransactionTypeEnum.Income }];
   currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
     isNaN(Number(key))
   );
 
   ngOnInit(): void {
-  this.formGroup!.get('Group')?.setValue(this.data.transactionGroup);
-  this.formGroup!.get('Currency')?.setValue(this.data.value.currency);
-  this.formGroup!.get('TransactionType')?.setValue(this.data.transactionType);
-  this.formGroup!.get('TransactionDate')?.setValue(new Date(this.data.transactionDate));
+  this.formGroup!.get('Group')?.setValue(this.data.TransactionGroup);
+  this.formGroup!.get('Currency')?.setValue(this.data.Value.Currency);
+  this.formGroup!.get('TransactionType')?.setValue(this.data.TransactionType);
+  this.formGroup!.get('TransactionDate')?.setValue(new Date(this.data.TransactionDate));
 
     this.executeWithLoading(
       this.transactionApiService.getAllTransactionGroups(),
