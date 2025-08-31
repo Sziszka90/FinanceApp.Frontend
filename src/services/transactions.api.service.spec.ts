@@ -155,7 +155,7 @@ describe('TransactionApiService', () => {
         expect(req.request.method).toBe('GET');
         req.flush(mockSummary);
       });
-      
+
       it('should handle empty summary', () => {
         const emptySummary: Money = { Amount: 0, Currency: CurrencyEnum.EUR };
 
@@ -596,7 +596,7 @@ describe('TransactionApiService', () => {
     it('should handle very large amounts', () => {
       const largeAmountTransaction = {
         ...mockCreateTransaction,
-        value: { amount: Number.MAX_SAFE_INTEGER, currency: CurrencyEnum.EUR }
+        Value: { Amount: Number.MAX_SAFE_INTEGER, Currency: CurrencyEnum.EUR }
       };
 
       service.createTransaction(largeAmountTransaction).subscribe();
