@@ -602,33 +602,33 @@ describe('TransactionApiService', () => {
       service.createTransaction(largeAmountTransaction).subscribe();
 
       const req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactions/`);
-      expect(req.request.body.value.amount).toBe(Number.MAX_SAFE_INTEGER);
+      expect(req.request.body.Value.Amount).toBe(Number.MAX_SAFE_INTEGER);
       req.flush(mockTransaction);
     });
 
     it('should handle negative amounts', () => {
       const negativeAmountTransaction = {
         ...mockCreateTransaction,
-        value: { amount: -100, currency: CurrencyEnum.EUR }
+        Value: { Amount: -100, Currency: CurrencyEnum.EUR }
       };
 
       service.createTransaction(negativeAmountTransaction).subscribe();
 
       const req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactions/`);
-      expect(req.request.body.value.amount).toBe(-100);
+      expect(req.request.body.Value.Amount).toBe(-100);
       req.flush(mockTransaction);
     });
 
     it('should handle zero amounts', () => {
       const zeroAmountTransaction = {
         ...mockCreateTransaction,
-        value: { amount: 0, currency: CurrencyEnum.EUR }
+        Value: { Amount: 0, Currency: CurrencyEnum.EUR }
       };
 
       service.createTransaction(zeroAmountTransaction).subscribe();
 
       const req = httpMock.expectOne(`${mockEnvironment.apiUrl}/api/v1/transactions/`);
-      expect(req.request.body.value.amount).toBe(0);
+      expect(req.request.body.Value.Amount).toBe(0);
       req.flush(mockTransaction);
     });
   });

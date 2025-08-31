@@ -5,36 +5,36 @@
     {{ errorMessage() }}
   </div>
   <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
-    <label class="default-font" for="currency">Currency</label>
-    <label class="default-font" for="userName">User Name</label>
+    <label class="default-font" for="Currency">Currency</label>
+    <label class="default-font" for="UserName">User Name</label>
     <div class="form-group">
       <input
         class="default-font"
-        id="userName"
+        id="UserName"
         type="text"
-        formControlName="userName"
+        formControlName="UserName"
         placeholder="User Name"
       />
-      <div class="error-font" *ngIf="hasFieldError('userName')">
-        {{ getFieldErrorMessage('userName') }}
+      <div class="error-font" *ngIf="hasFieldError('UserName')">
+        {{ getFieldErrorMessage('UserName') }}
       </div>
     </div>
-    <label class="default-font" for="password">Password</label>
+    <label class="default-font" for="Password">Password</label>
     <div class="form-group">
       <input
         class="default-font"
-        id="password"
+        id="Password"
         type="password"
-        formControlName="password"
+        formControlName="Password"
         placeholder="Password"
       />
-      <div class="error-font" *ngIf="hasFieldError('password')">
-        {{ getFieldErrorMessage('password') }}
+      <div class="error-font" *ngIf="hasFieldError('Password')">
+        {{ getFieldErrorMessage('Password') }}
       </div>
     </div>
-    <label class="default-font" for="currency">Currency</label>
+    <label class="default-font" for="Currency">Currency</label>
     <div class="form-group">
-      <mat-select class="select" formControlName="currency" [compareWith]="compareCategoryObjects" required>
+      <mat-select class="select" formControlName="Currency" [compareWith]="compareCategoryObjects" required>
         <mat-option *ngFor="let option of currencyOptions" [value]="option">
           {{ option }}
         </mat-option>
