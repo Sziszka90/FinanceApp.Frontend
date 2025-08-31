@@ -26,19 +26,19 @@
   <form [formGroup]="filterForm" class="search-container">
     <div class="form-group">
       <input
-        name="name"
+        name="Name"
         type="text"
-        placeholder="Search by name"
-        formControlName="name"
+        placeholder="Search by Name"
+        formControlName="Name"
         [class.disabled]="loading()"
         class="search-input"
-      />
+      />  
 
       <div class="input-with-icon">
         <input 
-          name="date"
+          name="Date"
           bsDatepicker 
-          formControlName="date" 
+          formControlName="Date" 
           [class.disabled]="loading()" 
           type="text" 
           placeholder="Select a date" />
@@ -46,9 +46,9 @@
       </div>
 
       <mat-select 
-        name="type"
+        name="Type"
         class="select" 
-        formControlName="type" 
+        formControlName="Type" 
         [class.disabled]="loading()">
         <mat-option *ngFor="let option of typeOptions" [value]="option.Name">
           &#8226; {{ option.Name }}
