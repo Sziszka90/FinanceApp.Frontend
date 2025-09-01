@@ -315,24 +315,6 @@ describe('ProfileComponent', () => {
     });
   });
 
-  describe('Utility Methods', () => {
-    it('should compare category objects correctly', () => {
-      const obj1 = { id: 1, name: 'Test' };
-      const obj2 = { id: 1, name: 'Different' };
-      const obj3 = { id: 2, name: 'Test' };
-
-      expect(component.compareCategoryObjects(obj1, obj2)).toBe(true);
-      expect(component.compareCategoryObjects(obj1, obj3)).toBe(false);
-      expect(component.compareCategoryObjects(null, obj1)).toBe(false);
-      expect(component.compareCategoryObjects(obj1, null)).toBe(false);
-    });
-
-    it('should handle null objects in comparison', () => {
-      expect(component.compareCategoryObjects(null, null)).toBe(false);
-      expect(component.compareCategoryObjects(undefined, undefined)).toBe(false);
-    });
-  });
-
   describe('Password Validator', () => {
     it('should validate empty password as valid (optional)', () => {
       const passwordControl = new FormControl('');

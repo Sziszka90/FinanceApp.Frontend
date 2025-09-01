@@ -29,34 +29,27 @@ export class ProfileComponent extends BaseComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
 
-  // Custom validator for optional strong password
   private optionalStrongPassword(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
-    
-    // Allow empty passwords (optional field)
+
     if (!value) {
       return null;
     }
     
-    // If password is provided, it must be strong
     const errors: ValidationErrors = {};
     
-    // Minimum 8 characters
     if (value.length < 8) {
       errors['minlength'] = { requiredLength: 8, actualLength: value.length };
     }
     
-    // Must contain uppercase
     if (!/[A-Z]/.test(value)) {
       errors['pattern'] = { message: 'Must contain uppercase letter' };
     }
     
-    // Must contain number  
     if (!/\d/.test(value)) {
       errors['pattern'] = { message: 'Must contain number' };
     }
     
-    // Must contain special character
     if (!/[^A-Za-z0-9]/.test(value)) {
       errors['pattern'] = { message: 'Must contain special character' };
     }
@@ -126,14 +119,11 @@ export class ProfileComponent extends BaseComponent implements OnInit {
     }
   }
 
-  compareCategoryObjects(object1: any, object2: any) {
+  compareCategoryObjects(object1: CurrencyEnum, object2: CurrencyEnum) {
     if (object1 == null || object2 == null) {
       return false;
     }
 
-    if ('id' in object1 && 'id' in object2) {
-      return object1.id === object2.id;
-    }
     return object1 === object2;
   }
 }
