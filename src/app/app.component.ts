@@ -2,9 +2,10 @@ import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
-import { NotificationService } from 'src/services/notification.service';
 import { ChatBubbleComponent } from './shared/chat-bubble/chat-bubble.component';
 import { AuthenticationService } from 'src/services/authentication.service';
+import { WakeupLoaderComponent } from './shared/wakeup-loader/wakeup-loader.components';
+import { WakeupService } from 'src/services/wakeup.service';
 
 @Component({
   selector: 'root',
@@ -12,21 +13,33 @@ import { AuthenticationService } from 'src/services/authentication.service';
     NavBarComponent,
     RouterOutlet,
     CommonModule,
-    ChatBubbleComponent
+    ChatBubbleComponent,
+    WakeupLoaderComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   standalone: true
 })
 export class AppComponent implements OnInit {
-  private notificationService = inject(NotificationService);
   private authService = inject(AuthenticationService);
+  private wakeupService = inject(WakeupService);
 
   title = 'Finance App';
   isServer = false;
 
-  ngOnInit(): void {
+  showWakeupLoader = false;
+  showApp = false;
+
+  async ngOnInit(): Promise<void> {
     this.authService.isAuthenticated();
+    this.wakeupService.showWakeupLoader$.subscribe(show => {
+      this.showWakeupLoader = show;
+    });
+    this.wakeupService.showApp$.subscribe(show => {
+      this.showApp = show;
+    });
+    await this.wakeupService.wakeup();
+
   }
 
   testGlobalError(): void {

@@ -1,9 +1,8 @@
-import { ApplicationConfig, importProvidersFrom, inject } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
-  HttpClient,
   HttpHandlerFn,
   HttpInterceptorFn,
   HttpRequest,
@@ -19,6 +18,8 @@ import { Observable } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
 import { errorInterceptor } from 'src/interceptors/error.interceptor';
 import { environment } from '../environments/environment';
+import { inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 export const provideTranslation = () => ({
   defaultLanguage: 'en',
@@ -56,6 +57,7 @@ export const provideAuthInterceptor: HttpInterceptorFn = (
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
 }
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(),
@@ -68,6 +70,6 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([provideAuthInterceptor, errorInterceptor])
     ),
     importProvidersFrom([TranslateModule.forRoot(provideTranslation())]),
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
   ]
 };
