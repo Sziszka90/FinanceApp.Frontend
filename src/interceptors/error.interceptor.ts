@@ -21,7 +21,7 @@ export const errorInterceptor: HttpInterceptorFn = (
         router.navigateByUrl('/login');
       }
 
-      if(error.status === 503) {
+      if (error.status === 503) {
         console.error('Service Unavailable:', error);
       }
 

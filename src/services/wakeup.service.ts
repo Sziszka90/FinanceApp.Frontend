@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpStatusCode } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
-import { BehaviorSubject, catchError, firstValueFrom, Observable, throwError, timeout } from 'rxjs';
+import { BehaviorSubject, catchError, firstValueFrom, throwError, timeout } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ErrorModalComponent } from 'src/app/shared/error-modal/error-modal.component';
 
@@ -30,7 +30,7 @@ export class WakeupService {
       await firstValueFrom(
         this.http.post(`${environment.apiUrl}/wakeup`, {}).pipe(
           timeout(60000),
-          catchError((err) => {
+          catchError(() => {
             this.showWakeupLoader = false;
             this.dialog.open(ErrorModalComponent, {
               data: {

@@ -1,4 +1,4 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, inject } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -8,7 +8,8 @@ import {
   HttpRequest,
   provideHttpClient,
   withInterceptors,
-  HttpEvent
+  HttpEvent,
+  HttpClient
 } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -18,8 +19,6 @@ import { Observable } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
 import { errorInterceptor } from 'src/interceptors/error.interceptor';
 import { environment } from '../environments/environment';
-import { inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
 export const provideTranslation = () => ({
   defaultLanguage: 'en',
@@ -70,6 +69,6 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([provideAuthInterceptor, errorInterceptor])
     ),
     importProvidersFrom([TranslateModule.forRoot(provideTranslation())]),
-    provideAnimationsAsync(),
+    provideAnimationsAsync()
   ]
 };
