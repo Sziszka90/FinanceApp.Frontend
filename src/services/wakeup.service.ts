@@ -28,7 +28,7 @@ export class WakeupService {
     try {
       this.showWakeupLoader = true;
       await firstValueFrom(
-        this.http.post(`${environment.apiUrl}/wakeup`, {}).pipe(
+        this.http.post(`${environment.apiUrl}/api/v1/wakeup`, {}).pipe(
           timeout(60000),
           catchError(() => {
             this.showWakeupLoader = false;
