@@ -80,6 +80,7 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
       next: (createdTransactionGroup) => {
         if (createdTransactionGroup) {
           this.allTransactionGroups.update(groups => [...groups, createdTransactionGroup]);
+          this.dataSource.set(new MatTableDataSource<GetTransactionGroupDto>(this.allTransactionGroups()));
         }
       }
     });
@@ -89,6 +90,7 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
     this.allTransactionGroups.update(groups => groups.filter(
       (group) => group.Id !== transactionGroup.Id
     ));
+    this.dataSource.set(new MatTableDataSource<GetTransactionGroupDto>(this.allTransactionGroups()));
 
     this.executeWithLoading(
       this.transactionApiService.deleteTransactionGroup(transactionGroup.Id),
@@ -132,6 +134,7 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
             }
             return transactionGroup;
           }));
+          this.dataSource.set(new MatTableDataSource<GetTransactionGroupDto>(this.allTransactionGroups()));
         }
       }
     });

@@ -48,8 +48,8 @@
     <label for="TransactionType">Transaction Type</label>
     <div class="form-group">
       <mat-select class="select" formControlName="TransactionType">
-        <mat-option *ngFor="let option of typeOptions" [value]="option.value">
-          &#8226; {{ option.name }}
+        <mat-option *ngFor="let option of typeOptions" [value]="option.Value">
+          &#8226; {{ option.Name }}
         </mat-option>
       </mat-select>
       <div class="error-message" *ngIf="hasFieldError('TransactionType')">
@@ -60,7 +60,7 @@
     <div class="form-group">
       <mat-select class="select" formControlName="Group">
         <mat-option *ngFor="let option of groupOptions()" [value]="option">
-          &#8226; {{ option.name }}
+          &#8226; {{ option.Name }}
         </mat-option>
       </mat-select>
       <div class="error-message" *ngIf="hasFieldError('Group')">

@@ -30,11 +30,13 @@ export class ComponentErrorService {
     }
 
     if (error && typeof error === 'object') {
-      const errorObj = error as Record<string, unknown>;
-      return (errorObj['error'] as Record<string, unknown>)?.['message'] as string ||
-             errorObj['message'] as string ||
-             errorObj['error'] as string ||
-             'An unexpected error occurred';
+      const err = error as any;
+      return (
+        err?.error?.error?.message as string ??
+        err?.error?.error as string ??
+        err?.message as string ??
+        'An unexpected error occurred'
+      );
     }
 
     return 'An unexpected error occurred';

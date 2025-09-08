@@ -111,7 +111,6 @@ export class ProfileComponent extends BaseComponent implements OnInit {
         'Profile updated successfully',
         'Failed to update profile'
       ).subscribe(() => {
-        this.authService.logout();
         this.router.navigate(['/']);
       });
     } else {
