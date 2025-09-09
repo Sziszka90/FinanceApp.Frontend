@@ -1,6 +1,6 @@
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { LoginRequestDto } from '../models/LoginDtos/login-request.dto';
-import { catchError, map, Observable, of, Subject } from 'rxjs';
+import { catchError, map, Observable, of, BehaviorSubject } from 'rxjs';
 import { LoginResponseDto } from '../models/LoginDtos/login-response.dto';
 import { jwtDecode } from 'jwt-decode';
 import { TOKEN_KEY } from 'src/models/Constants/token.const';
