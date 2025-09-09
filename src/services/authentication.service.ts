@@ -20,7 +20,7 @@ export class AuthenticationService {
   private correlationService = inject(CorrelationService);
 
   private readonly tokenKey: string = TOKEN_KEY;
-  public userLoggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>();
+  public userLoggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   saveToken(token: string): void {
     localStorage.setItem(this.tokenKey, token);
