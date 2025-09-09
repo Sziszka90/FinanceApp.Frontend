@@ -38,7 +38,7 @@ export class ResendConfirmationEmailModalComponent extends BaseComponent {
         'Error sending email confirmation'
       ).subscribe({
         next: (result: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-          this.showSuccess(result?.message || 'Confirmation email sent successfully');
+          this.showSuccess(result?.Message || 'Confirmation email sent successfully');
           this.matDialogRef.close();
         }
       });
