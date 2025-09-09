@@ -32,6 +32,7 @@ export class ComponentErrorService {
     if (error && typeof error === 'object') {
       const err = error as any;
       return (
+        err?.Message as string ??
         err?.error?.error?.message as string ??
         err?.error?.error as string ??
         err?.message as string ??
