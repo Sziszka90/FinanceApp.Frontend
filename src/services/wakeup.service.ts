@@ -47,7 +47,7 @@ export class WakeupService {
             });
             return throwError(() => new Error('Backend services are not available. Retry later.'));
           })
-      ));
+        ));
       this.showApp = response.status === 200;
     } finally {
       this.showWakeupLoader = false;
