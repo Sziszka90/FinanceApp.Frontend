@@ -126,7 +126,7 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
     }
 
     const updatedTransaction: UpdateTransactionDto = {
-      Id: this.data.id,
+      Id: this.data.Id,
       Name: this.getFieldValue<string>('Name')!,
       Description: this.getFieldValue<string>('Description') || '',
       Value: {
@@ -139,7 +139,7 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
     };
 
     this.executeWithLoading(
-      this.transactionApiService.updateTransaction(this.data.id, updatedTransaction),
+      this.transactionApiService.updateTransaction(this.data.Id, updatedTransaction),
       'Transaction updated successfully!',
       'Updating transaction'
     ).subscribe({

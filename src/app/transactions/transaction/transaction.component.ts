@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, Signal, signal, ElementRef } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, signal, ElementRef } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
@@ -72,14 +72,14 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   });
 
   displayedColumns: string[] = [
-    'name',
-    'description',
-    'value',
-    'currency',
-    'transactionDate',
-    'transactionType',
-    'group',
-    'actions'
+    'Name',
+    'Description',
+    'Amount',
+    'Currency',
+    'TransactionDate',
+    'TransactionType',
+    'Group',
+    'Actions'
   ];
 
   @ViewChild(MatSort) sort!: MatSort;
@@ -89,10 +89,13 @@ export class TransactionComponent extends BaseComponent implements OnInit {
     this.dataSource.update(ds => {
       ds.sortingDataAccessor = (item, property) => {
         switch (property) {
-          case 'value': return item.Value.Amount;
-          case 'currency': return item.Value.Currency;
-          case 'transactionDate': return new Date(item.TransactionDate);
-          case 'group': return item.TransactionGroup?.Name ?? '';
+          case 'Amount':
+            const amount = item.Value?.Amount;
+            console.log('Sorting Amount:', amount, 'for item', item);
+            return amount;
+          case 'Currency': return item.Value.Currency;
+          case 'TransactionDate': return new Date(item.TransactionDate);
+          case 'Group': return item.TransactionGroup?.Name ?? '';
           default: return (item as any)[property];
         }
       };
@@ -130,7 +133,10 @@ export class TransactionComponent extends BaseComponent implements OnInit {
     ).subscribe({
       next: (value: GetTransactionDto[]) => {
         this.allTransactions.set(value);
-        this.dataSource.set(new MatTableDataSource<GetTransactionDto>(value));
+        this.dataSource.update(ds => {
+          ds.data = value;
+          return ds;
+        });
         this.setupCustomFilterPredicate();
       }
     });
@@ -142,6 +148,9 @@ export class TransactionComponent extends BaseComponent implements OnInit {
         ds.sort = this.sort;
         return ds;
       });
+      if (this.sort.sortChange) {
+        this.sort.sortChange.emit();
+      }
     }
   }
 
@@ -154,11 +163,11 @@ export class TransactionComponent extends BaseComponent implements OnInit {
         return (!Name || data.Name.toLowerCase().includes(Name.toLowerCase())) &&
               (!Date || (
                 data.TransactionDate &&
-                new Date(data.TransactionDate).toISOString().slice(0, 10) === Date
+                formatDate(data.TransactionDate, 'yyyy-MM-dd', 'en-US') === Date
               )) &&
               (!Type || data.TransactionType === Type);
       };
-      return ds; // important: return the same object
+      return ds;
     });
   }
 

@@ -70,49 +70,49 @@
     <div *ngIf="dataSource().data.length > 0; else noTransactions">
       <table mat-table [dataSource]="dataSource()" matSort class="mat-elevation-z8">
         <!-- Name Column -->
-        <ng-container class="column" matColumnDef="name">
+        <ng-container class="column" matColumnDef="Name">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header appColumnResize> Name </th>
           <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Name}} </td>
         </ng-container>
 
         <!-- Description Column -->
-        <ng-container class="column" matColumnDef="description">
+        <ng-container class="column" matColumnDef="Description">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef> Description </th>
           <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Description}} </td>
         </ng-container>
 
-        <!-- Value Column -->
-        <ng-container class="column" matColumnDef="value">
-          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Value</th>
+        <!-- Amount Column -->
+        <ng-container class="column" matColumnDef="Amount">
+          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
           <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.Value.Amount }}</td>
         </ng-container>
 
         <!-- Currency Column -->
-        <ng-container class="column" matColumnDef="currency">
+        <ng-container class="column" matColumnDef="Currency">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Currency</th>
           <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.Value.Currency }}</td>
         </ng-container>
 
         <!-- Transaction Date Column -->
-        <ng-container class="column" matColumnDef="transactionDate">
+        <ng-container class="column" matColumnDef="TransactionDate">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Transaction Date</th>
           <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.TransactionDate | date: 'yyyy/MM/dd' }}</td>
         </ng-container>
 
         <!-- Transaction Type Column -->
-        <ng-container class="column" matColumnDef="transactionType">
+        <ng-container class="column" matColumnDef="TransactionType">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Transaction Type</th>
           <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.TransactionType }}</td>
         </ng-container>
 
         <!-- Group Column -->
-        <ng-container class="column" matColumnDef="group">
+        <ng-container class="column" matColumnDef="Group">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef> Group </th>
           <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.TransactionGroup != undefined ? element.TransactionGroup.Name : ""}} </td>
         </ng-container>
 
         <!-- Actions Column -->
-        <ng-container class="column" matColumnDef="actions">
+        <ng-container class="column" matColumnDef="Actions">
           <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Actions</th>
           <td class="default-font text-color-black" mat-cell *matCellDef="let row">
             <div class="action-button-container">
