@@ -17,11 +17,13 @@ import { AuthenticationService } from 'src/services/authentication.service';
   styleUrls: ['./chat-bubble.component.scss']
 })
 export class ChatBubbleComponent implements OnInit, OnDestroy {
-  @ViewChild('chatBody') chatBody!: ElementRef<HTMLDivElement>;
-  @ViewChild('chatBubble') chatBubble!: ElementRef<HTMLDivElement>;
   llmProcessorApiService = inject(LlmProcessorApiService);
   userApiService = inject(UserApiService);
   authService = inject(AuthenticationService);
+
+  @ViewChild('chatBody') chatBody!: ElementRef<HTMLDivElement>;
+  @ViewChild('chatBubble') chatBubble!: ElementRef<HTMLDivElement>;
+
   showBubble = false;
   message = '';
   response = '';
@@ -129,10 +131,13 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
 
   onDragMove(event: MouseEvent | TouchEvent) {
     if (!this.dragging) return;
+
     if (event instanceof TouchEvent) {
       event.preventDefault();
     }
+
     let clientX, clientY;
+
     if (event instanceof TouchEvent) {
       clientX = event.touches[0].clientX;
       clientY = event.touches[0].clientY;
@@ -140,17 +145,22 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
       clientX = event.clientX;
       clientY = event.clientY;
     }
+    
     const dx = clientX - this.dragOffsetX;
     const dy = clientY - this.dragOffsetY;
+
     if (this.chatBubble) {
       const bubbleRect = this.chatBubble.nativeElement.getBoundingClientRect();
+
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
+
       let newRight = this.bubblePosition.right - dx;
       let newBottom = this.bubblePosition.bottom - dy;
-      // Prevent moving out of viewport
+ 
       newRight = Math.max(0, Math.min(newRight, viewportWidth - bubbleRect.width));
       newBottom = Math.max(0, Math.min(newBottom, viewportHeight - bubbleRect.height));
+
       this.bubblePosition.right = newRight;
       this.bubblePosition.bottom = newBottom;
     }
