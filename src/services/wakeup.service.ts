@@ -26,14 +26,14 @@ export class WakeupService {
   }
 
   async wakeup() {
-    const delays = [5000, 10000, 15000, 15000, 15000];
+    const delays = [15000, 15000, 15000, 15000, 15000, 15000, 15000];
 
     try {
       const response = await firstValueFrom(
         this.http.post(`${environment.apiUrl}/api/v1/wakeup`, {}, { observe: 'response' }).pipe(
           timeout(180000),
           retry({
-            count: 5,
+            count: 7,
             delay: (error, retryCount) => {
               if (error.status === 503) {
                 return throwError(() => new Error('Backend services are not available. Retry later.'));
