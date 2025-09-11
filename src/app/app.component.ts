@@ -14,7 +14,7 @@ import { WakeupService } from 'src/services/wakeup.service';
     RouterOutlet,
     ChatBubbleComponent,
     WakeupLoaderComponent
-],
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   standalone: true

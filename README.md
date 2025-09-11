@@ -2,7 +2,7 @@
 
 🌐 **A modern Angular-based frontend for sophisticated personal finance management**
 
-This is the frontend application for a personal finance management platform that helps users track, categorize, and analyze their financial transactions with AI-powered insights. Built with Angular 19 and TypeScript, it provides a responsive and intuitive user interface for managing personal finances.
+This is the frontend application for a personal finance management platform that helps users track, categorize, and analyze their financial transactions with AI-powered insights. It features an integrated chat with AI functionalities, allowing users to query and receive information about their own financial data. Built with Angular 20 and TypeScript, it provides a responsive and intuitive user interface for managing personal finances.
 
 ### 🎯 Current Features
 
@@ -26,12 +26,14 @@ For detailed upcoming features and development progress, please check our [GitHu
 📁 src/
   📁 app/                                    # Main application module
     📁 shared/                               # Shared components and utilities
+      📁 chat-bubble/                        # AI chat bubble
       📁 error-modal/                        # Error handling modal
       📁 home/                               # Home page component
       📁 loader/                             # Loading spinner component
       📁 nav-bar/                            # Navigation bar
       📁 not-found/                          # 404 page component
       📁 validation-failed/                  # Validation error component
+      📁 wakeup-loader/                      # Loader to indicate the wake up of backend service
     📁 transaction-groups/                   # Transaction group features
       📁 create-transaction-group-modal/     # Create group modal
       📁 transaction-group/                  # Group display component
@@ -54,8 +56,10 @@ For detailed upcoming features and development progress, please check our [GitHu
     📁 translations/                         # i18n translation files
   📁 environments/                           # Environment configurations
   📁 helpers/                                # Utility functions
+  📁 interceptors/                           # Interceptors
   📁 models/                                 # TypeScript interfaces and DTOs
   📁 services/                               # Angular services for API communication
+  📁 testing/                                # Unit tests
 ```
 
 ### **Key Frontend Patterns**
@@ -72,7 +76,7 @@ For detailed upcoming features and development progress, please check our [GitHu
 
 ### **Frontend Framework**
 
-- **Angular 19** - Latest Angular framework with standalone components
+- **Angular 20** - Latest Angular framework with standalone components
 - **TypeScript** - Strong typing for better code quality and maintainability
 - **Angular CLI** - Development tooling and build optimization
 - **RxJS** - Reactive programming for async data handling
@@ -84,12 +88,6 @@ For detailed upcoming features and development progress, please check our [GitHu
 - **SCSS** - Enhanced CSS with variables, mixins, and nesting
 - **Responsive Design** - Mobile-first approach with breakpoint management
 - **Custom Theming** - Consistent design system across the application
-
-### **State Management & Communication**
-
-- **HTTP Client** - RESTful API communication
-- **JWT Interceptor** - Automatic token handling
-- **Error Interceptor** - Global error handling
 
 ## 🔧 Features Deep Dive
 
@@ -106,6 +104,7 @@ For detailed upcoming features and development progress, please check our [GitHu
 - **Create/Edit Modals** with rich form controls and validation
 - **Bulk Operations** with selection and confirmation dialogs
 - **CSV Import** - Bulk transaction import from CSV files
+- **Notification Service** - SignalR to notify frontend to refresh data
 - **Visual Transaction** with color-coded categories
 
 ### **🎨 User Experience Features**
@@ -122,7 +121,7 @@ For detailed upcoming features and development progress, please check our [GitHu
 ```bash
 # Required software
 Node.js 18+ (with npm)
-Angular CLI 19+
+Angular CLI 20+
 Git
 ```
 
@@ -148,13 +147,13 @@ ng serve
 // src/environments/environment.ts
 export const environment = {
   production: false,
-  apiUrl: "https://localhost:5001/api",
+  apiUrl: 'https://localhost:5001/api'
 };
 
 // src/environments/environment.prod.ts
 export const environment = {
   production: true,
-  apiUrl: "https://your-api-domain.com/api",
+  apiUrl: 'https://your-api-domain.com/api'
 };
 ```
 
@@ -223,18 +222,17 @@ ng build --configuration=production
 ```yaml
 # Automated pipeline includes:
 ✅ Code quality checks and linting
-✅ Unit test execution
-✅ Build optimization and bundling
+✅ Automated Unit test execution
+✅ Build
 ✅ Docker image creation
 ✅ Deployment to hosting platform
-✅ Automated testing and health checks
 ```
 
 **Deployment Flow:**
 
 1. **Push to main** → Triggers GitHub Actions workflow
 2. **Build & Test** → Runs automated test suite and linting
-3. **Bundle** → Creates optimized production build
+3. **Bundle** → Creates production build
 4. **Deploy** → Updates hosting platform with new version
 5. **Verify** → Automated health checks ensure successful deployment
 
