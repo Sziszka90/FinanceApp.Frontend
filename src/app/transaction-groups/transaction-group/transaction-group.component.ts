@@ -31,16 +31,15 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
   private authService = inject(AuthenticationService);
 
   displayedColumnsFull: string[] = [
-    'name',
-    'description',
-    'icon',
-    'actions'
+    'Name',
+    'Description',
+    'Icon',
+    'Actions'
   ];
 
   public transactionGroups$: Observable<GetTransactionGroupDto[]> | undefined;
   public allTransactionGroups = signal<GetTransactionGroupDto[]>([]);
-
-  dataSource = signal<MatTableDataSource<GetTransactionGroupDto>>(new MatTableDataSource<GetTransactionGroupDto>([]));
+  public dataSource = signal<MatTableDataSource<GetTransactionGroupDto>>(new MatTableDataSource<GetTransactionGroupDto>([]));
 
   touchStartX = 0;
 

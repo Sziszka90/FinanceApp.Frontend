@@ -25,7 +25,6 @@ import { LoaderComponent } from '../../shared/loader/loader.component';
 })
 export class ProfileComponent extends BaseComponent implements OnInit {
   private userApiService = inject(UserApiService);
-  private authService = inject(AuthenticationService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
 

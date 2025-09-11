@@ -55,12 +55,9 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   public transactions$: Observable<GetTransactionDto[]> | undefined;
   public allTransactions = signal<GetTransactionDto[]>([]);
   public total = signal<Money>({ Amount: 0, Currency: CurrencyEnum.EUR });
-
   public showSummary = signal<boolean>(false);
   public summary = signal<Money | null>(null);
-
   public importLoading = signal<boolean>(false);
-
   dataSource = signal<MatTableDataSource<GetTransactionDto>>(new MatTableDataSource<GetTransactionDto>([]));
 
   typeOptions: {Name: string, Value: TransactionTypeEnum}[] = [{ Name: 'Expense', Value: TransactionTypeEnum.Expense }, { Name: 'Income', Value: TransactionTypeEnum.Income }];

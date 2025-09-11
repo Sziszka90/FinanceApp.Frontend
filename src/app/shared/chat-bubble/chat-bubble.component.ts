@@ -94,7 +94,7 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.messages.push({ text: msgToSend, sender: 'user' });
     this.scrollToBottom();
-  this.llmProcessorApiService.promptRequest({ Prompt: msgToSend, UserId: this.userId, CorrelationId: uuidv4() }).subscribe({
+    this.llmProcessorApiService.promptRequest({ Prompt: msgToSend, UserId: this.userId, CorrelationId: uuidv4() }).subscribe({
       next: res => {
         const reply = res.Result || 'No response';
         this.messages.push({ text: reply, sender: 'assistant' });
@@ -145,7 +145,7 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
       clientX = event.clientX;
       clientY = event.clientY;
     }
-    
+
     const dx = clientX - this.dragOffsetX;
     const dy = clientY - this.dragOffsetY;
 
@@ -206,6 +206,5 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
       event.preventDefault();
       this.sendMessage();
     }
-    // Shift+Enter will insert a new line by default
   }
 }

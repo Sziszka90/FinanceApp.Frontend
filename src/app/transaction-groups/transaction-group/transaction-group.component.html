@@ -5,24 +5,22 @@
 <div *ngIf="!loading()" class="table-container">
   <div *ngIf="dataSource().data.length > 0; else noTransactionGroups">
     <table mat-table [dataSource]="dataSource()" class="mat-elevation-z8">
-      <!-- Note that these columns can be defined in any order.
-          The actual rendered columns are set as a property on the row definition -->
-      <ng-container class="column" matColumnDef="name">
+      <ng-container class="column" matColumnDef="Name">
         <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Name</th>
         <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Name}} </td>
       </ng-container>
 
-      <ng-container class="column" matColumnDef="description">
+      <ng-container class="column" matColumnDef="Description">
         <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Description</th>
         <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Description}} </td>
       </ng-container>
 
-      <ng-container class="column" matColumnDef="icon">
+      <ng-container class="column" matColumnDef="Icon">
         <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Icon</th>
         <td class="default-font text-color-black" mat-cell *matCellDef="let element"><i class="{{element.GroupIcon}}"></i></td>
       </ng-container>
 
-      <ng-container class="column" matColumnDef="actions">
+      <ng-container class="column" matColumnDef="Actions">
         <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Actions</th>
         <td class="default-font text-color-black" mat-cell *matCellDef="let row">
           <div class="action-button-container">

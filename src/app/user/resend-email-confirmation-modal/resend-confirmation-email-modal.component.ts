@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { LoaderComponent } from 'src/app/shared/loader/loader.component';
 import { UserApiService } from 'src/services/user.api.service';
 import { BaseComponent } from 'src/app/shared/base-component';
+import { ResendEmailConfirmationResponse } from 'src/models/UserDtos/resend-email-confirmation-response.dto';
 
 @Component({
   selector: 'resend-confirmation-email-modal',
@@ -37,7 +38,7 @@ export class ResendConfirmationEmailModalComponent extends BaseComponent {
         undefined,
         'Error sending email confirmation'
       ).subscribe({
-        next: (result: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+        next: (result: ResendEmailConfirmationResponse) => { // eslint-disable-line @typescript-eslint/no-explicit-any
           this.showSuccess(result?.Message || 'Confirmation email sent successfully');
           this.matDialogRef.close();
         }
