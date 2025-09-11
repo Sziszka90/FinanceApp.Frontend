@@ -9,7 +9,7 @@ import {
 import {
   MatDialogRef
 } from '@angular/material/dialog';
-import { CommonModule } from '@angular/common';
+
 import { TransactionApiService } from '../../../services/transactions.api.service';
 import { ICONS } from 'src/models/Constants/group-icon-options.const';
 import { MatSelectModule } from '@angular/material/select';
@@ -24,9 +24,8 @@ import { LoaderComponent } from 'src/app/shared/loader/loader.component';
     ReactiveFormsModule,
     MatSelectModule,
     MatIconModule,
-    CommonModule,
     LoaderComponent
-  ],
+],
   templateUrl: './create-transaction-group-modal.component.html',
   styleUrl: './create-transaction-group-modal.component.scss',
   standalone: true

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { AuthenticationService } from '../../../services/authentication.service';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -15,12 +15,11 @@ import { BaseComponent } from '../../shared/base-component';
   styleUrls: ['./login.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     RouterLink,
     LoaderComponent
-  ]
+]
 })
 export class LoginComponent extends BaseComponent {
   private authService = inject(AuthenticationService);

@@ -1,50 +1,64 @@
-<loader *ngIf="loading()"></loader>
-<div *ngIf="!loading()" class="form-container">
-  <h3 class="default-font">Update Profile</h3>
-  <div class="error-message default-font" *ngIf="hasError()">
-    {{ errorMessage() }}
-  </div>
-  <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
-    <label class="default-font" for="Currency">Currency</label>
-    <label class="default-font" for="UserName">User Name</label>
-    <div class="form-group">
-      <input
-        class="default-font"
-        id="UserName"
-        type="text"
-        formControlName="UserName"
-        placeholder="User Name"
-      />
-      <div class="error-font" *ngIf="hasFieldError('UserName')">
-        {{ getFieldErrorMessage('UserName') }}
+@if (loading()) {
+  <loader></loader>
+}
+@if (!loading()) {
+  <div class="form-container">
+    <h3 class="default-font">Update Profile</h3>
+    @if (hasError()) {
+      <div class="error-message default-font">
+        {{ errorMessage() }}
       </div>
-    </div>
-    <label class="default-font" for="Password">Password</label>
-    <div class="form-group">
-      <input
-        class="default-font"
-        id="Password"
-        type="password"
-        formControlName="Password"
-        placeholder="Password"
-      />
-      <div class="error-font" *ngIf="hasFieldError('Password')">
-        {{ getFieldErrorMessage('Password') }}
+    }
+    <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
+      <label class="default-font" for="Currency">Currency</label>
+      <label class="default-font" for="UserName">User Name</label>
+      <div class="form-group">
+        <input
+          class="default-font"
+          id="UserName"
+          type="text"
+          formControlName="UserName"
+          placeholder="User Name"
+          />
+          @if (hasFieldError('UserName')) {
+            <div class="error-font">
+              {{ getFieldErrorMessage('UserName') }}
+            </div>
+          }
+        </div>
+        <label class="default-font" for="Password">Password</label>
+        <div class="form-group">
+          <input
+            class="default-font"
+            id="Password"
+            type="password"
+            formControlName="Password"
+            placeholder="Password"
+            />
+            @if (hasFieldError('Password')) {
+              <div class="error-font">
+                {{ getFieldErrorMessage('Password') }}
+              </div>
+            }
+          </div>
+          <label class="default-font" for="Currency">Currency</label>
+          <div class="form-group">
+            <mat-select class="select" formControlName="Currency" [compareWith]="compareCategoryObjects" required>
+              @for (option of currencyOptions; track option) {
+                <mat-option [value]="option">
+                  {{ option }}
+                </mat-option>
+              }
+            </mat-select>
+            @if (hasFieldError('Currency')) {
+              <div class="error-font">
+                {{ getFieldErrorMessage('Currency') }}
+              </div>
+            }
+          </div>
+          <div class="button-container">
+            <button class="bounce-button custom-button" type="submit" [disabled]="!isFormValid()">Update</button>
+          </div>
+        </form>
       </div>
-    </div>
-    <label class="default-font" for="Currency">Currency</label>
-    <div class="form-group">
-      <mat-select class="select" formControlName="Currency" [compareWith]="compareCategoryObjects" required>
-        <mat-option *ngFor="let option of currencyOptions" [value]="option">
-          {{ option }}
-        </mat-option>
-      </mat-select>
-      <div class="error-font" *ngIf="hasFieldError('Currency')">
-        {{ getFieldErrorMessage('Currency') }}
-      </div>
-    </div>
-    <div class="button-container">
-      <button class="bounce-button custom-button" type="submit" [disabled]="!isFormValid()">Update</button>
-    </div>
-  </form>
-</div>
+    }

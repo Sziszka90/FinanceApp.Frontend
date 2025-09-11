@@ -14,7 +14,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
-import { CommonModule, formatDate } from '@angular/common';
+import { formatDate } from '@angular/common';
 import { GetTransactionGroupDto } from 'src/models/TransactionGroupDtos/get-transaction-group.dto';
 import { TransactionTypeEnum } from 'src/models/Enums/transaction-type.enum';
 import { MatIconModule } from '@angular/material/icon';
@@ -35,10 +35,9 @@ import { LoaderComponent } from 'src/app/shared/loader/loader.component';
     MatDatepickerModule,
     ReactiveFormsModule,
     MatSelectModule,
-    CommonModule,
     BsDatepickerModule,
     LoaderComponent
-  ],
+],
   templateUrl: './create-transaction-modal.component.html',
   styleUrl: './create-transaction-modal.component.scss',
   standalone: true

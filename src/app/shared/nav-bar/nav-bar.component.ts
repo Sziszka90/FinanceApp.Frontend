@@ -2,17 +2,16 @@ import { Component, ElementRef, HostListener, inject, OnInit, signal } from '@an
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
 import { Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { AuthenticationService } from 'src/services/authentication.service';
 
 @Component({
   selector: 'nav-bar',
   imports: [
-    CommonModule,
     MatIconModule,
     TranslateModule,
     RouterLink
-  ],
+],
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.scss',
   standalone: true

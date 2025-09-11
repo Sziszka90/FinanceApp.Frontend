@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -9,7 +9,7 @@ import { ResendEmailConfirmationResponse } from 'src/models/UserDtos/resend-emai
 
 @Component({
   selector: 'resend-confirmation-email-modal',
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
+  imports: [ReactiveFormsModule, LoaderComponent],
   templateUrl: './resend-confirmation-email-modal.component.html',
   styleUrl: './resend-confirmation-email-modal.component.scss'
 })

@@ -3,39 +3,51 @@
     <h3>Update Transaction Group</h3>
     <p class="modal-description">Update the item and click on save!</p>
   </div>
-  <div class="error-message default-font" *ngIf="hasError()">
-    {{ errorMessage() }}
-  </div>
-  <loader *ngIf="loading()" class="loader"></loader>
-  <form *ngIf="!loading()" class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
-    <label for="Name">Name</label>
-    <div class="form-group">
-      <input id="Name" type="text" formControlName="Name" required />
-      <div class="error-message" *ngIf="hasFieldError('Name')">
-        {{ getFieldErrorMessage('Name') }}
+  @if (hasError()) {
+    <div class="error-message default-font">
+      {{ errorMessage() }}
+    </div>
+  }
+  @if (loading()) {
+    <loader class="loader"></loader>
+  }
+  @if (!loading()) {
+    <form class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
+      <label for="Name">Name</label>
+      <div class="form-group">
+        <input id="Name" type="text" formControlName="Name" required />
+        @if (hasFieldError('Name')) {
+          <div class="error-message">
+            {{ getFieldErrorMessage('Name') }}
+          </div>
+        }
       </div>
-    </div>
-    <label for="Description">Description</label>
-    <div class="form-group">
-      <input id="Description" type="text" formControlName="Description" />
-    </div>
-    <label class="default-font" for="GroupIcon">Group Icon</label>
-    <div class="form-group">
-      <mat-select class="select" formControlName="GroupIcon" required>
-        <mat-select-trigger>
-          <i class="{{ formGroup!.get('GroupIcon')?.value }}"></i>
-        </mat-select-trigger>
-        <mat-option *ngFor="let option of groupIconOptions" [value]="option">
-          <i class="{{ option }}"></i>
-        </mat-option>
-      </mat-select>
-      <div class="error-message" *ngIf="hasFieldError('GroupIcon')">
-        {{ getFieldErrorMessage('GroupIcon') }}
+      <label for="Description">Description</label>
+      <div class="form-group">
+        <input id="Description" type="text" formControlName="Description" />
       </div>
-    </div>
-    <div class="button-container">
-      <button [disabled]="formGroup!.invalid" class="custom-button bounce-button" type="submit">Save</button>
-      <button class="custom-button bounce-button" type="button" (click)="onClose()">Close</button>
-    </div>
-  </form>
+      <label class="default-font" for="GroupIcon">Group Icon</label>
+      <div class="form-group">
+        <mat-select class="select" formControlName="GroupIcon" required>
+          <mat-select-trigger>
+            <i class="{{ formGroup!.get('GroupIcon')?.value }}"></i>
+          </mat-select-trigger>
+          @for (option of groupIconOptions; track option) {
+            <mat-option [value]="option">
+              <i class="{{ option }}"></i>
+            </mat-option>
+          }
+        </mat-select>
+        @if (hasFieldError('GroupIcon')) {
+          <div class="error-message">
+            {{ getFieldErrorMessage('GroupIcon') }}
+          </div>
+        }
+      </div>
+      <div class="button-container">
+        <button [disabled]="formGroup!.invalid" class="custom-button bounce-button" type="submit">Save</button>
+        <button class="custom-button bounce-button" type="button" (click)="onClose()">Close</button>
+      </div>
+    </form>
+  }
 </div>

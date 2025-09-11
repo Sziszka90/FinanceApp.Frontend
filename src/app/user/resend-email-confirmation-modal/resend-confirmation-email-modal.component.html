@@ -2,21 +2,29 @@
   <div class="modal-header">
     <h3>Resend Confirmation Email</h3>
   </div>
-  <div class="error-message default-font" *ngIf="hasError()">
-    {{ errorMessage() }}
-  </div>
-  <loader *ngIf="loading()"></loader>
-  <form *ngIf="!loading()" class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
-    <label for="Email">Email</label>
-    <div class="form-group">
-      <input id="Email" type="email" placeholder="Enter your email address" formControlName="Email" />
-      <div class="error-font" *ngIf="hasFieldError('Email')">
-        {{ getFieldErrorMessage('Email') }}
+  @if (hasError()) {
+    <div class="error-message default-font">
+      {{ errorMessage() }}
+    </div>
+  }
+  @if (loading()) {
+    <loader></loader>
+  }
+  @if (!loading()) {
+    <form class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
+      <label for="Email">Email</label>
+      <div class="form-group">
+        <input id="Email" type="email" placeholder="Enter your email address" formControlName="Email" />
+        @if (hasFieldError('Email')) {
+          <div class="error-font">
+            {{ getFieldErrorMessage('Email') }}
+          </div>
+        }
       </div>
-    </div>
-    <div class="button-container">
-      <button type="submit" [disabled]="!isFormValid()" class="custom-button bounce-button">Confirm</button>
-      <button type="button" class="custom-button-inverse bounce-button" (click)="onCancel()">Cancel</button>
-    </div>
-  </form>
+      <div class="button-container">
+        <button type="submit" [disabled]="!isFormValid()" class="custom-button bounce-button">Confirm</button>
+        <button type="button" class="custom-button-inverse bounce-button" (click)="onCancel()">Cancel</button>
+      </div>
+    </form>
+  }
 </div>

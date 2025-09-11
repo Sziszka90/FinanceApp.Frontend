@@ -1,47 +1,48 @@
 <div class="button-container">
   <button class="custom-button bounce-button" [disabled]="loading()" (click)="createTransactionGroup()">Create Transaction Group</button>
 </div>
-<loader *ngIf="loading()"></loader>
-<div *ngIf="!loading()" class="table-container">
-  <div *ngIf="dataSource().data.length > 0; else noTransactionGroups">
-    <table mat-table [dataSource]="dataSource()" class="mat-elevation-z8">
-      <ng-container class="column" matColumnDef="Name">
-        <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Name</th>
-        <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Name}} </td>
-      </ng-container>
-
-      <ng-container class="column" matColumnDef="Description">
-        <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Description</th>
-        <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Description}} </td>
-      </ng-container>
-
-      <ng-container class="column" matColumnDef="Icon">
-        <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Icon</th>
-        <td class="default-font text-color-black" mat-cell *matCellDef="let element"><i class="{{element.GroupIcon}}"></i></td>
-      </ng-container>
-
-      <ng-container class="column" matColumnDef="Actions">
-        <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Actions</th>
-        <td class="default-font text-color-black" mat-cell *matCellDef="let row">
-          <div class="action-button-container">
-            <button class="custom-small-button bounce-button" [disabled]="loading()" (click)="deleteTransactionGroup(row)">
-              <mat-icon>delete</mat-icon>
-            </button>
-            <button class="custom-small-button bounce-button" [disabled]="loading()" (click)="editTransactionGroup(row)">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </div>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumnsFull"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumnsFull;"></tr>
-    </table>
+@if (loading()) {
+  <loader></loader>
+}
+@if (!loading()) {
+  <div class="table-container">
+    @if (dataSource().data.length > 0) {
+      <div>
+        <table mat-table [dataSource]="dataSource()" class="mat-elevation-z8">
+          <ng-container class="column" matColumnDef="Name">
+            <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Name</th>
+            <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Name}} </td>
+          </ng-container>
+          <ng-container class="column" matColumnDef="Description">
+            <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Description</th>
+            <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Description}} </td>
+          </ng-container>
+          <ng-container class="column" matColumnDef="Icon">
+            <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Icon</th>
+            <td class="default-font text-color-black" mat-cell *matCellDef="let element"><i class="{{element.GroupIcon}}"></i></td>
+          </ng-container>
+          <ng-container class="column" matColumnDef="Actions">
+            <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Actions</th>
+            <td class="default-font text-color-black" mat-cell *matCellDef="let row">
+              <div class="action-button-container">
+                <button class="custom-small-button bounce-button" [disabled]="loading()" (click)="deleteTransactionGroup(row)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+                <button class="custom-small-button bounce-button" [disabled]="loading()" (click)="editTransactionGroup(row)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumnsFull"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumnsFull;"></tr>
+        </table>
+      </div>
+    } @else {
+      <div class="default-font no-transaction-groups">
+        No transaction groups found.
+      </div>
+    }
   </div>
-</div>
+}
 
-<ng-template #noTransactionGroups>
-  <div class="default-font no-transaction-groups">
-    No transaction groups found.
-  </div>
-</ng-template>

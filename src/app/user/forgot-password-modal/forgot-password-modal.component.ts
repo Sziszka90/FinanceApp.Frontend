@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -9,7 +9,7 @@ import { FieldValidationMessages } from 'src/services/form-validation.service';
 
 @Component({
   selector: 'forgot-password-modal',
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
+  imports: [ReactiveFormsModule, LoaderComponent],
   templateUrl: './forgot-password-modal.component.html',
   styleUrl: './forgot-password-modal.component.scss'
 })

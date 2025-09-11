@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import {
   FormBuilder,
@@ -18,11 +18,10 @@ import { BaseComponent } from '../../shared/base-component';
   selector: 'registration',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatSelectModule,
     LoaderComponent
-  ],
+],
   templateUrl: './registration.component.html',
   styleUrls: ['./registration.component.scss']
 })

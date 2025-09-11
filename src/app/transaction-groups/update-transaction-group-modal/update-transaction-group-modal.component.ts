@@ -10,7 +10,7 @@ import {
   MAT_DIALOG_DATA,
   MatDialogRef
 } from '@angular/material/dialog';
-import { CommonModule } from '@angular/common';
+
 import { TransactionApiService } from '../../../services/transactions.api.service';
 import { ICONS } from 'src/models/Constants/group-icon-options.const';
 import { GetTransactionGroupDto } from 'src/models/TransactionGroupDtos/get-transaction-group.dto';
@@ -23,9 +23,8 @@ import { LoaderComponent } from 'src/app/shared/loader/loader.component';
   imports: [
     ReactiveFormsModule,
     MatSelectModule,
-    CommonModule,
     LoaderComponent
-  ],
+],
   templateUrl: './update-transaction-group-modal.component.html',
   styleUrl: './update-transaction-group-modal.component.scss',
   standalone: true

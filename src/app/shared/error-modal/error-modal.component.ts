@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -9,9 +9,8 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
   styleUrls: ['./error-modal.component.scss'],
   imports: [
     MatDialogModule,
-    MatButtonModule,
-    CommonModule
-  ]
+    MatButtonModule
+]
 })
 export class ErrorModalComponent {
   private dialogRef = inject(MatDialogRef<ErrorModalComponent>);

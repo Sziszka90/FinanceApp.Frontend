@@ -1,44 +1,54 @@
-<loader *ngIf="loading()"></loader>
-<div *ngIf="!loading()" class="form-container">
-  <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
-    <h3 class="default-font">Log In</h3>
-    <div class="error-message default-font" *ngIf="hasError()">
-      {{ errorMessage() }}
-    </div>
-    <label class="default-font" for="Email">User Email</label>
-    <div class="form-group">
-      <input
-        class="default-font"
-        id="Email"
-        formControlName="Email"
-        required
-        placeholder="Email"
-      />
-      <div class="error-message default-font"
-           *ngIf="hasFieldError('Email')">
-        {{ getFieldErrorMessage('Email') }}
+@if (loading()) {
+  <loader></loader>
+}
+@if (!loading()) {
+  <div class="form-container">
+    <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
+      <h3 class="default-font">Log In</h3>
+      @if (hasError()) {
+        <div class="error-message default-font">
+          {{ errorMessage() }}
+        </div>
+      }
+      <label class="default-font" for="Email">User Email</label>
+      <div class="form-group">
+        <input
+          class="default-font"
+          id="Email"
+          formControlName="Email"
+          required
+          placeholder="Email"
+          />
+          @if (hasFieldError('Email')) {
+            <div class="error-message default-font"
+              >
+              {{ getFieldErrorMessage('Email') }}
+            </div>
+          }
+        </div>
+        <label class="default-font" for="Password">Password</label>
+        <div class="form-group">
+          <input
+            class="default-font"
+            id="Password"
+            type="password"
+            formControlName="Password"
+            required
+            placeholder="Password"
+            />
+            @if (hasFieldError('Password')) {
+              <div class="error-message default-font"
+                >
+                {{ getFieldErrorMessage('Password') }}
+              </div>
+            }
+          </div>
+          <div class="button-container">
+            <button class="custom-button bounce-button default-font" type="submit" [disabled]="!isFormValid()">Login</button>
+            <button class="custom-button-inverse bounce-button default-font" type="button" routerLink="/registration">Registration</button>
+            <button class="custom-button-inverse bounce-button" type="button" (click)="forgotPassword()">Forgot Password</button>
+            <button class="small-action-button" type="button" (click)="resendConfirmationEmail()">Resend Email Confirmation</button>
+          </div>
+        </form>
       </div>
-    </div>
-    <label class="default-font" for="Password">Password</label>
-    <div class="form-group">
-      <input
-        class="default-font"
-        id="Password"
-        type="password"
-        formControlName="Password"
-        required
-        placeholder="Password"
-      />
-      <div class="error-message default-font"
-           *ngIf="hasFieldError('Password')">
-        {{ getFieldErrorMessage('Password') }}
-      </div>
-    </div>
-    <div class="button-container">
-      <button class="custom-button bounce-button default-font" type="submit" [disabled]="!isFormValid()">Login</button>
-      <button class="custom-button-inverse bounce-button default-font" type="button" routerLink="/registration">Registration</button>
-      <button class="custom-button-inverse bounce-button" type="button" (click)="forgotPassword()">Forgot Password</button>
-      <button class="small-action-button" type="button" (click)="resendConfirmationEmail()">Resend Email Confirmation</button>
-    </div>
-  </form>
-</div>
+    }

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
 import { ChatBubbleComponent } from './shared/chat-bubble/chat-bubble.component';
 import { AuthenticationService } from 'src/services/authentication.service';
@@ -12,10 +12,9 @@ import { WakeupService } from 'src/services/wakeup.service';
   imports: [
     NavBarComponent,
     RouterOutlet,
-    CommonModule,
     ChatBubbleComponent,
     WakeupLoaderComponent
-  ],
+],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   standalone: true

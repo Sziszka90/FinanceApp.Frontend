@@ -3,73 +3,97 @@
     <h3>Update Transaction</h3>
     <p class="modal-description">Update the item and click on save!</p>
   </div>
-  <div class="error-message default-font" *ngIf="hasError()">
-    {{ errorMessage() }}
-  </div>
-  <loader *ngIf="loading()" class="loader"></loader>
-  <form *ngIf="!loading()" class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
-    <label for="Name">Name</label>
-    <div class="form-group">
-      <input id="Name" type="text" formControlName="Name" required />
-      <div class="error-message" *ngIf="hasFieldError('Name')">
-        {{ getFieldErrorMessage('Name') }}
+  @if (hasError()) {
+    <div class="error-message default-font">
+      {{ errorMessage() }}
+    </div>
+  }
+  @if (loading()) {
+    <loader class="loader"></loader>
+  }
+  @if (!loading()) {
+    <form class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
+      <label for="Name">Name</label>
+      <div class="form-group">
+        <input id="Name" type="text" formControlName="Name" required />
+        @if (hasFieldError('Name')) {
+          <div class="error-message">
+            {{ getFieldErrorMessage('Name') }}
+          </div>
+        }
       </div>
-    </div>
-    <label for="Description">Description</label>
-    <div class="form-group">
-      <input id="Description" type="text" formControlName="Description" />
-    </div>
-    <label for="Value">Value</label>
-    <div class="form-group">
-      <input id="Value" type="number" formControlName="Value" />
-      <div class="error-message" *ngIf="hasFieldError('Value')">
-        {{ getFieldErrorMessage('Value') }}
+      <label for="Description">Description</label>
+      <div class="form-group">
+        <input id="Description" type="text" formControlName="Description" />
       </div>
-    </div>
-    <label for="Currency">Currency</label>
-    <div class="form-group">
-      <mat-select class="select" formControlName="Currency">
-        <mat-option *ngFor="let option of currencyOptions" [value]="option">
-          &#8226; {{ option }}
-        </mat-option>
-      </mat-select>
-      <div class="error-message" *ngIf="hasFieldError('Currency')">
-        {{ getFieldErrorMessage('Currency') }}
+      <label for="Value">Value</label>
+      <div class="form-group">
+        <input id="Value" type="number" formControlName="Value" />
+        @if (hasFieldError('Value')) {
+          <div class="error-message">
+            {{ getFieldErrorMessage('Value') }}
+          </div>
+        }
       </div>
-    </div>
-    <label for="TransactionDate">Transaction Date</label>
-    <div class="input-with-icon">
-      <input bsDatepicker formControlName="TransactionDate" type="text" placeholder="Select a date" />
-      <i class="fa fa-calendar"></i>
-      <div class="error-message" *ngIf="hasFieldError('TransactionDate')">
-        {{ getFieldErrorMessage('TransactionDate') }}
+      <label for="Currency">Currency</label>
+      <div class="form-group">
+        <mat-select class="select" formControlName="Currency">
+          @for (option of currencyOptions; track option) {
+            <mat-option [value]="option">
+              &#8226; {{ option }}
+            </mat-option>
+          }
+        </mat-select>
+        @if (hasFieldError('Currency')) {
+          <div class="error-message">
+            {{ getFieldErrorMessage('Currency') }}
+          </div>
+        }
       </div>
-    </div>
-    <label for="TransactionType">Transaction Type</label>
-    <div class="form-group">
-      <mat-select class="select" formControlName="TransactionType" [compareWith]="compareCategoryObjects">
-        <mat-option *ngFor="let option of typeOptions" [value]="option.Value">
-          &#8226; {{ option.Name }}
-        </mat-option>
-      </mat-select>
-      <div class="error-message" *ngIf="hasFieldError('TransactionType')">
-        {{ getFieldErrorMessage('TransactionType') }}
+      <label for="TransactionDate">Transaction Date</label>
+      <div class="input-with-icon">
+        <input bsDatepicker formControlName="TransactionDate" type="text" placeholder="Select a date" />
+        <i class="fa fa-calendar"></i>
+        @if (hasFieldError('TransactionDate')) {
+          <div class="error-message">
+            {{ getFieldErrorMessage('TransactionDate') }}
+          </div>
+        }
       </div>
-    </div>
-    <label for="Group">Group</label>
-    <div class="form-group">
-      <mat-select class="select" formControlName="Group" [compareWith]="compareCategoryObjects">
-        <mat-option *ngFor="let option of groupOptions()" [value]="option">
-          &#8226; {{ option.Name }}
-        </mat-option>
-      </mat-select>
-      <div class="error-message" *ngIf="hasFieldError('Group')">
-        {{ getFieldErrorMessage('Group') }}
+      <label for="TransactionType">Transaction Type</label>
+      <div class="form-group">
+        <mat-select class="select" formControlName="TransactionType" [compareWith]="compareCategoryObjects">
+          @for (option of typeOptions; track option) {
+            <mat-option [value]="option.Value">
+              &#8226; {{ option.Name }}
+            </mat-option>
+          }
+        </mat-select>
+        @if (hasFieldError('TransactionType')) {
+          <div class="error-message">
+            {{ getFieldErrorMessage('TransactionType') }}
+          </div>
+        }
       </div>
-    </div>
-    <div class="button-container">
-      <button [disabled]="formGroup!.invalid" class="custom-button bounce-button" type="submit">Save</button>
-      <button class="custom-button bounce-button" type="button" (click)="onClose()">Close</button>
-    </div>
-  </form>
+      <label for="Group">Group</label>
+      <div class="form-group">
+        <mat-select class="select" formControlName="Group" [compareWith]="compareCategoryObjects">
+          @for (option of groupOptions(); track option) {
+            <mat-option [value]="option">
+              &#8226; {{ option.Name }}
+            </mat-option>
+          }
+        </mat-select>
+        @if (hasFieldError('Group')) {
+          <div class="error-message">
+            {{ getFieldErrorMessage('Group') }}
+          </div>
+        }
+      </div>
+      <div class="button-container">
+        <button [disabled]="formGroup!.invalid" class="custom-button bounce-button" type="submit">Save</button>
+        <button class="custom-button bounce-button" type="button" (click)="onClose()">Close</button>
+      </div>
+    </form>
+  }
 </div>

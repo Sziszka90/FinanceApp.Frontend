@@ -1,65 +1,81 @@
-<loader *ngIf="loading()"></loader>
-<div *ngIf="!loading()" class="form-container">
-  <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
-    <h3 class="default-font">Registration</h3>
-    <div class="error-message default-font" *ngIf="hasError()">
-      {{ errorMessage() }}
-    </div>
-    <label class="default-font" for="UserName">User Name</label>
-    <div class="form-group">
-      <input
-        class="default-font"
-        id="UserName"
-        type="text"
-        formControlName="UserName"
-        required
-        placeholder="User Name"
-      />
-      <div class="error-font" *ngIf="hasFieldError('UserName')">
-        {{ getFieldErrorMessage('UserName') }}
-      </div>
-    </div>
-    <label class="default-font" for="Email">Email</label>
-    <div class="form-group">
-      <input
-        class="default-font"
-        id="Email"
-        type="text"
-        formControlName="Email"
-        required
-        placeholder="Email"
-      />
-      <div class="error-font" *ngIf="hasFieldError('Email')">
-        {{ getFieldErrorMessage('Email') }}
-      </div>
-    </div>
-    <label class="default-font" for="Password">Password</label>
-    <div class="form-group">
-      <input
-        class="default-font"
-        id="Password"
-        type="password"
-        formControlName="Password"
-        required
-        placeholder="Password"
-      />
-      <div class="error-font" *ngIf="hasFieldError('Password')">
-        {{ getFieldErrorMessage('Password') }}
-      </div>
-    </div>
-    <label class="default-font" for="Currency">Currency</label>
-    <div class="select">
-      <mat-select formControlName="Currency" required>
-        <mat-option *ngFor="let option of currencyOptions" [value]="option">
-          {{ option }}
-        </mat-option>
-      </mat-select>
-      <div class="error-font" *ngIf="hasFieldError('Currency')">
-        {{ getFieldErrorMessage('Currency') }}
-      </div>
-    </div>
-    <button class="custom-button bounce-button default-font" type="submit" [disabled]="!isFormValid()">
-      Register
-    </button>
-  </form>
-</div>
+@if (loading()) {
+  <loader></loader>
+}
+@if (!loading()) {
+  <div class="form-container">
+    <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
+      <h3 class="default-font">Registration</h3>
+      @if (hasError()) {
+        <div class="error-message default-font">
+          {{ errorMessage() }}
+        </div>
+      }
+      <label class="default-font" for="UserName">User Name</label>
+      <div class="form-group">
+        <input
+          class="default-font"
+          id="UserName"
+          type="text"
+          formControlName="UserName"
+          required
+          placeholder="User Name"
+          />
+          @if (hasFieldError('UserName')) {
+            <div class="error-font">
+              {{ getFieldErrorMessage('UserName') }}
+            </div>
+          }
+        </div>
+        <label class="default-font" for="Email">Email</label>
+        <div class="form-group">
+          <input
+            class="default-font"
+            id="Email"
+            type="text"
+            formControlName="Email"
+            required
+            placeholder="Email"
+            />
+            @if (hasFieldError('Email')) {
+              <div class="error-font">
+                {{ getFieldErrorMessage('Email') }}
+              </div>
+            }
+          </div>
+          <label class="default-font" for="Password">Password</label>
+          <div class="form-group">
+            <input
+              class="default-font"
+              id="Password"
+              type="password"
+              formControlName="Password"
+              required
+              placeholder="Password"
+              />
+              @if (hasFieldError('Password')) {
+                <div class="error-font">
+                  {{ getFieldErrorMessage('Password') }}
+                </div>
+              }
+            </div>
+            <label class="default-font" for="Currency">Currency</label>
+            <div class="select">
+              <mat-select formControlName="Currency" required>
+                @for (option of currencyOptions; track option) {
+                  <mat-option [value]="option">
+                    {{ option }}
+                  </mat-option>
+                }
+              </mat-select>
+              @if (hasFieldError('Currency')) {
+                <div class="error-font">
+                  {{ getFieldErrorMessage('Currency') }}
+                </div>
+              }
+            </div>
+            <button class="custom-button bounce-button default-font" type="submit" [disabled]="!isFormValid()">
+              Register
+            </button>
+          </form>
+        </div>
+      }

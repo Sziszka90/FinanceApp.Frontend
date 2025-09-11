@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,7 +9,7 @@ import { LoaderComponent } from '../../shared/loader/loader.component';
 
 @Component({
   selector: 'reset-password',
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
+  imports: [ReactiveFormsModule, LoaderComponent],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss'
 })

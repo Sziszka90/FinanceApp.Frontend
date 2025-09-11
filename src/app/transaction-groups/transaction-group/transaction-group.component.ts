@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CreateTransactionGroupModalComponent } from '../create-transaction-group-modal/create-transaction-group-modal.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { CommonModule } from '@angular/common';
+
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { Observable } from 'rxjs';
@@ -18,9 +18,9 @@ import { BaseComponent } from 'src/app/shared/base-component';
   imports: [
     MatIconModule,
     MatButtonModule,
-    CommonModule,
     MatTableModule,
-    LoaderComponent],
+    LoaderComponent
+],
   templateUrl: './transaction-group.component.html',
   styleUrl: './transaction-group.component.scss'
 })

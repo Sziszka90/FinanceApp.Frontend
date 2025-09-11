@@ -1,6 +1,10 @@
-<wakeup-loader *ngIf="showWakeupLoader"></wakeup-loader>
-<div *ngIf="showApp">
-  <nav-bar></nav-bar>
-  <chat-bubble></chat-bubble>
-  <router-outlet></router-outlet>
-</div>
+@if (showWakeupLoader) {
+  <wakeup-loader></wakeup-loader>
+}
+@if (showApp) {
+  <div>
+    <nav-bar></nav-bar>
+    <chat-bubble></chat-bubble>
+    <router-outlet></router-outlet>
+  </div>
+}

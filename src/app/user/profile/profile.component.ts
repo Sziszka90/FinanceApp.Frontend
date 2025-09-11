@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { take } from 'rxjs';
 import { Router } from '@angular/router';
@@ -15,11 +15,10 @@ import { LoaderComponent } from '../../shared/loader/loader.component';
 @Component({
   selector: 'profile',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatSelectModule,
     LoaderComponent
-  ],
+],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })

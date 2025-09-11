@@ -2,19 +2,23 @@
   <button class="custom-button bounce-button" [class.disabled]="loading()" (click)="!loading() && createTransaction()">Create Transaction</button>
   <button class="custom-button bounce-button" [class.disabled]="loading()" (click)="!loading() && getSummary()">Show Summary</button>
 </div>
-<div *ngIf="showSummary()" class="summary default-font text-color-grey">
-  <div class="title">Sum of Transactions</div>
-  <div class="value" id="value">{{ summary()?.Amount }} {{ summary()?.Currency }}</div>
-</div>
+@if (showSummary()) {
+  <div class="summary default-font text-color-grey">
+    <div class="title">Sum of Transactions</div>
+    <div class="value" id="value">{{ summary()?.Amount }} {{ summary()?.Currency }}</div>
+  </div>
+}
 
 <div class="drag-drop-container"
-     (dragover)="onDragOver($event)"
-     (drop)="onDrop($event)">
+  (dragover)="onDragOver($event)"
+  (drop)="onDrop($event)">
   <p>Drag and drop a CSV file here, or click to upload</p>
-  <div *ngIf="importLoading()" class="upload-loading">
-    <loader></loader>
-    <p>Uploading file...</p>
-  </div>
+  @if (importLoading()) {
+    <div class="upload-loading">
+      <loader></loader>
+      <p>Uploading file...</p>
+    </div>
+  }
   <input type="file" accept=".csv" (change)="onFileSelect($event)" hidden #fileInput>
   <button class="custom-button bounce-button" [class.disabled]="loading()" type="button" (click)="!loading() && fileInput.click()">Upload CSV</button>
 </div>
@@ -32,104 +36,102 @@
         formControlName="Name"
         [class.disabled]="loading()"
         class="search-input"
-      />  
+        />
 
-      <div class="input-with-icon">
-        <input 
-          name="Date"
-          bsDatepicker 
-          formControlName="Date" 
-          [class.disabled]="loading()" 
-          type="text" 
-          placeholder="Select a date" />
-        <i class="fa fa-calendar"></i>
-      </div>
+        <div class="input-with-icon">
+          <input
+            name="Date"
+            bsDatepicker
+            formControlName="Date"
+            [class.disabled]="loading()"
+            type="text"
+            placeholder="Select a date" />
+            <i class="fa fa-calendar"></i>
+          </div>
 
-      <mat-select 
-        name="Type"
-        class="select" 
-        formControlName="Type" 
-        [class.disabled]="loading()">
-        <mat-option *ngFor="let option of typeOptions" [value]="option.Name">
-          &#8226; {{ option.Name }}
-        </mat-option>
-      </mat-select>
+          <mat-select
+            name="Type"
+            class="select"
+            formControlName="Type"
+            [class.disabled]="loading()">
+            @for (option of typeOptions; track option) {
+              <mat-option [value]="option.Name">
+                &#8226; {{ option.Name }}
+              </mat-option>
+            }
+          </mat-select>
+        </div>
+
+        <div class="button-container">
+          <button type="button" class="custom-button bounce-button" [class.disabled]="loading()" (click)="!loading() && resetFilters()">
+            Reset Filter
+          </button>
+        </div>
+      </form>
     </div>
 
-    <div class="button-container">
-      <button type="button" class="custom-button bounce-button" [class.disabled]="loading()" (click)="!loading() && resetFilters()">
-        Reset Filter
-      </button>
-    </div>
-  </form>
-</div>
-
-<loader *ngIf="loading()"></loader>
-<div *ngIf="!loading()">
-  <div class="table-container mat-elevation-z8" style="overflow: auto; max-height: 70vh;">
-    <div *ngIf="dataSource().data.length > 0; else noTransactions">
-      <table mat-table [dataSource]="dataSource()" matSort class="mat-elevation-z8">
-
-        <ng-container class="column" matColumnDef="Name">
-          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header appColumnResize> Name </th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Name}} </td>
-        </ng-container>
-
-        <ng-container class="column" matColumnDef="Description">
-          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef> Description </th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Description}} </td>
-        </ng-container>
-
-        <ng-container class="column" matColumnDef="Amount">
-          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.Value.Amount }}</td>
-        </ng-container>
-
-        <ng-container class="column" matColumnDef="Currency">
-          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Currency</th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.Value.Currency }}</td>
-        </ng-container>
-
-        <ng-container class="column" matColumnDef="TransactionDate">
-          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Transaction Date</th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.TransactionDate | date: 'yyyy/MM/dd' }}</td>
-        </ng-container>
-
-        <ng-container class="column" matColumnDef="TransactionType">
-          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Transaction Type</th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.TransactionType }}</td>
-        </ng-container>
-
-        <ng-container class="column" matColumnDef="Group">
-          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef> Group </th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.TransactionGroup != undefined ? element.TransactionGroup.Name : ""}} </td>
-        </ng-container>
-
-        <ng-container class="column" matColumnDef="Actions">
-          <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Actions</th>
-          <td class="default-font text-color-black" mat-cell *matCellDef="let row">
-            <div class="action-button-container">
-              <button class="custom-small-button bounce-button" [class.disabled]="loading()" (click)="!loading() && deleteTransaction(row)">
-                <mat-icon>delete</mat-icon>
-              </button>
-              <button class="custom-small-button bounce-button" [class.disabled]="loading()" (click)="!loading() && editTransaction(row)">
-                <mat-icon>edit</mat-icon>
-              </button>
+    @if (loading()) {
+      <loader></loader>
+    }
+    @if (!loading()) {
+      <div>
+        <div class="table-container mat-elevation-z8" style="overflow: auto; max-height: 70vh;">
+          @if (dataSource().data.length > 0) {
+            <div>
+              <table mat-table [dataSource]="dataSource()" matSort class="mat-elevation-z8">
+                <ng-container class="column" matColumnDef="Name">
+                  <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header appColumnResize> Name </th>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Name}} </td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="Description">
+                  <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef> Description </th>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Description}} </td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="Amount">
+                  <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.Value.Amount }}</td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="Currency">
+                  <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Currency</th>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.Value.Currency }}</td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="TransactionDate">
+                  <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Transaction Date</th>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.TransactionDate | date: 'yyyy/MM/dd' }}</td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="TransactionType">
+                  <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Transaction Type</th>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.TransactionType }}</td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="Group">
+                  <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef> Group </th>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.TransactionGroup != undefined ? element.TransactionGroup.Name : ""}} </td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="Actions">
+                  <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let row">
+                    <div class="action-button-container">
+                      <button class="custom-small-button bounce-button" [class.disabled]="loading()" (click)="!loading() && deleteTransaction(row)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                      <button class="custom-small-button bounce-button" [class.disabled]="loading()" (click)="!loading() && editTransaction(row)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                    </div>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" ></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'expense': row.TransactionType === 'Expense', 'income': row.TransactionType !== 'Expense'}"></tr>
+              </table>
             </div>
-          </td>
-        </ng-container>
+          } @else {
+            <div class="default-font no-transactions">
+              No transactions found.
+            </div>
+          }
+        </div>
+      </div>
+    }
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" ></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'expense': row.TransactionType === 'Expense', 'income': row.TransactionType !== 'Expense'}"></tr>
-      </table>
-    </div>
-  </div>
-</div>
-
-<ng-template #noTransactions>
-  <div class="default-font no-transactions">
-    No transactions found.
-  </div>
-</ng-template>
 
 
