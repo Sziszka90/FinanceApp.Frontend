@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, firstValueFrom, of, throwError } from 'rxjs';
-import { timeout, catchError, retry } from 'rxjs/operators';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { timeout } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { ErrorModalComponent } from 'src/app/shared/error-modal/error-modal.component';
@@ -26,42 +26,35 @@ export class WakeupService {
   }
 
   async wakeup() {
-    const delays = [
-      15000,
-      15000,
-      15000,
-      15000,
-      15000,
-      15000,
-      15000,
-      15000,
-      15000,
-      15000,
-      15000,
-      15000,
-      15000];
-
+    const delays = Array(5).fill(15000);
+    let lastError: unknown = null;
     try {
-      const response = await firstValueFrom(
-        this.http.post(`${environment.apiUrl}/api/v1/wakeup`, {}, { observe: 'response' }).pipe(
-          timeout(240000),
-          retry({
-            count: 13,
-            delay: (error, retryCount) => {
-              if (error.status === 503) {
-                return throwError(() => new Error('Backend services are not available. Retry later.'));
-              }
-              return of(delays[retryCount - 1]);
-            }
-          }),
-          catchError(() => {
-            this.dialog.open(ErrorModalComponent, {
-              data: { message: 'Backend services are not available. Retry later.' }
-            });
-            return throwError(() => new Error('Backend services are not available. Retry later.'));
-          })
-        ));
-      this.showApp = response.status === 200;
+      let response: unknown = null;
+      let shouldRetry = true;
+      for (let i = 0; i < 5 && shouldRetry; i++) {
+        try {
+          response = await firstValueFrom(
+            this.http.post(`${environment.apiUrl}/api/v1/wakeup`, {}, { observe: 'response' }).pipe(
+              timeout(300000)
+            )
+          );
+          lastError = null;
+          break;
+        } catch (error) {
+          lastError = error;
+          const status = typeof error === 'object' && error && 'status' in error ? (error as any).status : undefined;
+          if (status !== 503 || i === 4) {
+              this.dialog.open(ErrorModalComponent, {
+                data: { message: 'Backend services are not available. Retry later.' }
+              });
+              shouldRetry = false;
+              break;
+          } else {
+            await new Promise(res => setTimeout(res, delays[i]));
+          }
+        }
+      }
+      this.showApp = (response as any)?.status === 200;
     } finally {
       this.showWakeupLoader = false;
     }
