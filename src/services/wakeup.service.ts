@@ -27,7 +27,6 @@ export class WakeupService {
 
   async wakeup() {
     const delays = Array(5).fill(15000);
-    let lastError: unknown = null;
     try {
       let response: unknown = null;
       let shouldRetry = true;
@@ -38,17 +37,15 @@ export class WakeupService {
               timeout(300000)
             )
           );
-          lastError = null;
           break;
         } catch (error) {
-          lastError = error;
           const status = typeof error === 'object' && error && 'status' in error ? (error as any).status : undefined;
           if (status !== 503 || i === 4) {
-              this.dialog.open(ErrorModalComponent, {
-                data: { message: 'Backend services are not available. Retry later.' }
-              });
-              shouldRetry = false;
-              break;
+            this.dialog.open(ErrorModalComponent, {
+              data: { message: 'Backend services are not available. Retry later.' }
+            });
+            shouldRetry = false;
+            break;
           } else {
             await new Promise(res => setTimeout(res, delays[i]));
           }
