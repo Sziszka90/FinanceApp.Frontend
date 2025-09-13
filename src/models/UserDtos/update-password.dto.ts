@@ -1,4 +1,4 @@
 export interface UpdatePasswordDto {
-    Password: string,
-    Token: string
+    password: string,
+    token: string
 }

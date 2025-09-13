@@ -5,7 +5,6 @@ import { take } from 'rxjs';
 import { Router } from '@angular/router';
 import { UserFormModel } from 'src/models/Profile/user-form-model';
 import { MatSelectModule } from '@angular/material/select';
-import { AuthenticationService } from 'src/services/authentication.service';
 import { UserApiService } from 'src/services/user.api.service';
 import { GetUserDto } from 'src/models/UserDtos/get-user.dto';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
@@ -56,21 +55,21 @@ export class ProfileComponent extends BaseComponent implements OnInit {
   }
 
   override formGroup: FormGroup<UserFormModel> = this.fb.group<UserFormModel>({
-    UserName: new FormControl('', [Validators.minLength(2)]),
-    Password: new FormControl('', [this.optionalStrongPassword.bind(this)]),
-    Currency: new FormControl(CurrencyEnum.EUR)
+    userName: new FormControl('', [Validators.minLength(2)]),
+    password: new FormControl('', [this.optionalStrongPassword.bind(this)]),
+    currency: new FormControl(CurrencyEnum.EUR)
   });
 
   override customValidationMessages = {
-    UserName: {
+    userName: {
       required: 'User name is required',
       minlength: 'Minimum 2 characters required'
     },
-    Password: {
+    password: {
       minlength: 'Password must be at least 8 characters long',
       pattern: 'Password must include uppercase letter, number, and special character'
     },
-    Currency: {
+    currency: {
       required: 'Currency is required'
     }
   };
@@ -88,8 +87,8 @@ export class ProfileComponent extends BaseComponent implements OnInit {
     ).subscribe((user) => {
       this.user = user;
       this.formGroup.patchValue({
-        UserName: user.UserName,
-        Currency: user.BaseCurrency
+        userName: user.userName,
+        currency: user.baseCurrency
       });
     });
   }
@@ -101,10 +100,10 @@ export class ProfileComponent extends BaseComponent implements OnInit {
 
       this.executeWithLoading(
         this.userApiService.updateUser({
-          Id: this.user?.Id,
-          UserName: this.getFieldValue('UserName') || this.user?.UserName,
-          Password: this.getFieldValue('Password') || '',
-          BaseCurrency: this.getFieldValue('Currency') ?? CurrencyEnum.EUR
+          id: this.user?.id,
+          userName: this.getFieldValue('userName') || this.user?.userName,
+          password: this.getFieldValue('password') || '',
+          baseCurrency: this.getFieldValue('currency') ?? CurrencyEnum.EUR
         }).pipe(take(1)),
         'Profile updated successfully',
         'Failed to update profile'

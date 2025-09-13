@@ -3,11 +3,11 @@ import { Money } from '../Money/money.dto';
 import { GetTransactionGroupDto } from '../TransactionGroupDtos/get-transaction-group.dto';
 
 export interface GetTransactionDto {
-    Id: string;
-    Name: string;
-    Description?: string;
-    Value: Money;
-    TransactionDate: Date;
-    TransactionType: TransactionTypeEnum;
-    TransactionGroup?: GetTransactionGroupDto;
+    id: string;
+    name: string;
+    description?: string;
+    value: Money;
+    transactionDate: Date;
+    transactionType: TransactionTypeEnum;
+    transactionGroup?: GetTransactionGroupDto;
 }

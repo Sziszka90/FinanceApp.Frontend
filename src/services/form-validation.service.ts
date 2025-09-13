@@ -53,10 +53,8 @@ export class FormValidationService {
                      this.defaultMessages[errorType] ||
                      this.defaultMessages['custom'];
 
-        // Replace placeholders with actual values
         message = this.replacePlaceholders(message, errors[errorType]);
 
-        // Capitalize field name in message
         const capitalizedFieldName = this.capitalizeFieldName(fieldName);
         message = message.replace(/this field/gi, capitalizedFieldName);
 
@@ -67,9 +65,6 @@ export class FormValidationService {
     return '';
   }
 
-  /**
-   * Get all validation errors for a form
-   */
   getAllFormErrors(
     form: FormGroup,
     customMessages?: FieldValidationMessages
@@ -86,16 +81,12 @@ export class FormValidationService {
     return formErrors;
   }
 
-  /**
-   * Mark all fields as touched to trigger validation display
-   */
   markAllFieldsAsTouched(form: FormGroup): void {
     Object.keys(form.controls).forEach(fieldName => {
       const control = form.get(fieldName);
       if (control) {
         control.markAsTouched();
 
-        // If it's a nested FormGroup, recursively mark as touched
         if (control instanceof FormGroup) {
           this.markAllFieldsAsTouched(control);
         }
@@ -103,9 +94,6 @@ export class FormValidationService {
     });
   }
 
-  /**
-   * Get a summary of all validation errors as a single string
-   */
   getValidationSummary(
     form: FormGroup,
     customMessages?: FieldValidationMessages,
@@ -115,16 +103,10 @@ export class FormValidationService {
     return Object.values(errors).join(separator);
   }
 
-  /**
-   * Check if form has any validation errors
-   */
   hasFormErrors(form: FormGroup): boolean {
     return form.invalid && form.touched;
   }
 
-  /**
-   * Get the first validation error found in the form
-   */
   getFirstFormError(
     form: FormGroup,
     customMessages?: FieldValidationMessages
@@ -134,9 +116,6 @@ export class FormValidationService {
     return firstError || '';
   }
 
-  /**
-   * Validate form and return formatted error messages
-   */
   validateForm(
     form: FormGroup,
     customMessages?: FieldValidationMessages
@@ -158,9 +137,6 @@ export class FormValidationService {
     };
   }
 
-  /**
-   * Custom validator factory for common patterns
-   */
   createCustomValidators() {
     return {
       noWhitespace: (control: AbstractControl): ValidationErrors | null => {
@@ -188,9 +164,6 @@ export class FormValidationService {
     };
   }
 
-  /**
-   * Private helper methods
-   */
   private replacePlaceholders(message: string, errorValue: unknown): string {
     if (typeof errorValue === 'object' && errorValue !== null) {
       const errorObj = errorValue as Record<string, unknown>;
@@ -204,7 +177,6 @@ export class FormValidationService {
   }
 
   private capitalizeFieldName(fieldName: string): string {
-    // Convert camelCase to readable format
     const readable = fieldName.replace(/([A-Z])/g, ' $1').toLowerCase();
     return readable.charAt(0).toUpperCase() + readable.slice(1);
   }

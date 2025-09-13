@@ -2,7 +2,7 @@ import { Component, inject, OnInit, ViewChild, signal, ElementRef } from '@angul
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { GetTransactionDto } from 'src/models/TransactionDtos/get-transaction.dto';
@@ -54,29 +54,29 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   public summary$: Observable<Money> | undefined;
   public transactions$: Observable<GetTransactionDto[]> | undefined;
   public allTransactions = signal<GetTransactionDto[]>([]);
-  public total = signal<Money>({ Amount: 0, Currency: CurrencyEnum.EUR });
+  public total = signal<Money>({ amount: 0, currency: CurrencyEnum.EUR });
   public showSummary = signal<boolean>(false);
   public summary = signal<Money | null>(null);
   public importLoading = signal<boolean>(false);
   dataSource = signal<MatTableDataSource<GetTransactionDto>>(new MatTableDataSource<GetTransactionDto>([]));
 
-  typeOptions: {Name: string, Value: TransactionTypeEnum}[] = [{ Name: 'Expense', Value: TransactionTypeEnum.Expense }, { Name: 'Income', Value: TransactionTypeEnum.Income }];
+  typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
 
   filterForm: FormGroup = this.fb.group({
-    Name: [''],
-    Date: [''],
-    Type: []
+    name: [''],
+    date: [''],
+    type: []
   });
 
   displayedColumns: string[] = [
-    'Name',
-    'Description',
-    'Amount',
-    'Currency',
-    'TransactionDate',
-    'TransactionType',
-    'Group',
-    'Actions'
+    'name',
+    'description',
+    'amount',
+    'currency',
+    'transactionDate',
+    'transactionType',
+    'group',
+    'actions'
   ];
 
   @ViewChild(MatSort) sort!: MatSort;
@@ -86,13 +86,13 @@ export class TransactionComponent extends BaseComponent implements OnInit {
     this.dataSource.update(ds => {
       ds.sortingDataAccessor = (item, property) => {
         switch (property) {
-          case 'Amount':
-            const amount = item.Value?.Amount;
+          case 'amount':
+            const amount = item.value?.amount;
             console.log('Sorting Amount:', amount, 'for item', item);
             return amount;
-          case 'Currency': return item.Value.Currency;
-          case 'TransactionDate': return new Date(item.TransactionDate);
-          case 'Group': return item.TransactionGroup?.Name ?? '';
+          case 'currency': return item.value.currency;
+          case 'transactionDate': return new Date(item.transactionDate);
+          case 'group': return item.transactionGroup?.name ?? '';
           default: return (item as any)[property];
         }
       };
@@ -155,25 +155,25 @@ export class TransactionComponent extends BaseComponent implements OnInit {
     this.dataSource.update(ds => {
       ds.filterPredicate = (data: GetTransactionDto, filter: string) => {
         const filterObj = JSON.parse(filter);
-        const { Name, Date, Type } = filterObj;
+        const { name, date, type } = filterObj;
 
-        return (!Name || data.Name.toLowerCase().includes(Name.toLowerCase())) &&
-              (!Date || (
-                data.TransactionDate &&
-                formatDate(data.TransactionDate, 'yyyy-MM-dd', 'en-US') === Date
+        return (!name || data.name.toLowerCase().includes(name.toLowerCase())) &&
+              (!date || (
+                data.transactionDate &&
+                formatDate(data.transactionDate, 'yyyy-MM-dd', 'en-US') === date
               )) &&
-              (!Type || data.TransactionType === Type);
+              (!type || data.transactionType === type);
       };
       return ds;
     });
   }
 
   applyFilters() {
-    const { Name, Date, Type } = this.filterForm.value;
-    const formattedDate = Date ? formatDate(Date, 'yyyy-MM-dd', 'en-US') : '';
+    const { name, date, type } = this.filterForm.value;
+    const formattedDate = date ? formatDate(date, 'yyyy-MM-dd', 'en-US') : '';
 
     this.dataSource.update(ds => {
-      ds.filter = JSON.stringify({ Name, Date: formattedDate, Type });
+      ds.filter = JSON.stringify({ name, date: formattedDate, type });
       return ds;
     });
 
@@ -183,14 +183,14 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   }
 
   deleteTransaction(transactionDto: GetTransactionDto) {
-    this.allTransactions.update(transactions => transactions.filter((t) => t.Id !== transactionDto.Id));
+    this.allTransactions.update(transactions => transactions.filter((t) => t.id !== transactionDto.id));
     this.dataSource.update(ds => {
       ds.data = this.allTransactions();
       return ds;
     });
 
     this.executeWithLoading(
-      this.transactionApiService.deleteTransaction(transactionDto.Id),
+      this.transactionApiService.deleteTransaction(transactionDto.id),
       'Transaction deleted successfully!',
       'Deleting transaction',
       false
@@ -201,9 +201,10 @@ export class TransactionComponent extends BaseComponent implements OnInit {
     });
   }
 
-  editTransaction(transactionDto: GetTransactionDto) {
-    if (!this.authService.isAuthenticated()) {
-      this.authService.logout();
+  async editTransaction(transactionDto: GetTransactionDto) {
+    const result = this.executeAsync(async () => this.authService.isAuthenticatedAsync())
+    if( !result) {
+      this.executeAsync(async () => this.authService.logoutAsync());
       return;
     }
 
@@ -224,15 +225,15 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       next: (updatedTransaction: GetTransactionDto) => {
         if (updatedTransaction) {
           this.allTransactions?.update(transactions => transactions.map((transaction: GetTransactionDto) => {
-            if (transaction.Id === updatedTransaction.Id) {
+            if (transaction.id === updatedTransaction.id) {
               return {
                 ...transaction,
-                Name: updatedTransaction.Name,
-                Description: updatedTransaction.Description,
-                Value: updatedTransaction.Value,
-                TransactionDate: updatedTransaction.TransactionDate,
-                TransactionType: updatedTransaction.TransactionType,
-                TransactionGroup: updatedTransaction.TransactionGroup
+                name: updatedTransaction.name,
+                description: updatedTransaction.description,
+                value: updatedTransaction.value,
+                transactionDate: updatedTransaction.transactionDate,
+                transactionType: updatedTransaction.transactionType,
+                transactionGroup: updatedTransaction.transactionGroup
               };
             }
             return transaction;
@@ -247,8 +248,9 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   }
 
   createTransaction() {
-    if (!this.authService.isAuthenticated()) {
-      this.authService.logout();
+    const result = this.executeAsync(async () => this.authService.isAuthenticatedAsync())
+    if( !result) {
+      this.executeAsync(async () => this.authService.logoutAsync());
       return;
     }
 
@@ -296,7 +298,6 @@ export class TransactionComponent extends BaseComponent implements OnInit {
         this.summary.set(data);
         this.showSummary.set(true);
 
-        // Hide the summary after 5 seconds
         setTimeout(() => {
           this.showSummary.set(false);
         }, 5000);

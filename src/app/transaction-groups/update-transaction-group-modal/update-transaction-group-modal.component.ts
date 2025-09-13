@@ -10,7 +10,6 @@ import {
   MAT_DIALOG_DATA,
   MatDialogRef
 } from '@angular/material/dialog';
-
 import { TransactionApiService } from '../../../services/transactions.api.service';
 import { ICONS } from 'src/models/Constants/group-icon-options.const';
 import { GetTransactionGroupDto } from 'src/models/TransactionGroupDtos/get-transaction-group.dto';
@@ -36,19 +35,19 @@ export class UpdateTransactionGroupModalComponent extends BaseComponent {
   public data = inject<GetTransactionGroupDto>(MAT_DIALOG_DATA);
 
   public override formGroup = this.fb.group({
-    Name: new FormControl(this.data.Name, [Validators.required, Validators.minLength(2)]),
-    Description: new FormControl(this.data.Description),
-    GroupIcon: new FormControl(this.data.GroupIcon, Validators.required)
+    name: new FormControl(this.data.name, [Validators.required, Validators.minLength(2)]),
+    description: new FormControl(this.data.description),
+    groupIcon: new FormControl(this.data.groupIcon, Validators.required)
   });
 
   public groupIconOptions: string[] = Object.values(ICONS);
 
   public override customValidationMessages: FieldValidationMessages = {
-    Name: {
+    name: {
       required: 'Transaction group name is required',
       minlength: 'Name must be at least 2 characters long'
     },
-    GroupIcon: {
+    groupIcon: {
       required: 'Please select an icon for the group'
     }
   };
@@ -59,14 +58,14 @@ export class UpdateTransactionGroupModalComponent extends BaseComponent {
     }
 
     const updatedTransactionGroup = {
-      Id: this.data.Id,
-      Name: this.getFieldValue<string>('Name')!,
-      Description: this.getFieldValue<string>('Description') || '',
-      GroupIcon: this.getFieldValue<string>('GroupIcon')!
+      id: this.data.id,
+      name: this.getFieldValue<string>('name')!,
+      description: this.getFieldValue<string>('description') || '',
+      groupIcon: this.getFieldValue<string>('groupIcon')!
     };
 
     this.executeWithLoading(
-      this.transactionApiService.updateTransactionGroup(this.data.Id, updatedTransactionGroup),
+      this.transactionApiService.updateTransactionGroup(this.data.id, updatedTransactionGroup),
       'Transaction group updated successfully!',
       'Updating transaction group'
     ).subscribe({

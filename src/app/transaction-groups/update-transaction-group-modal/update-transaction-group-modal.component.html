@@ -13,24 +13,24 @@
   }
   @if (!loading()) {
     <form class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
-      <label for="Name">Name</label>
+      <label for="name">Name</label>
       <div class="form-group">
-        <input id="Name" type="text" formControlName="Name" required />
-        @if (hasFieldError('Name')) {
+        <input id="name" type="text" formControlName="name" required />
+        @if (hasFieldError('name')) {
           <div class="error-message">
-            {{ getFieldErrorMessage('Name') }}
+            {{ getFieldErrorMessage('name') }}
           </div>
         }
       </div>
-      <label for="Description">Description</label>
+      <label for="description">Description</label>
       <div class="form-group">
-        <input id="Description" type="text" formControlName="Description" />
+        <input id="description" type="text" formControlName="description" />
       </div>
-      <label class="default-font" for="GroupIcon">Group Icon</label>
+      <label class="default-font" for="groupIcon">Group Icon</label>
       <div class="form-group">
-        <mat-select class="select" formControlName="GroupIcon" required>
+        <mat-select class="select" formControlName="groupIcon" required>
           <mat-select-trigger>
-            <i class="{{ formGroup!.get('GroupIcon')?.value }}"></i>
+            <i class="{{ formGroup!.get('groupIcon')?.value }}"></i>
           </mat-select-trigger>
           @for (option of groupIconOptions; track option) {
             <mat-option [value]="option">
@@ -38,9 +38,9 @@
             </mat-option>
           }
         </mat-select>
-        @if (hasFieldError('GroupIcon')) {
+        @if (hasFieldError('groupIcon')) {
           <div class="error-message">
-            {{ getFieldErrorMessage('GroupIcon') }}
+            {{ getFieldErrorMessage('groupIcon') }}
           </div>
         }
       </div>

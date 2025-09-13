@@ -3,6 +3,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { MatButtonModule } from '@angular/material/button';
+import { BaseComponent } from 'src/app/shared/base-component';
 
 @Component({
   selector: 'logged-in',
@@ -14,12 +15,12 @@ import { MatButtonModule } from '@angular/material/button';
     RouterLink
   ]
 })
-export class LoggedInComponent {
+export class LoggedInComponent extends BaseComponent {
   public router = inject(Router);
   public authService = inject(AuthenticationService);
 
   logout() {
-    this.authService.logout();
+    this.executeAsync(async () => this.authService.logoutAsync());
     this.router.navigate(['/login']);
   }
 }

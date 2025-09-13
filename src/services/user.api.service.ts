@@ -13,7 +13,6 @@ import { ResendEmailConfirmationResponse } from 'src/models/UserDtos/resend-emai
 })
 export class UserApiService {
 
-  // API base URL
   private apiUrl = environment?.apiUrl ?? '';
 
   // eslint-disable-next-line no-unused-vars

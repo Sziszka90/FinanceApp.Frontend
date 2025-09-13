@@ -48,37 +48,37 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
   private transactionApiService = inject(TransactionApiService);
 
   public override formGroup: FormGroup = this.fb.group({
-    Name: new FormControl('', [Validators.required, Validators.minLength(2)]),
-    Description: new FormControl(''),
-    Value: new FormControl(0, [Validators.required, Validators.min(0.01)]),
-    Currency: new FormControl('', Validators.required),
-    TransactionDate: new FormControl(new Date(), Validators.required),
-    TransactionType: new FormControl('', Validators.required),
-    Group: new FormControl('')
+    name: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    description: new FormControl(''),
+    value: new FormControl(0, [Validators.required, Validators.min(0.01)]),
+    currency: new FormControl('', Validators.required),
+    transactionDate: new FormControl(new Date(), Validators.required),
+    transactionType: new FormControl('', Validators.required),
+    group: new FormControl('')
   });
 
   public override customValidationMessages: FieldValidationMessages = {
-    Name: {
+    name: {
       required: 'Transaction name is required',
       minlength: 'Name must be at least 2 characters long'
     },
-    Value: {
+    value: {
       required: 'Transaction amount is required',
       min: 'Amount must be greater than 0'
     },
-    Currency: {
+    currency: {
       required: 'Please select a currency'
     },
-    TransactionDate: {
+    transactionDate: {
       required: 'Transaction date is required'
     },
-    TransactionType: {
+    transactionType: {
       required: 'Please select a transaction type'
     }
   };
 
   groupOptions = signal<GetTransactionGroupDto[]>([]);
-  typeOptions: {Name: string, Value: TransactionTypeEnum}[] = [{ Name: 'Expense', Value: TransactionTypeEnum.Expense }, { Name: 'Income', Value: TransactionTypeEnum.Income }];
+  typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
   currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
     isNaN(Number(key))
   );
@@ -91,7 +91,7 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
     ).subscribe({
       next: (data) => {
         this.groupOptions.set(data);
-        this.groupOptions.update(groups => [...groups, { Id: '', Name: 'No group' } as GetTransactionGroupDto]);
+        this.groupOptions.update(groups => [...groups, { id: '', name: 'No group' } as GetTransactionGroupDto]);
       }
     });
   }
@@ -101,20 +101,20 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
       return;
     }
 
-    const date: Date = this.getFieldValue<Date>('TransactionDate')!;
+    const date: Date = this.getFieldValue<Date>('transactionDate')!;
     const formattedDate = new Date(date ? formatDate(date, 'yyyy-MM-dd', 'en-US') : '');
-    const groupValue = this.getFieldValue<GetTransactionGroupDto>('Group') || null;
+    const groupValue = this.getFieldValue<GetTransactionGroupDto>('group') || null;
 
     const createTransactionDto = {
-      Name: this.getFieldValue<string>('Name')!,
-      Description: this.getFieldValue<string>('Description') || '',
-      Value: {
-        Amount: this.getFieldValue<number>('Value')!,
-        Currency: this.getFieldValue<CurrencyEnum>('Currency')!
+      name: this.getFieldValue<string>('name')!,
+      description: this.getFieldValue<string>('description') || '',
+      value: {
+        amount: this.getFieldValue<number>('value')!,
+        currency: this.getFieldValue<CurrencyEnum>('currency')!
       },
-      TransactionDate: formattedDate,
-      TransactionType: this.getFieldValue<TransactionTypeEnum>('TransactionType')!,
-      TransactionGroupId: groupValue?.Id || undefined
+      transactionDate: formattedDate,
+      transactionType: this.getFieldValue<TransactionTypeEnum>('transactionType')!,
+      transactionGroupId: groupValue?.id || undefined
     };
 
     this.executeWithLoading(

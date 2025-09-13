@@ -53,8 +53,8 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
           this.userApiService.getActiveUser().pipe(take(1)).subscribe({
             next: user => {
               if (user) {
-                this.userId = user.Id;
-                this.userName = user.UserName;
+                this.userId = user.id;
+                this.userName = user.userName;
                 if(this.messages.length === 0) {
                   this.messages.push({ text: `Hi ${this.userName}! How can I assist you today?`, sender: 'assistant' });
                 }
@@ -94,9 +94,9 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.messages.push({ text: msgToSend, sender: 'user' });
     this.scrollToBottom();
-    this.llmProcessorApiService.promptRequest({ Prompt: msgToSend, UserId: this.userId, CorrelationId: uuidv4() }).subscribe({
+    this.llmProcessorApiService.promptRequest({ prompt: msgToSend, userId: this.userId, correlationId: uuidv4() }).subscribe({
       next: res => {
-        const reply = res.Result || 'No response';
+        const reply = res.result || 'No response';
         this.messages.push({ text: reply, sender: 'assistant' });
         this.loading = false;
         this.scrollToBottom();

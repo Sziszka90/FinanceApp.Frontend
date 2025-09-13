@@ -2,8 +2,8 @@ import { Component, ElementRef, HostListener, inject, OnInit, signal } from '@an
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
 import { Router, RouterLink } from '@angular/router';
-
 import { AuthenticationService } from 'src/services/authentication.service';
+import { BaseComponent } from '../base-component';
 
 @Component({
   selector: 'nav-bar',
@@ -16,7 +16,7 @@ import { AuthenticationService } from 'src/services/authentication.service';
   styleUrl: './nav-bar.component.scss',
   standalone: true
 })
-export class NavBarComponent implements OnInit {
+export class NavBarComponent extends BaseComponent implements OnInit {
   private authService = inject(AuthenticationService);
   private router = inject(Router);
   private elementRef = inject(ElementRef);
@@ -30,8 +30,9 @@ export class NavBarComponent implements OnInit {
     });
   }
 
-  login() {
-    if (this.authService.isAuthenticated()) {
+  async login() {
+    const result = await this.executeAsync<boolean>(async () => await this.authService.isAuthenticatedAsync());
+    if (result) {
       this.router.navigateByUrl('/logged-in');
     } else {
       this.router.navigateByUrl('/login');

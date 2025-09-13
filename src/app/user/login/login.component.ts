@@ -8,6 +8,8 @@ import { ForgotPasswordRequestModalComponent } from '../forgot-password-modal/fo
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { ResendConfirmationEmailModalComponent } from '../resend-email-confirmation-modal/resend-confirmation-email-modal.component';
 import { BaseComponent } from '../../shared/base-component';
+import { LoginResponseDto } from 'src/models/LoginDtos/login-response.dto';
+import { Result } from 'src/models/Result/result';
 
 @Component({
   selector: 'login',
@@ -28,8 +30,8 @@ export class LoginComponent extends BaseComponent {
   private fb = inject(FormBuilder);
 
   override formGroup: FormGroup = this.fb.group({
-    Email: ['', [Validators.required, Validators.email]],
-    Password: ['', [Validators.required]]
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]]
   });
 
   forgotPassword(): void {
@@ -46,23 +48,16 @@ export class LoginComponent extends BaseComponent {
     });
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.formGroup.valid) {
-      this.executeWithLoading(
-        this.authService.login(this.formGroup.value),
-        undefined,
-        'Login failed'
-      ).subscribe({
-        next: (data: { Token: string }) => {
-          if (data.Token === '') {
-            this.showError('Invalid login credentials');
-          } else {
-            this.authService.saveToken(data.Token);
-            this.authService.userLoggedIn.next(true);
-            this.router.navigate(['/']);
-          }
-        }
-      });
+      const result = await this.executeAsync<LoginResponseDto>(async () => this.authService.loginAsync(this.formGroup.value));
+      if (result!.token === '') {
+        this.showError('Invalid login credentials');
+      } else {
+        this.authService.saveToken(result!.token);
+        this.authService.userLoggedIn.next(true);
+        this.router.navigate(['/']);
+      }
     } else {
       this.formGroup.markAllAsTouched();
     }

@@ -3,7 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { CreateTransactionGroupModalComponent } from '../create-transaction-group-modal/create-transaction-group-modal.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { Observable } from 'rxjs';
@@ -31,10 +30,10 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
   private authService = inject(AuthenticationService);
 
   displayedColumnsFull: string[] = [
-    'Name',
-    'Description',
-    'Icon',
-    'Actions'
+    'name',
+    'description',
+    'icon',
+    'actions'
   ];
 
   public transactionGroups$: Observable<GetTransactionGroupDto[]> | undefined;
@@ -60,9 +59,10 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
     });
   }
 
-  createTransactionGroup() {
-    if (!this.authService.isAuthenticated()) {
-      this.authService.logout();
+  async createTransactionGroup() {
+    const result = await this.executeAsync<boolean>(async () => this.authService.isAuthenticatedAsync())
+    if (!result) {
+      await this.executeAsync<boolean>(async () => this.authService.logoutAsync());
       return;
     }
 
@@ -87,12 +87,12 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
 
   deleteTransactionGroup(transactionGroup: GetTransactionGroupDto) {
     this.allTransactionGroups.update(groups => groups.filter(
-      (group) => group.Id !== transactionGroup.Id
+      (group) => group.id !== transactionGroup.id
     ));
     this.dataSource.set(new MatTableDataSource<GetTransactionGroupDto>(this.allTransactionGroups()));
 
     this.executeWithLoading(
-      this.transactionApiService.deleteTransactionGroup(transactionGroup.Id),
+      this.transactionApiService.deleteTransactionGroup(transactionGroup.id),
       'Transaction group deleted successfully!',
       'Deleting transaction group',
       false
@@ -104,8 +104,9 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
   }
 
   editTransactionGroup(transactionGroup: GetTransactionGroupDto) {
-    if (!this.authService.isAuthenticated()) {
-      this.authService.logout();
+    const result = this.executeAsync(async () => this.authService.isAuthenticatedAsync())
+    if (!result) {
+      this.executeAsync(async () => this.authService.logoutAsync());
       return;
     }
     const dialogRef = this.matDialog.open(
@@ -123,12 +124,12 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
       next: (updatedTransactionGroup) => {
         if (updatedTransactionGroup) {
           this.allTransactionGroups.update(groups => groups.map((transactionGroup) => {
-            if (transactionGroup.Id === updatedTransactionGroup.Id) {
+            if (transactionGroup.id === updatedTransactionGroup.id) {
               return {
                 ...transactionGroup,
-                Name: updatedTransactionGroup.Name,
-                Description: updatedTransactionGroup.Description,
-                GroupIcon: updatedTransactionGroup.GroupIcon
+                name: updatedTransactionGroup.name,
+                description: updatedTransactionGroup.description,
+                groupIcon: updatedTransactionGroup.groupIcon
               };
             }
             return transactionGroup;

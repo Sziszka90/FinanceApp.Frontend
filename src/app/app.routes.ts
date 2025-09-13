@@ -12,29 +12,40 @@ import { ProfileComponent } from './user/profile/profile.component';
 import { inject } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
 import { map } from 'rxjs';
+import { ComponentErrorService } from 'src/services/component-error.service';
 
-const AuthGuard: CanActivateFn = () => {
+const AuthGuard: CanActivateFn = async () => {
   const authService = inject(AuthenticationService);
   const router = inject(Router);
-  if (!authService.isAuthenticated()) {
+  const componentErrorService = inject(ComponentErrorService)
+
+  try {
+    const result = await authService.isAuthenticatedAsync();
+    if (result.isSuccess) {
+      return true;
+    } else {
+      componentErrorService.showError(result.error ?? 'Authentication failed');
+      router.navigate(['/login']);
+      return false;
+    }
+  } catch (error) {
+    componentErrorService.showError('Authentication failed');
     router.navigate(['/login']);
     return false;
   }
-  return true;
 };
 
-const ResetPasswordGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+const ResetPasswordGuard: CanActivateFn = async (route: ActivatedRouteSnapshot) => {
   const authService = inject(AuthenticationService);
   const router = inject(Router);
   const token = route.queryParamMap.get('token');
-  return authService.validateTokenWithApi(token || '').pipe(
-    map((isValid) => {
-      if (!isValid) {
-        router.navigate(['/validation-failed']);
-      }
-      return isValid;
-    })
-  );
+  const result = await authService.validateTokenAsync(token ?? '');
+
+  if(!result.isSuccess || result.data === false) {
+    router.navigate(['/validation-failed']);
+    return false;
+  }
+  return true;
 };
 
 export const routes: Routes = [

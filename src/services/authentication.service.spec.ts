@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { Subject, of, throwError } from 'rxjs';
+import { Subject, firstValueFrom, of, throwError } from 'rxjs';
 import { PLATFORM_ID } from '@angular/core';
 import { AuthenticationService } from './authentication.service';
 import { AuthenticationApiService } from './authentication.api.service';
@@ -92,31 +92,31 @@ describe('AuthenticationService', () => {
       expect(service.getToken()).toBeNull();
     });
 
-    it('should validate token correctly when token exists and is valid', () => {
+    it('should validate token correctly when token exists and is valid', async () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
       const validToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ exp: futureExp, sub: '123' }))}.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`;
       localStorage.setItem('authToken', validToken);
 
-      expect(service.validateToken()).toBe(true);
+      expect(await firstValueFrom(service.validateToken())).toBe(true);
     });
 
-    it('should return false for expired token', () => {
+    it('should return false for expired token', async () => {
       // Mock an expired token
       const pastExp = Math.floor(Date.now() / 1000) - 3600; // 1 hour ago
       const expiredToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ exp: pastExp, sub: '123' }))}.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`;
       localStorage.setItem('authToken', expiredToken);
 
-      expect(service.validateToken()).toBe(false);
+      expect(await firstValueFrom(service.validateToken())).toBe(false);
     });
 
-    it('should return false for malformed token', () => {
+    it('should return false for malformed token', async () => {
       // Create a token with invalid base64 in the payload section
       localStorage.setItem('authToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid_base64_@#$.signature');
-      expect(service.validateToken()).toBe(false);
+      expect(await firstValueFrom(service.validateToken())).toBe(false);
     });
 
-    it('should return false when no token exists', () => {
-      expect(service.validateToken()).toBe(false);
+    it('should return false when no token exists', async () => {
+      expect(await firstValueFrom(service.validateToken())).toBe(false);
     });
   });
 
@@ -170,24 +170,24 @@ describe('AuthenticationService', () => {
   });
 
   describe('Authentication Status', () => {
-    it('should return true when user is authenticated with valid token', () => {
+    it('should return true when user is authenticated with valid token', async () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600;
       const validToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ exp: futureExp, sub: '123' }))}.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`;
       localStorage.setItem('authToken', validToken);
 
-      expect(service.isAuthenticated()).toBe(true);
+      expect(await service.isAuthenticated()).toBe(true);
     });
 
-    it('should return false when user is not authenticated', () => {
-      expect(service.isAuthenticated()).toBe(false);
+    it('should return false when user is not authenticated', async () => {
+      expect(await service.isAuthenticated()).toBe(false);
     });
 
-    it('should return false when token is expired', () => {
+    it('should return false when token is expired', async () => {
       const pastExp = Math.floor(Date.now() / 1000) - 3600;
       const expiredToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ exp: pastExp, sub: '123' }))}.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`;
       localStorage.setItem('authToken', expiredToken);
 
-      expect(service.isAuthenticated()).toBe(false);
+      expect(await service.isAuthenticated()).toBe(false);
     });
 
     it('should emit false when token validation fails', (done) => {

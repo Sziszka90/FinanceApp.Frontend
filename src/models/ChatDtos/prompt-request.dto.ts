@@ -1,5 +1,5 @@
 export interface PromptRequestDto {
-  Prompt: string;
-  UserId: string;
-  CorrelationId: string;
+  prompt: string;
+  userId: string;
+  correlationId: string;
 }

@@ -24,7 +24,7 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
   resetPasswordValid = signal<boolean>(true);
 
   override formGroup: FormGroup = this.fb.group({
-    Password: [
+    password: [
       '',
       [
         Validators.required,
@@ -32,7 +32,7 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
         Validators.minLength(8)
       ]
     ],
-    ConfirmPassword: [
+    confirmPassword: [
       '',
       [
         Validators.required,
@@ -45,12 +45,12 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
   );
 
   override customValidationMessages = {
-    Password: {
+    password: {
       required: 'Password is required',
       minlength: 'Minimum 8 characters required',
       pattern: 'Password must include at least one uppercase letter, one number, and one special character'
     },
-    ConfirmPassword: {
+    confirmPassword: {
       required: 'Confirm password is required',
       minlength: 'Minimum 8 characters required',
       pattern: 'Password must include at least one uppercase letter, one number, and one special character'
@@ -64,18 +64,18 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
   }
 
   passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
-    const password = control.get('Password')?.value;
-    const confirmPassword = control.get('ConfirmPassword')?.value;
+    const password = control.get('password')?.value;
+    const confirmPassword = control.get('confirmPassword')?.value;
 
     return password === confirmPassword ? null : { passwordsMismatch: true };
   }
 
   onSubmit(): void {
     if (this.isFormValid()) {
-      const password = this.getFieldValue<string>('Password') || '';
+      const password = this.getFieldValue<string>('password') || '';
 
       this.executeWithLoading(
-        this.userApiService.updatePassword({ Password: password, Token: this.token }),
+        this.userApiService.updatePassword({ password: password, token: this.token }),
         'Password reset successfully',
         'Failed to reset password'
       ).subscribe({

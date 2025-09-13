@@ -15,13 +15,11 @@ import { Money } from 'src/models/Money/money.dto';
 })
 export class TransactionApiService {
 
-  // API base URL
   private apiUrl = environment?.apiUrl ?? '';
 
   // eslint-disable-next-line no-unused-vars
   constructor(private http: HttpClient) { }
 
-  // Method to get data from the backend
   getAllTransactions(): Observable<GetTransactionDto[]> {
     return this.http.get<GetTransactionDto[]>(`${this.apiUrl}/api/v1/transactions/`);
   }

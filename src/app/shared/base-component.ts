@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { FormValidationService, FieldValidationMessages } from 'src/services/form-validation.service';
 import { ComponentErrorService } from 'src/services/component-error.service';
 import { Observable, finalize, Subject, tap, catchError, throwError, takeUntil } from 'rxjs';
+import { Result } from 'src/models/Result/result';
 
 @Injectable()
 export abstract class BaseComponent implements OnDestroy {
@@ -123,6 +124,30 @@ export abstract class BaseComponent implements OnDestroy {
         }
       })
     );
+  }
+
+  protected async executeAsync<T>(
+    asyncFn: () => Promise<Result<T>>,
+    successMessage?: string,
+    errorContext?: string,
+    showLoader: boolean = false
+  ): Promise<T | undefined> {
+    if (showLoader) this.setLoading(true);
+    this.clearError();
+    try {
+      const result = await asyncFn();
+        if (result && result.isSuccess === false) {
+          this.showError(result.error || 'Unknown error');
+          return undefined;
+        }
+        if (successMessage) this.showSuccess(successMessage);
+      return result.data;
+    } catch (error) {
+      this.handleError(error, errorContext || 'operation');
+      return undefined;
+    } finally {
+      if (showLoader) this.setLoading(false);
+    }
   }
 
   protected getFormValue<T = unknown>(): T | null {

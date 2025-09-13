@@ -10,66 +10,66 @@
           {{ errorMessage() }}
         </div>
       }
-      <label class="default-font" for="UserName">User Name</label>
+      <label class="default-font" for="userName">User Name</label>
       <div class="form-group">
         <input
           class="default-font"
-          id="UserName"
+          id="userName"
           type="text"
-          formControlName="UserName"
+          formControlName="userName"
           required
           placeholder="User Name"
           />
-          @if (hasFieldError('UserName')) {
+          @if (hasFieldError('userName')) {
             <div class="error-font">
-              {{ getFieldErrorMessage('UserName') }}
+              {{ getFieldErrorMessage('userName') }}
             </div>
           }
         </div>
-        <label class="default-font" for="Email">Email</label>
+        <label class="default-font" for="email">Email</label>
         <div class="form-group">
           <input
             class="default-font"
-            id="Email"
+            id="email"
             type="text"
-            formControlName="Email"
+            formControlName="email"
             required
             placeholder="Email"
             />
-            @if (hasFieldError('Email')) {
+            @if (hasFieldError('email')) {
               <div class="error-font">
-                {{ getFieldErrorMessage('Email') }}
+                {{ getFieldErrorMessage('email') }}
               </div>
             }
           </div>
-          <label class="default-font" for="Password">Password</label>
+          <label class="default-font" for="password">Password</label>
           <div class="form-group">
             <input
               class="default-font"
-              id="Password"
+              id="password"
               type="password"
-              formControlName="Password"
+              formControlName="password"
               required
               placeholder="Password"
               />
-              @if (hasFieldError('Password')) {
+              @if (hasFieldError('password')) {
                 <div class="error-font">
-                  {{ getFieldErrorMessage('Password') }}
+                  {{ getFieldErrorMessage('password') }}
                 </div>
               }
             </div>
-            <label class="default-font" for="Currency">Currency</label>
+            <label class="default-font" for="currency">Currency</label>
             <div class="select">
-              <mat-select formControlName="Currency" required>
+              <mat-select formControlName="currency" required>
                 @for (option of currencyOptions; track option) {
                   <mat-option [value]="option">
                     {{ option }}
                   </mat-option>
                 }
               </mat-select>
-              @if (hasFieldError('Currency')) {
+              @if (hasFieldError('currency')) {
                 <div class="error-font">
-                  {{ getFieldErrorMessage('Currency') }}
+                  {{ getFieldErrorMessage('currency') }}
                 </div>
               }
             </div>

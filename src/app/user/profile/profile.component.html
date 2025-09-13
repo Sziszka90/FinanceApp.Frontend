@@ -10,40 +10,40 @@
       </div>
     }
     <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
-      <label class="default-font" for="Currency">Currency</label>
-      <label class="default-font" for="UserName">User Name</label>
+      <label class="default-font" for="currency">Currency</label>
+      <label class="default-font" for="userName">User Name</label>
       <div class="form-group">
         <input
           class="default-font"
-          id="UserName"
+          id="userName"
           type="text"
-          formControlName="UserName"
+          formControlName="userName"
           placeholder="User Name"
           />
-          @if (hasFieldError('UserName')) {
+          @if (hasFieldError('userName')) {
             <div class="error-font">
-              {{ getFieldErrorMessage('UserName') }}
+              {{ getFieldErrorMessage('userName') }}
             </div>
           }
         </div>
-        <label class="default-font" for="Password">Password</label>
+        <label class="default-font" for="password">Password</label>
         <div class="form-group">
           <input
             class="default-font"
-            id="Password"
+            id="password"
             type="password"
-            formControlName="Password"
+            formControlName="password"
             placeholder="Password"
             />
-            @if (hasFieldError('Password')) {
+            @if (hasFieldError('password')) {
               <div class="error-font">
-                {{ getFieldErrorMessage('Password') }}
+                {{ getFieldErrorMessage('password') }}
               </div>
             }
           </div>
-          <label class="default-font" for="Currency">Currency</label>
+          <label class="default-font" for="currency">Currency</label>
           <div class="form-group">
-            <mat-select class="select" formControlName="Currency" [compareWith]="compareCategoryObjects" required>
+            <mat-select class="select" formControlName="currency" [compareWith]="compareCategoryObjects" required>
               @for (option of currencyOptions; track option) {
                 <mat-option [value]="option">
                   {{ option }}

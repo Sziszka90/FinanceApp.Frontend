@@ -13,80 +13,80 @@
   }
   @if (!loading()) {
     <form class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
-      <label for="Name">Name</label>
+      <label for="name">Name</label>
       <div class="form-group">
-        <input id="Name" type="text" formControlName="Name" required />
-        @if (hasFieldError('Name')) {
+        <input id="name" type="text" formControlName="name" required />
+        @if (hasFieldError('name')) {
           <div class="error-message">
-            {{ getFieldErrorMessage('Name') }}
+            {{ getFieldErrorMessage('name') }}
           </div>
         }
       </div>
-      <label for="Description">Description</label>
+      <label for="description">Description</label>
       <div class="form-group">
-        <input id="Description" type="text" formControlName="Description" />
+        <input id="description" type="text" formControlName="description" />
       </div>
-      <label for="Value">Value</label>
+      <label for="value">Value</label>
       <div class="form-group">
-        <input id="Value" type="number" formControlName="Value" />
-        @if (hasFieldError('Value')) {
+        <input id="value" type="number" formControlName="value" />
+        @if (hasFieldError('value')) {
           <div class="error-message">
-            {{ getFieldErrorMessage('Value') }}
+            {{ getFieldErrorMessage('value') }}
           </div>
         }
       </div>
-      <label for="Currency">Currency</label>
+      <label for="currency">Currency</label>
       <div class="form-group">
-        <mat-select class="select" formControlName="Currency">
+        <mat-select class="select" formControlName="currency">
           @for (option of currencyOptions; track option) {
             <mat-option [value]="option">
               &#8226; {{ option }}
             </mat-option>
           }
         </mat-select>
-        @if (hasFieldError('Currency')) {
+        @if (hasFieldError('currency')) {
           <div class="error-message">
-            {{ getFieldErrorMessage('Currency') }}
+            {{ getFieldErrorMessage('currency') }}
           </div>
         }
       </div>
-      <label for="TransactionDate">Transaction Date</label>
+      <label for="transactionDate">Transaction Date</label>
       <div class="input-with-icon">
-        <input bsDatepicker formControlName="TransactionDate" type="text" placeholder="Select a date" />
+        <input bsDatepicker formControlName="transactionDate" type="text" placeholder="Select a date" />
         <i class="fa fa-calendar"></i>
-        @if (hasFieldError('TransactionDate')) {
+        @if (hasFieldError('transactionDate')) {
           <div class="error-message">
-            {{ getFieldErrorMessage('TransactionDate') }}
+            {{ getFieldErrorMessage('transactionDate') }}
           </div>
         }
       </div>
-      <label for="TransactionType">Transaction Type</label>
+      <label for="transactionType">Transaction Type</label>
       <div class="form-group">
-        <mat-select class="select" formControlName="TransactionType">
+        <mat-select class="select" formControlName="transactionType">
           @for (option of typeOptions; track option) {
             <mat-option [value]="option.Value">
               &#8226; {{ option.Name }}
             </mat-option>
           }
         </mat-select>
-        @if (hasFieldError('TransactionType')) {
+        @if (hasFieldError('transactionType')) {
           <div class="error-message">
-            {{ getFieldErrorMessage('TransactionType') }}
+            {{ getFieldErrorMessage('transactionType') }}
           </div>
         }
       </div>
-      <label for="Group">Group</label>
+      <label for="group">Group</label>
       <div class="form-group">
-        <mat-select class="select" formControlName="Group">
+        <mat-select class="select" formControlName="group">
           @for (option of groupOptions(); track option) {
             <mat-option [value]="option">
               &#8226; {{ option.Name }}
             </mat-option>
           }
         </mat-select>
-        @if (hasFieldError('Group')) {
+        @if (hasFieldError('group')) {
           <div class="error-message">
-            {{ getFieldErrorMessage('Group') }}
+            {{ getFieldErrorMessage('group') }}
           </div>
         }
       </div>

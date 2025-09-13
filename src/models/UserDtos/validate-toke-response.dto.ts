@@ -1,3 +1,3 @@
 export interface ValidateTokenResponse {
-    IsValid: boolean;
+    isValid: boolean;
 }

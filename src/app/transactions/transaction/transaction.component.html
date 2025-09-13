@@ -5,7 +5,7 @@
 @if (showSummary()) {
   <div class="summary default-font text-color-grey">
     <div class="title">Sum of Transactions</div>
-    <div class="value" id="value">{{ summary()?.Amount }} {{ summary()?.Currency }}</div>
+    <div class="value" id="value">{{ summary()?.amount }} {{ summary()?.currency }}</div>
   </div>
 }
 
@@ -30,19 +30,19 @@
   <form [formGroup]="filterForm" class="search-container">
     <div class="form-group">
       <input
-        name="Name"
+        name="name"
         type="text"
         placeholder="Search by Name"
-        formControlName="Name"
+        formControlName="name"
         [class.disabled]="loading()"
         class="search-input"
         />
 
         <div class="input-with-icon">
           <input
-            name="Date"
+            name="date"
             bsDatepicker
-            formControlName="Date"
+            formControlName="date"
             [class.disabled]="loading()"
             type="text"
             placeholder="Select a date" />
@@ -50,13 +50,13 @@
           </div>
 
           <mat-select
-            name="Type"
+            name="type"
             class="select"
-            formControlName="Type"
+            formControlName="type"
             [class.disabled]="loading()">
             @for (option of typeOptions; track option) {
-              <mat-option [value]="option.Name">
-                &#8226; {{ option.Name }}
+              <mat-option [value]="option.name">
+                &#8226; {{ option.name }}
               </mat-option>
             }
           </mat-select>
@@ -79,35 +79,35 @@
           @if (dataSource().data.length > 0) {
             <div>
               <table mat-table [dataSource]="dataSource()" matSort class="mat-elevation-z8">
-                <ng-container class="column" matColumnDef="Name">
+                <ng-container class="column" matColumnDef="name">
                   <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header appColumnResize> Name </th>
-                  <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Name}} </td>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.name}} </td>
                 </ng-container>
-                <ng-container class="column" matColumnDef="Description">
+                <ng-container class="column" matColumnDef="description">
                   <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef> Description </th>
-                  <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.Description}} </td>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.description}} </td>
                 </ng-container>
-                <ng-container class="column" matColumnDef="Amount">
+                <ng-container class="column" matColumnDef="amount">
                   <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
-                  <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.Value.Amount }}</td>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.value.amount }}</td>
                 </ng-container>
-                <ng-container class="column" matColumnDef="Currency">
+                <ng-container class="column" matColumnDef="currency">
                   <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Currency</th>
-                  <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.Value.Currency }}</td>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.value.currency }}</td>
                 </ng-container>
-                <ng-container class="column" matColumnDef="TransactionDate">
+                <ng-container class="column" matColumnDef="transactionDate">
                   <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef mat-sort-header>Transaction Date</th>
-                  <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.TransactionDate | date: 'yyyy/MM/dd' }}</td>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.transactionDate | date: 'yyyy/MM/dd' }}</td>
                 </ng-container>
-                <ng-container class="column" matColumnDef="TransactionType">
+                <ng-container class="column" matColumnDef="transactionType">
                   <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Transaction Type</th>
-                  <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.TransactionType }}</td>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element">{{ element.transactionType }}</td>
                 </ng-container>
-                <ng-container class="column" matColumnDef="Group">
+                <ng-container class="column" matColumnDef="group">
                   <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef> Group </th>
-                  <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.TransactionGroup != undefined ? element.TransactionGroup.Name : ""}} </td>
+                  <td class="default-font text-color-black" mat-cell *matCellDef="let element"> {{element.transactionGroup != undefined ? element.transactionGroup.name : ""}} </td>
                 </ng-container>
-                <ng-container class="column" matColumnDef="Actions">
+                <ng-container class="column" matColumnDef="actions">
                   <th class="default-font text-color-black" mat-header-cell *matHeaderCellDef>Actions</th>
                   <td class="default-font text-color-black" mat-cell *matCellDef="let row">
                     <div class="action-button-container">

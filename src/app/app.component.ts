@@ -6,6 +6,9 @@ import { ChatBubbleComponent } from './shared/chat-bubble/chat-bubble.component'
 import { AuthenticationService } from 'src/services/authentication.service';
 import { WakeupLoaderComponent } from './shared/wakeup-loader/wakeup-loader.components';
 import { WakeupService } from 'src/services/wakeup.service';
+import { NotificationService } from 'src/services/notification.service';
+import { BaseComponent } from './shared/base-component';
+import { Result } from 'src/models/Result/result';
 
 @Component({
   selector: 'root',
@@ -19,9 +22,10 @@ import { WakeupService } from 'src/services/wakeup.service';
   styleUrl: './app.component.scss',
   standalone: true
 })
-export class AppComponent implements OnInit {
+export class AppComponent extends BaseComponent implements OnInit {
   private authService = inject(AuthenticationService);
   private wakeupService = inject(WakeupService);
+  private notificationService = inject(NotificationService);
 
   title = 'Finance App';
   isServer = false;
@@ -30,7 +34,8 @@ export class AppComponent implements OnInit {
   showApp = false;
 
   async ngOnInit(): Promise<void> {
-    this.authService.isAuthenticated();
+    this.executeAsync<boolean>(async () => await this.authService.isAuthenticatedAsync());
+
     this.wakeupService.showWakeupLoader$.subscribe(show => {
       this.showWakeupLoader = show;
     });
@@ -38,7 +43,7 @@ export class AppComponent implements OnInit {
       this.showApp = show;
     });
     await this.wakeupService.wakeup();
-
+    await this.notificationService.initializeAsync();
   }
 
   testGlobalError(): void {

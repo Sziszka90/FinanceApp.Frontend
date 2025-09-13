@@ -1,14 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
-import { timeout } from 'rxjs/operators';
-import { environment } from '../environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { ErrorModalComponent } from 'src/app/shared/error-modal/error-modal.component';
+import { WakeupApiService } from './wakeup.api.service';
 
 @Injectable({ providedIn: 'root' })
 export class WakeupService {
-  private http = inject(HttpClient);
+  private wakeupApiService = inject(WakeupApiService);
   private dialog = inject(MatDialog);
 
   private _showApp = new BehaviorSubject<boolean>(false);
@@ -32,15 +30,10 @@ export class WakeupService {
       let shouldRetry = true;
       for (let i = 0; i < 5 && shouldRetry; i++) {
         try {
-          response = await firstValueFrom(
-            this.http.post(`${environment.apiUrl}/api/v1/wakeup`, {}, { observe: 'response' }).pipe(
-              timeout(300000)
-            )
-          );
+          response = await firstValueFrom(this.wakeupApiService.wakeup());
           break;
         } catch (error) {
-          const status = typeof error === 'object' && error && 'status' in error ? (error as any).status : undefined;
-          if (status !== 503 || i === 4) {
+          if (i === 4) {
             this.dialog.open(ErrorModalComponent, {
               data: { message: 'Backend services are not available. Retry later.' }
             });

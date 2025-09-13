@@ -10,36 +10,36 @@
           {{ errorMessage() }}
         </div>
       }
-      <label class="default-font" for="Email">User Email</label>
+      <label class="default-font" for="email">User Email</label>
       <div class="form-group">
         <input
           class="default-font"
-          id="Email"
-          formControlName="Email"
+          id="email"
+          formControlName="email"
           required
           placeholder="Email"
           />
-          @if (hasFieldError('Email')) {
+          @if (hasFieldError('email')) {
             <div class="error-message default-font"
               >
-              {{ getFieldErrorMessage('Email') }}
+              {{ getFieldErrorMessage('email') }}
             </div>
           }
         </div>
-        <label class="default-font" for="Password">Password</label>
+        <label class="default-font" for="password">Password</label>
         <div class="form-group">
           <input
             class="default-font"
-            id="Password"
+            id="password"
             type="password"
-            formControlName="Password"
+            formControlName="password"
             required
             placeholder="Password"
             />
-            @if (hasFieldError('Password')) {
+            @if (hasFieldError('password')) {
               <div class="error-message default-font"
                 >
-                {{ getFieldErrorMessage('Password') }}
+                {{ getFieldErrorMessage('password') }}
               </div>
             }
           </div>

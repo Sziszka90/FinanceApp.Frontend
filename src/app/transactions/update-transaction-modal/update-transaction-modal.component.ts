@@ -50,55 +50,55 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
   public data = inject(MAT_DIALOG_DATA);
 
   public override formGroup: FormGroup = this.fb.group({
-    Name: new FormControl(this.data.Name, [Validators.required, Validators.minLength(2)]),
-    Description: new FormControl(this.data.Description),
-    Value: new FormControl(this.data.Value.Amount, [
+    name: new FormControl(this.data.name, [Validators.required, Validators.minLength(2)]),
+    description: new FormControl(this.data.description),
+    value: new FormControl(this.data.value.amount, [
       Validators.required,
       Validators.min(0.01)
     ]),
-    Currency: new FormControl(this.data.Value.Currency, Validators.required),
-    TransactionDate: new FormControl(this.data.TransactionDate, Validators.required),
-    TransactionType: new FormControl(
+    currency: new FormControl(this.data.value.currency, Validators.required),
+    transactionDate: new FormControl(this.data.transactionDate, Validators.required),
+    transactionType: new FormControl(
       null,
       [Validators.required, enumValidator(TransactionTypeEnum)]
     ),
-    Group: new FormControl(
-      this.data.TransactionGroup != null
-        ? this.data.TransactionGroup
+    group: new FormControl(
+      this.data.transactionGroup != null
+        ? this.data.transactionGroup
         : null
     )
   });
 
   public override customValidationMessages: FieldValidationMessages = {
-    Name: {
+    name: {
       required: 'Transaction name is required',
       minlength: 'Name must be at least 2 characters long'
     },
-    Value: {
+    value: {
       required: 'Transaction amount is required',
       min: 'Amount must be greater than 0'
     },
-    Currency: {
+    currency: {
       required: 'Please select a currency'
     },
-    TransactionDate: {
+    transactionDate: {
       required: 'Transaction date is required'
     },
-    TransactionType: {
+    transactionType: {
       required: 'Please select a transaction type'
     }
   };
   groupOptions = signal<GetTransactionGroupDto[]>([]);
-  typeOptions: {Name: string, Value: TransactionTypeEnum}[] = [{ Name: 'Expense', Value: TransactionTypeEnum.Expense }, { Name: 'Income', Value: TransactionTypeEnum.Income }];
+  typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
   currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
     isNaN(Number(key))
   );
 
   ngOnInit(): void {
-  this.formGroup!.get('Group')?.setValue(this.data.TransactionGroup);
-  this.formGroup!.get('Currency')?.setValue(this.data.Value.Currency);
-  this.formGroup!.get('TransactionType')?.setValue(this.data.TransactionType);
-  this.formGroup!.get('TransactionDate')?.setValue(new Date(this.data.TransactionDate));
+    this.formGroup!.get('group')?.setValue(this.data.transactionGroup);
+    this.formGroup!.get('currency')?.setValue(this.data.value.currency);
+    this.formGroup!.get('transactionType')?.setValue(this.data.transactionType);
+    this.formGroup!.get('transactionDate')?.setValue(new Date(this.data.transactionDate));
 
     this.executeWithLoading(
       this.transactionApiService.getAllTransactionGroups(),
@@ -107,7 +107,7 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
     ).subscribe({
       next: (data) => {
         this.groupOptions.set(data);
-        this.groupOptions.update(groups => [...groups, { Id: '', Name: 'No group' } as GetTransactionGroupDto]);
+        this.groupOptions.update(groups => [...groups, { id: '', name: 'No group' } as GetTransactionGroupDto]);
       }
     });
   }
@@ -119,26 +119,26 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
 
     let transactionDate = undefined;
 
-    const date: Date = this.getFieldValue<Date>('TransactionDate')!;
+    const date: Date = this.getFieldValue<Date>('transactionDate')!;
     if (date && date.getFullYear() !== 1) {
       transactionDate = date;
     }
 
     const updatedTransaction: UpdateTransactionDto = {
-      Id: this.data.Id,
-      Name: this.getFieldValue<string>('Name')!,
-      Description: this.getFieldValue<string>('Description') || '',
-      Value: {
-        Amount: this.getFieldValue<number>('Value')!,
-        Currency: this.getFieldValue<CurrencyEnum>('Currency')!
+      id: this.data.id,
+      name: this.getFieldValue<string>('name')!,
+      description: this.getFieldValue<string>('description') || '',
+      value: {
+        amount: this.getFieldValue<number>('value')!,
+        currency: this.getFieldValue<CurrencyEnum>('currency')!
       },
-      TransactionType: this.getFieldValue<TransactionTypeEnum>('TransactionType')!,
-      TransactionDate: transactionDate,
-      TransactionGroupId: this.getFieldValue<GetTransactionGroupDto>('Group')?.Id || undefined
+      transactionType: this.getFieldValue<TransactionTypeEnum>('transactionType')!,
+      transactionDate: transactionDate,
+      transactionGroupId: this.getFieldValue<GetTransactionGroupDto>('group')?.id || undefined
     };
 
     this.executeWithLoading(
-      this.transactionApiService.updateTransaction(this.data.Id, updatedTransaction),
+      this.transactionApiService.updateTransaction(this.data.id, updatedTransaction),
       'Transaction updated successfully!',
       'Updating transaction'
     ).subscribe({

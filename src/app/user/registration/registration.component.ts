@@ -31,9 +31,9 @@ export class RegistrationComponent extends BaseComponent {
   private router = inject(Router);
 
   override formGroup: FormGroup = this.fb.group({
-    UserName: ['', [Validators.required, Validators.minLength(2)]],
-    Email: ['', [Validators.required, Validators.email]],
-    Password: [
+    userName: ['', [Validators.required, Validators.minLength(2)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: [
       '',
       [
         Validators.required,
@@ -41,24 +41,24 @@ export class RegistrationComponent extends BaseComponent {
         Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$')
       ]
     ],
-    Currency: ['', [Validators.required]]
+    currency: ['', [Validators.required]]
   });
 
   override customValidationMessages = {
-    UserName: {
+    userName: {
       required: 'User name is required',
       minlength: 'Minimum 2 characters required'
     },
-    Email: {
+    email: {
       required: 'Email is required',
       email: 'Invalid email format'
     },
-    Password: {
+    password: {
       required: 'Password is required',
       minlength: 'Minimum 8 characters required',
       pattern: 'Include uppercase letter, number, and special character'
     },
-    Currency: {
+    currency: {
       required: 'Currency is required'
     }
   };
@@ -74,10 +74,10 @@ export class RegistrationComponent extends BaseComponent {
 
       this.executeWithLoading(
         this.apiService.register({
-          UserName: this.getFieldValue('UserName') || '',
-          Email: this.getFieldValue('Email') || '',
-          Password: this.getFieldValue('Password') || '',
-          BaseCurrency: this.getFieldValue('Currency') || CurrencyEnum.EUR
+          userName: this.getFieldValue('userName') || '',
+          email: this.getFieldValue('email') || '',
+          password: this.getFieldValue('password') || '',
+          baseCurrency: this.getFieldValue('currency') || CurrencyEnum.EUR
         }).pipe(take(1)),
         'Registration successful! Confirm email address',
         'Registration failed'

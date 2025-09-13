@@ -22,10 +22,10 @@ describe('ProfileComponent', () => {
   let router: jasmine.SpyObj<Router>;
 
   const mockUser: GetUserDto = {
-    Id: '123',
-    UserName: 'testuser',
-    Email: 'test@example.com',
-    BaseCurrency: CurrencyEnum.EUR
+    id: '123',
+    userName: 'testuser',
+    email: 'test@example.com',
+    baseCurrency: CurrencyEnum.EUR
   };
 
   beforeEach(async () => {
@@ -98,26 +98,26 @@ describe('ProfileComponent', () => {
 
     it('should initialize form group with correct structure', () => {
       expect(component.formGroup).toBeDefined();
-      expect(component.formGroup.get('UserName')).toBeInstanceOf(FormControl);
-      expect(component.formGroup.get('Password')).toBeInstanceOf(FormControl);
-      expect(component.formGroup.get('Currency')).toBeInstanceOf(FormControl);
+      expect(component.formGroup.get('userName')).toBeInstanceOf(FormControl);
+      expect(component.formGroup.get('password')).toBeInstanceOf(FormControl);
+      expect(component.formGroup.get('currency')).toBeInstanceOf(FormControl);
     });
 
     it('should set default currency to EUR', () => {
-      expect(component.formGroup.get('Currency')?.value).toBe(CurrencyEnum.EUR);
+      expect(component.formGroup.get('currency')?.value).toBe(CurrencyEnum.EUR);
     });
 
     it('should have correct validation messages', () => {
       expect(component.customValidationMessages).toEqual({
-        UserName: {
+        userName: {
           required: 'User name is required',
           minlength: 'Minimum 2 characters required'
         },
-        Password: {
+        password: {
           minlength: 'Password must be at least 8 characters long',
           pattern: 'Password must include uppercase letter, number, and special character'
         },
-        Currency: {
+        currency: {
           required: 'Currency is required'
         }
       });
@@ -136,7 +136,7 @@ describe('ProfileComponent', () => {
 
     describe('Username Validation', () => {
       it('should be invalid when username is too short', () => {
-        const userNameControl = component.formGroup.get('UserName')!;
+        const userNameControl = component.formGroup.get('userName')!;
         userNameControl.setValue('a');
         userNameControl.markAsTouched();
 
@@ -145,7 +145,7 @@ describe('ProfileComponent', () => {
       });
 
       it('should be valid when username meets minimum length', () => {
-        const userNameControl = component.formGroup.get('UserName')!;
+        const userNameControl = component.formGroup.get('userName')!;
         userNameControl.setValue('ab');
 
         expect(userNameControl.valid).toBe(true);
@@ -154,14 +154,14 @@ describe('ProfileComponent', () => {
 
     describe('Password Validation (Optional Strong Password)', () => {
       it('should be valid when password is empty (optional)', () => {
-        const passwordControl = component.formGroup.get('Password')!;
+        const passwordControl = component.formGroup.get('password')!;
         passwordControl.setValue('');
 
         expect(passwordControl.valid).toBe(true);
       });
 
       it('should be invalid when password is too short', () => {
-        const passwordControl = component.formGroup.get('Password')!;
+        const passwordControl = component.formGroup.get('password')!;
         passwordControl.setValue('short');
 
         expect(passwordControl.invalid).toBe(true);
@@ -169,7 +169,7 @@ describe('ProfileComponent', () => {
       });
 
       it('should be invalid when password lacks uppercase', () => {
-        const passwordControl = component.formGroup.get('Password')!;
+        const passwordControl = component.formGroup.get('password')!;
         passwordControl.setValue('lowercase123!');
 
         expect(passwordControl.invalid).toBe(true);
@@ -177,7 +177,7 @@ describe('ProfileComponent', () => {
       });
 
       it('should be invalid when password lacks numbers', () => {
-        const passwordControl = component.formGroup.get('Password')!;
+        const passwordControl = component.formGroup.get('password')!;
         passwordControl.setValue('Uppercase!');
 
         expect(passwordControl.invalid).toBe(true);
@@ -185,7 +185,7 @@ describe('ProfileComponent', () => {
       });
 
       it('should be invalid when password lacks special characters', () => {
-        const passwordControl = component.formGroup.get('Password')!;
+        const passwordControl = component.formGroup.get('password')!;
         passwordControl.setValue('Uppercase123');
 
         expect(passwordControl.invalid).toBe(true);
@@ -193,7 +193,7 @@ describe('ProfileComponent', () => {
       });
 
       it('should be valid when password meets all requirements', () => {
-        const passwordControl = component.formGroup.get('Password')!;
+        const passwordControl = component.formGroup.get('password')!;
         passwordControl.setValue('ValidPass123!');
 
         expect(passwordControl.valid).toBe(true);
@@ -212,8 +212,8 @@ describe('ProfileComponent', () => {
     it('should populate form with user data', () => {
       fixture.detectChanges();
 
-      expect(component.formGroup.get('UserName')?.value).toBe(mockUser.UserName);
-      expect(component.formGroup.get('Currency')?.value).toBe(mockUser.BaseCurrency);
+      expect(component.formGroup.get('userName')?.value).toBe(mockUser.userName);
+      expect(component.formGroup.get('currency')?.value).toBe(mockUser.baseCurrency);
     });
 
     it('should handle API error when loading user data', () => {
@@ -235,7 +235,7 @@ describe('ProfileComponent', () => {
 
     it('should not submit when form is invalid', () => {
       // Make form invalid
-      component.formGroup.get('UserName')?.setValue('a'); // Too short
+      component.formGroup.get('userName')?.setValue('a'); // Too short
 
       component.onSubmit();
 
@@ -244,39 +244,39 @@ describe('ProfileComponent', () => {
 
     it('should submit valid form data', () => {
       // Set valid form data
-      component.formGroup.get('UserName')?.setValue('newusername');
-      component.formGroup.get('Password')?.setValue('NewPass123!');
-      component.formGroup.get('Currency')?.setValue(CurrencyEnum.USD);
+      component.formGroup.get('userName')?.setValue('newusername');
+      component.formGroup.get('password')?.setValue('NewPass123!');
+      component.formGroup.get('currency')?.setValue(CurrencyEnum.USD);
 
       component.onSubmit();
 
       expect(userApiService.updateUser).toHaveBeenCalledWith({
-        Id: mockUser.Id,
-        UserName: 'newusername',
-        Password: 'NewPass123!',
-        BaseCurrency: CurrencyEnum.USD
+        id: mockUser.id,
+        userName: 'newusername',
+        password: 'NewPass123!',
+        baseCurrency: CurrencyEnum.USD
       });
     });
 
     it('should use existing username when form field is empty', () => {
-      component.formGroup.get('UserName')?.setValue('');
-      component.formGroup.get('Password')?.setValue('');
-      component.formGroup.get('Currency')?.setValue(CurrencyEnum.USD);
+      component.formGroup.get('userName')?.setValue('');
+      component.formGroup.get('password')?.setValue('');
+      component.formGroup.get('currency')?.setValue(CurrencyEnum.USD);
 
       component.onSubmit();
 
       expect(userApiService.updateUser).toHaveBeenCalledWith({
-        Id: mockUser.Id,
-        UserName: mockUser.UserName,
-        Password: '',
-        BaseCurrency: CurrencyEnum.USD
+        id: mockUser.id,
+        userName: mockUser.userName,
+        password: '',
+        baseCurrency: CurrencyEnum.USD
       });
     });
 
     it('should use default currency when form field is empty', () => {
-      component.formGroup.get('UserName')?.setValue('newusername');
-      component.formGroup.get('Password')?.setValue('');
-      component.formGroup.get('Currency')?.setValue(null);
+      component.formGroup.get('userName')?.setValue('newusername');
+      component.formGroup.get('password')?.setValue('');
+      component.formGroup.get('currency')?.setValue(null);
 
       // Override the form's valid property to return true
       Object.defineProperty(component.formGroup, 'valid', {
@@ -286,27 +286,18 @@ describe('ProfileComponent', () => {
       component.onSubmit();
 
       expect(userApiService.updateUser).toHaveBeenCalledWith({
-        Id: mockUser.Id,
-        UserName: 'newusername',
-        Password: '',
-        BaseCurrency: CurrencyEnum.EUR
+        id: mockUser.id,
+        userName: 'newusername',
+        password: '',
+        baseCurrency: CurrencyEnum.EUR
       });
-    });
-
-    it('should logout and navigate after successful update', () => {
-      component.formGroup.get('UserName')?.setValue('newusername');
-
-      component.onSubmit();
-
-      expect(authService.logout).toHaveBeenCalled();
-      expect(router.navigate).toHaveBeenCalledWith(['/']);
     });
 
     it('should handle API error on update', () => {
       userApiService.updateUser.and.returnValue(throwError(() => new Error('Update Error')));
       spyOn(console, 'error');
 
-      component.formGroup.get('UserName')?.setValue('newusername');
+      component.formGroup.get('userName')?.setValue('newusername');
       component.onSubmit();
 
       expect(userApiService.updateUser).toHaveBeenCalled();
@@ -358,23 +349,22 @@ describe('ProfileComponent', () => {
       expect(component.user).toEqual(mockUser);
 
       // Update form
-      component.formGroup.get('UserName')?.setValue('updateduser');
-      component.formGroup.get('Password')?.setValue('NewPassword123!');
-      component.formGroup.get('Currency')?.setValue(CurrencyEnum.USD);
+      component.formGroup.get('userName')?.setValue('updateduser');
+      component.formGroup.get('password')?.setValue('NewPassword123!');
+      component.formGroup.get('currency')?.setValue(CurrencyEnum.USD);
 
       // Submit form
       component.onSubmit();
 
       // Verify API call
       expect(userApiService.updateUser).toHaveBeenCalledWith({
-        Id: mockUser.Id,
-        UserName: 'updateduser',
-        Password: 'NewPassword123!',
-        BaseCurrency: CurrencyEnum.USD
+        id: mockUser.id,
+        userName: 'updateduser',
+        password: 'NewPassword123!',
+        baseCurrency: CurrencyEnum.USD
       });
 
       // Verify logout and navigation
-      expect(authService.logout).toHaveBeenCalled();
       expect(router.navigate).toHaveBeenCalledWith(['/']);
     });
 
@@ -382,17 +372,17 @@ describe('ProfileComponent', () => {
       fixture.detectChanges();
 
       // Only update currency, leave username and password empty
-      component.formGroup.get('UserName')?.setValue('');
-      component.formGroup.get('Password')?.setValue('');
-      component.formGroup.get('Currency')?.setValue(CurrencyEnum.GBP);
+      component.formGroup.get('userName')?.setValue('');
+      component.formGroup.get('password')?.setValue('');
+      component.formGroup.get('currency')?.setValue(CurrencyEnum.GBP);
 
       component.onSubmit();
 
       expect(userApiService.updateUser).toHaveBeenCalledWith({
-        Id: mockUser.Id,
-        UserName: mockUser.UserName, // Should preserve existing
-        Password: '',
-        BaseCurrency: CurrencyEnum.GBP
+        id: mockUser.id,
+        userName: mockUser.userName,
+        password: '',
+        baseCurrency: CurrencyEnum.GBP
       });
     });
   });

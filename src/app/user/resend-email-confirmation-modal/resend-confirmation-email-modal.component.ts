@@ -19,11 +19,11 @@ export class ResendConfirmationEmailModalComponent extends BaseComponent {
   private fb = inject(FormBuilder);
 
   override formGroup: FormGroup = this.fb.group({
-    Email: ['', [Validators.required, Validators.email]]
+    email: ['', [Validators.required, Validators.email]]
   });
 
   override customValidationMessages = {
-    Email: {
+    email: {
       required: 'Email is required',
       email: 'Please provide a valid email address'
     }
@@ -31,7 +31,7 @@ export class ResendConfirmationEmailModalComponent extends BaseComponent {
 
   onSubmit(): void {
     if (this.isFormValid()) {
-      const email = this.getFieldValue<string>('Email') || '';
+      const email = this.getFieldValue<string>('email') || '';
 
       this.executeWithLoading(
         this.userApiService.resendConfirmationEmail(email),
@@ -39,7 +39,7 @@ export class ResendConfirmationEmailModalComponent extends BaseComponent {
         'Error sending email confirmation'
       ).subscribe({
         next: (result: ResendEmailConfirmationResponse) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-          this.showSuccess(result?.Message || 'Confirmation email sent successfully');
+          this.showSuccess(result?.message || 'Confirmation email sent successfully');
           this.matDialogRef.close();
         }
       });

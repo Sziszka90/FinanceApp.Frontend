@@ -9,7 +9,6 @@ import {
 import {
   MatDialogRef
 } from '@angular/material/dialog';
-
 import { TransactionApiService } from '../../../services/transactions.api.service';
 import { ICONS } from 'src/models/Constants/group-icon-options.const';
 import { MatSelectModule } from '@angular/material/select';
@@ -36,19 +35,19 @@ export class CreateTransactionGroupModalComponent extends BaseComponent implemen
   private transactionApiService = inject(TransactionApiService);
 
   public override formGroup: FormGroup = this.fb.group({
-    Name: new FormControl('', [Validators.required, Validators.minLength(2)]),
-    Description: new FormControl(''),
-    GroupIcon: new FormControl('', Validators.required)
+    name: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    description: new FormControl(''),
+    groupIcon: new FormControl('', Validators.required)
   });
 
   public groupIconOptions: string[] = Object.values(ICONS);
 
   public override customValidationMessages: FieldValidationMessages = {
-    Name: {
+    name: {
       required: 'Transaction group name is required',
       minlength: 'Name must be at least 2 characters long'
     },
-    GroupIcon: {
+    groupIcon: {
       required: 'Please select an icon for the group'
     }
   };
@@ -56,7 +55,7 @@ export class CreateTransactionGroupModalComponent extends BaseComponent implemen
   ngOnInit(): void {
     if (this.groupIconOptions.length > 0) {
       this.formGroup!.patchValue({
-        GroupIcon: this.groupIconOptions.at(-1)
+        groupIcon: this.groupIconOptions.at(-1)
       });
     }
   }
@@ -67,9 +66,9 @@ export class CreateTransactionGroupModalComponent extends BaseComponent implemen
     }
 
     const createdTransactionGroup = {
-      Name: this.getFieldValue<string>('Name') ?? '',
-      Description: this.getFieldValue<string>('Description') ?? '',
-      GroupIcon: this.getFieldValue<string>('GroupIcon') ?? ''
+      name: this.getFieldValue<string>('name') ?? '',
+      description: this.getFieldValue<string>('description') ?? '',
+      groupIcon: this.getFieldValue<string>('groupIcon') ?? ''
     };
 
     this.executeWithLoading(

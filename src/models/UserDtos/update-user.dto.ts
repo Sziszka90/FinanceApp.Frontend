@@ -1,8 +1,8 @@
 import { CurrencyEnum } from '../Enums/currency.enum';
 
 export interface UpdateUserDto {
-    Id: string,
-    UserName: string,
-    Password?: string,
-    BaseCurrency: CurrencyEnum
+    id: string,
+    userName: string,
+    password?: string,
+    baseCurrency: CurrencyEnum
 }

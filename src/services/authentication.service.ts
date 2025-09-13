@@ -1,6 +1,6 @@
-import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { LoginRequestDto } from '../models/LoginDtos/login-request.dto';
-import { catchError, map, Observable, of, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { LoginResponseDto } from '../models/LoginDtos/login-response.dto';
 import { jwtDecode } from 'jwt-decode';
 import { TOKEN_KEY } from 'src/models/Constants/token.const';
@@ -8,12 +8,12 @@ import { Router } from '@angular/router';
 import { AuthenticationApiService } from './authentication.api.service';
 import { CorrelationService } from './correlation.service';
 import { TokenApiService } from './token.api.service';
+import { Result } from 'src/models/Result/result';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
-  private platformId = inject(PLATFORM_ID);
   private router = inject(Router);
   private authApiService = inject(AuthenticationApiService);
   private tokenApiService = inject(TokenApiService);
@@ -30,53 +30,78 @@ export class AuthenticationService {
     return localStorage.getItem(this.tokenKey);
   }
 
-  logout(): void {
-    localStorage.removeItem(this.tokenKey);
-    this.correlationService.clearAllCorrelationIds();
-    this.userLoggedIn.next(false);
-    this.router.navigate(['/login']);
-  }
-
-  login(loginRequestDto: LoginRequestDto): Observable<LoginResponseDto> {
-    this.correlationService.clearAllCorrelationIds();
-    return this.authApiService.login(loginRequestDto);
-  }
-
-  isAuthenticated(): boolean {
-    if (!this.validateToken()) {
+  async logoutAsync(): Promise<Result<boolean>> {
+    try {
+      await firstValueFrom(this.authApiService.logout());
+      localStorage.removeItem(this.tokenKey);
+      this.correlationService.clearAllCorrelationIds();
       this.userLoggedIn.next(false);
-      return false;
+      this.router.navigate(['/login']);
+      return { isSuccess: true, data: true };
+    } catch (error) {
+      return { isSuccess: false, error: 'Logout failed. Please try again later.' };
+    }
+  }
+
+  async loginAsync(loginRequestDto: LoginRequestDto): Promise<Result<LoginResponseDto>> {
+    try {
+      const result = await firstValueFrom(this.authApiService.login(loginRequestDto));
+      this.correlationService.clearAllCorrelationIds();
+      this.saveToken(result.token);
+      this.userLoggedIn.next(true);
+      return { isSuccess: true, data: result };
+    } catch (error) {
+      return { isSuccess: false, error: 'Login failed. Please check your credentials and try again.' };
+    }
+  }
+
+  async isAuthenticatedAsync(): Promise<Result<boolean>> {
+    const result = await this.validateTokenAsync();
+    if (!result.isSuccess) {
+      this.userLoggedIn.next(false);
+      return { isSuccess: false, error: 'User is not authenticated.' };
     }
     this.userLoggedIn.next(true);
-    return true;
+    return { isSuccess: true, data: result.data };
   }
 
-  validateToken(): boolean {
-    const token = this.getToken();
+  async validateTokenAsync(tokenToValidate: string = ""): Promise<Result<boolean>> {
+    let token = tokenToValidate;
+    if(token === "") {
+      token = this.getToken() ?? "";
+    }
+    
     if (!token) {
-      return false;
+      return { isSuccess: false, error: 'No token found.' };
     }
 
     try {
       const decodedToken: { exp: number; [key: string]: unknown } = jwtDecode(token);
-
       const currentTime = Math.floor(Date.now() / 1000);
+
       if (decodedToken.exp < currentTime) {
         console.warn('Token has expired.');
-        return false;
+        return { isSuccess: false, error: 'Token has expired.' };
       }
-      return true;
     } catch (error) {
       console.error('Invalid token format:', error);
-      return false;
+      return { isSuccess: false, error: 'Invalid token format.' };
     }
-  }
 
-  validateTokenWithApi(token: string): Observable<boolean> {
-    return this.tokenApiService.verifyToken(token).pipe(
-      map((response) => response.IsValid),
-      catchError(() => of(false))
-    );
+    try {
+      const result = await firstValueFrom(this.tokenApiService.verifyToken(token));
+      if (!result.isValid) {
+        const logoutResult = await this.logoutAsync();
+        if (!logoutResult.isSuccess) {
+          console.error('Logout failed after token invalidation:', logoutResult.error);
+          return { isSuccess: false, error: 'Logout failed after token invalidation.' };
+        }
+      }
+      return { isSuccess: true, data: result.isValid };
+    } catch (error) {
+      console.error('Error verifying token:', error);
+      return { isSuccess: false, error: 'Error verifying token.' };
+    }
   }
 
   getUserId(): string | null {
