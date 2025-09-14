@@ -38,7 +38,7 @@ export class AuthenticationService {
       this.userLoggedIn.next(false);
       this.router.navigate(['/login']);
       return { isSuccess: true, data: true };
-    } catch (error) {
+    } catch {
       return { isSuccess: false, error: 'Logout failed. Please try again later.' };
     }
   }
@@ -50,7 +50,7 @@ export class AuthenticationService {
       this.saveToken(result.token);
       this.userLoggedIn.next(true);
       return { isSuccess: true, data: result };
-    } catch (error) {
+    } catch {
       return { isSuccess: false, error: 'Login failed. Please check your credentials and try again.' };
     }
   }
@@ -65,12 +65,12 @@ export class AuthenticationService {
     return { isSuccess: true, data: result.data };
   }
 
-  async validateTokenAsync(tokenToValidate: string = ""): Promise<Result<boolean>> {
+  async validateTokenAsync(tokenToValidate = ''): Promise<Result<boolean>> {
     let token = tokenToValidate;
-    if(token === "") {
-      token = this.getToken() ?? "";
+    if (token === '') {
+      token = this.getToken() ?? '';
     }
-    
+
     if (!token) {
       return { isSuccess: false, error: 'No token found.' };
     }

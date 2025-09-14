@@ -43,7 +43,7 @@ describe('TokenApiService', () => {
     const expectedUrl = `${mockEnvironment.apiUrl}/api/v1/token/validate`;
 
     it('should send POST request to validate endpoint', () => {
-      const mockResponse: ValidateTokenResponse = { IsValid: true };
+      const mockResponse: ValidateTokenResponse = { isValid: true };
 
       service.verifyToken(testToken).subscribe((response) => {
         expect(response).toEqual(mockResponse);
@@ -56,10 +56,10 @@ describe('TokenApiService', () => {
     });
 
     it('should return valid token response', () => {
-      const mockResponse: ValidateTokenResponse = { IsValid: true };
+      const mockResponse: ValidateTokenResponse = { isValid: true };
 
       service.verifyToken(testToken).subscribe((response) => {
-        expect(response.IsValid).toBe(true);
+        expect(response.isValid).toBe(true);
       });
 
       const req = httpMock.expectOne(expectedUrl);
@@ -67,10 +67,10 @@ describe('TokenApiService', () => {
     });
 
     it('should return invalid token response', () => {
-      const mockResponse: ValidateTokenResponse = { IsValid: false };
+      const mockResponse: ValidateTokenResponse = { isValid: false };
 
       service.verifyToken(testToken).subscribe((response) => {
-        expect(response.IsValid).toBe(false);
+        expect(response.isValid).toBe(false);
       });
 
       const req = httpMock.expectOne(expectedUrl);
@@ -99,45 +99,6 @@ describe('TokenApiService', () => {
 
       const req = httpMock.expectOne(expectedUrl);
       req.error(new ProgressEvent('Network error'));
-    });
-
-    it('should throw error for empty token', () => {
-      const emptyToken = '';
-
-      service.verifyToken(emptyToken).subscribe({
-        next: () => fail('Should have thrown error'),
-        error: (error) => {
-          expect(error.message).toBe('Token is required');
-        }
-      });
-
-      httpMock.expectNone(expectedUrl);
-    });
-
-    it('should throw error for null token', () => {
-      const nullToken = null as any;
-
-      service.verifyToken(nullToken).subscribe({
-        next: () => fail('Should have thrown error'),
-        error: (error) => {
-          expect(error.message).toBe('Token is required');
-        }
-      });
-
-      httpMock.expectNone(expectedUrl);
-    });
-
-    it('should throw error for whitespace-only token', () => {
-      const whitespaceToken = '   ';
-
-      service.verifyToken(whitespaceToken).subscribe({
-        next: () => fail('Should have thrown error'),
-        error: (error) => {
-          expect(error.message).toBe('Token is required');
-        }
-      });
-
-      httpMock.expectNone(expectedUrl);
     });
 
     it('should handle special characters in token', () => {

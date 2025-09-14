@@ -11,13 +11,12 @@ import { ResetPasswordComponent } from './user/reset-password/reset-password.com
 import { ProfileComponent } from './user/profile/profile.component';
 import { inject } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
-import { map } from 'rxjs';
 import { ComponentErrorService } from 'src/services/component-error.service';
 
 const AuthGuard: CanActivateFn = async () => {
   const authService = inject(AuthenticationService);
   const router = inject(Router);
-  const componentErrorService = inject(ComponentErrorService)
+  const componentErrorService = inject(ComponentErrorService);
 
   try {
     const result = await authService.isAuthenticatedAsync();
@@ -28,7 +27,7 @@ const AuthGuard: CanActivateFn = async () => {
       router.navigate(['/login']);
       return false;
     }
-  } catch (error) {
+  } catch {
     componentErrorService.showError('Authentication failed');
     router.navigate(['/login']);
     return false;
@@ -41,7 +40,7 @@ const ResetPasswordGuard: CanActivateFn = async (route: ActivatedRouteSnapshot) 
   const token = route.queryParamMap.get('token');
   const result = await authService.validateTokenAsync(token ?? '');
 
-  if(!result.isSuccess || result.data === false) {
+  if (!result.isSuccess || result.data === false) {
     router.navigate(['/validation-failed']);
     return false;
   }

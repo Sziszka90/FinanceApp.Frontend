@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
 import { ChatBubbleComponent } from './shared/chat-bubble/chat-bubble.component';
 import { AuthenticationService } from 'src/services/authentication.service';
@@ -8,7 +7,6 @@ import { WakeupLoaderComponent } from './shared/wakeup-loader/wakeup-loader.comp
 import { WakeupService } from 'src/services/wakeup.service';
 import { NotificationService } from 'src/services/notification.service';
 import { BaseComponent } from './shared/base-component';
-import { Result } from 'src/models/Result/result';
 
 @Component({
   selector: 'root',

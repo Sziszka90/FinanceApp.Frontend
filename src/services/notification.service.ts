@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 import { JOIN_GROUP_METHOD, TRANSACTIONS_MATCHED_NOTIFICATION } from 'src/models/Constants/notification.const';
 
@@ -19,7 +19,7 @@ export class NotificationService {
       this.authenticationService.userLoggedIn.subscribe(async (loggedIn) => {
         if (loggedIn) {
           const result = await this.authenticationService.isAuthenticatedAsync();
-          if (!result.IsSuccess) {
+          if (!result.isSuccess || !result.data) {
             console.warn('SignalR: User not authenticated, skipping connection initialization');
             this.stopConnection();
             resolve();
@@ -46,7 +46,7 @@ export class NotificationService {
       return;
     }
 
-    const isTokenValid = await this.authenticationService.validateTokenAsync().then(res => res.IsSuccess);
+    const isTokenValid = await this.authenticationService.validateTokenAsync().then(res => res.isSuccess && res.data);
     if (!isTokenValid) {
       console.warn('SignalR: Token validation failed, cannot establish connection');
       return;
@@ -100,8 +100,8 @@ export class NotificationService {
           } else {
             console.error('SignalR: Max retries reached, logging out user');
             const result = await this.authenticationService.logoutAsync();
-            if (!result.IsSuccess) {
-              console.error(result.Error);
+            if (!result.isSuccess) {
+              console.error(result.error);
             }
           }
         }
@@ -138,13 +138,15 @@ export class NotificationService {
               console.warn(`SignalR: Retrying connection in 3 seconds (attempt ${this.connectionRetryCount}/${this.maxAuthRetries})`);
 
               setTimeout(async () => {
-                if (await this.authenticationService.isAuthenticatedAsync().then(res => res.IsSuccess) && await this.authenticationService.validateTokenAsync().then(res => res.IsSuccess)) {
+                if (await this.authenticationService.isAuthenticatedAsync()
+                  .then(res => res.isSuccess && res.data) &&
+                await this.authenticationService.validateTokenAsync().then(res => res.isSuccess && res.data)) {
                   await this.startConnectionAsync();
                 } else {
                   console.error('SignalR: Token invalid on retry, logging out user');
                   const result = await this.authenticationService.logoutAsync();
-                  if (!result.IsSuccess) {
-                    console.error(result.Error);
+                  if (!result.isSuccess) {
+                    console.error(result.error);
                   }
                 }
               }, 3000);
@@ -152,8 +154,8 @@ export class NotificationService {
             } else {
               console.error('SignalR: Max auth retries reached, logging out user');
               const result = await this.authenticationService.logoutAsync();
-              if (!result.IsSuccess) {
-                console.error(result.Error);
+              if (!result.isSuccess) {
+                console.error(result.error);
               }
               return;
             }
@@ -194,7 +196,8 @@ export class NotificationService {
 
     return new Promise(resolve => {
       setTimeout(async () => {
-        if (await this.authenticationService.isAuthenticatedAsync().then(res => res.IsSuccess) && await this.authenticationService.validateTokenAsync().then(res => res.IsSuccess)) {
+        if (await this.authenticationService.isAuthenticatedAsync().then(res => res.data) &&
+        await this.authenticationService.validateTokenAsync().then(res => res.data)) {
           await this.startConnectionAsync();
         }
         resolve();

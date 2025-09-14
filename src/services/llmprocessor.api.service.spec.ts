@@ -28,7 +28,7 @@ describe('LlmProcessorApiService', () => {
 
   it('should send prompt and return response', () => {
     const promptRequest: PromptRequestDto = { } as PromptRequestDto;
-    const mockResponse: PromptResponseDto = { Result: 'Test response' } as PromptResponseDto;
+    const mockResponse: PromptResponseDto = { result: 'Test response' } as PromptResponseDto;
 
     service.promptRequest(promptRequest).subscribe(response => {
       expect(response).toEqual(mockResponse);

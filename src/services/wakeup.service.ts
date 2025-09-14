@@ -32,7 +32,7 @@ export class WakeupService {
         try {
           response = await firstValueFrom(this.wakeupApiService.wakeup());
           break;
-        } catch (error) {
+        } catch {
           if (i === 4) {
             this.dialog.open(ErrorModalComponent, {
               data: { message: 'Backend services are not available. Retry later.' }
