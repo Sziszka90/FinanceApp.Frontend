@@ -71,14 +71,18 @@ export class CreateTransactionGroupModalComponent extends BaseComponent implemen
       groupIcon: this.getFieldValue<string>('groupIcon') ?? ''
     };
 
-    this.executeWithLoading(
-      this.transactionApiService.createTransactionGroup(createdTransactionGroup),
-      'Transaction group created successfully!',
-      'Creating transaction group'
-    ).subscribe({
+    this.setLoading(true);
+    this.transactionApiService.createTransactionGroup(createdTransactionGroup).subscribe({
       next: (result) => {
+        this.setLoading(false);
+        this.showSuccess('Transaction group created successfully!');
         this.dialogRef.close(result);
+      },
+      error: (error) => {
+        this.setLoading(false);
+        this.handleError(error, 'Creating transaction group');
       }
+
     });
   }
 

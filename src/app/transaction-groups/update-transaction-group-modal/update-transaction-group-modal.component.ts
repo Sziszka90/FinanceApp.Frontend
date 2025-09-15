@@ -64,13 +64,16 @@ export class UpdateTransactionGroupModalComponent extends BaseComponent {
       groupIcon: this.getFieldValue<string>('groupIcon')!
     };
 
-    this.executeWithLoading(
-      this.transactionApiService.updateTransactionGroup(this.data.id, updatedTransactionGroup),
-      'Transaction group updated successfully!',
-      'Updating transaction group'
-    ).subscribe({
+    this.setLoading(true);
+    this.transactionApiService.updateTransactionGroup(this.data.id, updatedTransactionGroup).subscribe({
       next: (result) => {
+        this.setLoading(false);
+        this.showSuccess('Transaction group updated successfully!');
         this.dialogRef.close(result);
+      },
+      error: (error) => {
+        this.setLoading(false);
+        this.handleError(error, 'Updating transaction group');
       }
     });
   }

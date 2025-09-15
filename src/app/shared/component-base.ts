@@ -2,11 +2,10 @@ import { inject, signal, WritableSignal, OnDestroy, Injectable } from '@angular/
 import { FormGroup } from '@angular/forms';
 import { FormValidationService, FieldValidationMessages } from 'src/services/form-validation.service';
 import { ComponentErrorService } from 'src/services/component-error.service';
-import { Observable, finalize, Subject, tap, catchError, throwError, takeUntil } from 'rxjs';
-import { Result } from 'src/models/Result/result';
+import { Subject } from 'rxjs';
 
 @Injectable()
-export abstract class BaseComponent implements OnDestroy {
+export abstract class ComponentBase implements OnDestroy {
   protected formValidator = inject(FormValidationService);
   protected errorHandler = inject(ComponentErrorService);
 
@@ -93,61 +92,6 @@ export abstract class BaseComponent implements OnDestroy {
 
   protected clearError(): void {
     this.errorHandler.clearError();
-  }
-
-  protected executeWithLoading<T>(
-    operation: Observable<T>,
-    successMessage?: string,
-    errorContext?: string,
-    showLoader: boolean = true
-  ): Observable<T> {
-    if (showLoader) {
-      this.setLoading(true);
-    }
-    this.clearError();
-
-    return operation.pipe(
-      takeUntil(this.destroy$),
-      tap(() => {
-        if (successMessage) {
-          this.showSuccess(successMessage);
-        }
-      }),
-      catchError((error) => {
-        this.handleError(error, errorContext || 'operation');
-        const handledError = { ...error, handled: true };
-        return throwError(() => handledError);
-      }),
-      finalize(() => {
-        if (showLoader) {
-          this.setLoading(false);
-        }
-      })
-    );
-  }
-
-  protected async executeAsync<T>(
-    asyncFn: () => Promise<Result<T>>,
-    successMessage?: string,
-    errorContext?: string,
-    showLoader: boolean = false
-  ): Promise<T | undefined> {
-    if (showLoader) this.setLoading(true);
-    this.clearError();
-    try {
-      const result = await asyncFn();
-        if (result && result.isSuccess === false) {
-          this.showError(result.error || 'Unknown error');
-          return undefined;
-        }
-        if (successMessage) this.showSuccess(successMessage);
-      return result.data;
-    } catch (error) {
-      this.handleError(error, errorContext || 'operation');
-      return undefined;
-    } finally {
-      if (showLoader) this.setLoading(false);
-    }
   }
 
   protected getFormValue<T = unknown>(): T | null {

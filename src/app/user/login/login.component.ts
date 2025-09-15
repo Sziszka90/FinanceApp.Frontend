@@ -50,7 +50,13 @@ export class LoginComponent extends BaseComponent {
 
   async onSubmit(): Promise<void> {
     if (this.formGroup.valid) {
-      const result = await this.executeAsync<LoginResponseDto>(async () => this.authService.loginAsync(this.formGroup.value));
+      const result = await this.executeAsync<LoginResponseDto>(
+        async () => this.authService.loginAsync(this.formGroup.value),
+        undefined,
+        undefined,
+        true,
+        true
+      );
       if (result!.token === '') {
         this.showError('Invalid login credentials');
       } else {

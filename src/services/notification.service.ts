@@ -70,7 +70,7 @@ export class NotificationService {
 
   private async attemptConnectionAsync(token: string): Promise<void> {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl(`/notificationHub`, {
+      .withUrl(`https://localhost:65030/notificationHub`, {
         accessTokenFactory: () => {
           return token;
         },
