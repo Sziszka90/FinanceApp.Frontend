@@ -88,6 +88,7 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
       required: 'Please select a transaction type'
     }
   };
+
   groupOptions = signal<GetTransactionGroupDto[]>([]);
   typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
   currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
@@ -100,14 +101,16 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
     this.formGroup!.get('transactionType')?.setValue(this.data.transactionType);
     this.formGroup!.get('transactionDate')?.setValue(new Date(this.data.transactionDate));
 
-    this.executeWithLoading(
-      this.transactionApiService.getAllTransactionGroups(),
-      undefined,
-      'Loading transaction groups'
-    ).subscribe({
+    this.setLoading(true);
+    this.transactionApiService.getAllTransactionGroups().subscribe({
       next: (data) => {
+        this.setLoading(false);
         this.groupOptions.set(data);
         this.groupOptions.update(groups => [...groups, { id: '', name: 'No group' } as GetTransactionGroupDto]);
+      },
+      error: (error) => {
+        this.setLoading(false);
+        this.handleError(error, 'Loading transaction groups');
       }
     });
   }

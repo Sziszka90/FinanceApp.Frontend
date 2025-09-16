@@ -84,14 +84,17 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
   );
 
   ngOnInit() {
-    this.executeWithLoading(
-      this.transactionApiService.getAllTransactionGroups(),
-      undefined,
-      'Loading transaction groups'
-    ).subscribe({
+    this.setLoading(true);
+    this.transactionApiService.getAllTransactionGroups().subscribe({
       next: (data) => {
+        this.setLoading(false);
         this.groupOptions.set(data);
         this.groupOptions.update(groups => [...groups, { id: '', name: 'No group' } as GetTransactionGroupDto]);
+        this.showSuccess('Transaction groups loaded successfully!');
+      },
+      error: (error) => {
+        this.setLoading(false);
+        this.handleError(error, 'Loading transaction groups');
       }
     });
   }
@@ -117,13 +120,15 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
       transactionGroupId: groupValue?.id || undefined
     };
 
-    this.executeWithLoading(
-      this.transactionApiService.createTransaction(createTransactionDto),
-      'Transaction created successfully!',
-      'Creating transaction'
-    ).subscribe({
+    this.setLoading(true);
+    this.transactionApiService.createTransaction(createTransactionDto).subscribe({
       next: (result) => {
+        this.setLoading(false);
         this.dialogRef.close(result);
+      },
+      error: (error) => {
+        this.setLoading(false);
+        this.handleError(error, 'Creating transaction');
       }
     });
   }

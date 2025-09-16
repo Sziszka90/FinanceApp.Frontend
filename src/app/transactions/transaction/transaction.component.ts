@@ -2,7 +2,7 @@ import { Component, inject, OnInit, ViewChild, signal, ElementRef } from '@angul
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
-import { firstValueFrom, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { GetTransactionDto } from 'src/models/TransactionDtos/get-transaction.dto';
@@ -57,7 +57,6 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   public total = signal<Money>({ amount: 0, currency: CurrencyEnum.EUR });
   public showSummary = signal<boolean>(false);
   public summary = signal<Money | null>(null);
-  public importLoading = signal<boolean>(false);
   dataSource = signal<MatTableDataSource<GetTransactionDto>>(new MatTableDataSource<GetTransactionDto>([]));
 
   typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
@@ -101,19 +100,11 @@ export class TransactionComponent extends BaseComponent implements OnInit {
 
     this.loadTransactions();
 
-    this.executeWithLoading(
-      this.filterForm.valueChanges,
-      undefined,
-      'Applying filters'
-    ).subscribe({
+    this.filterForm.valueChanges.subscribe({
       next: () => this.applyFilters()
     });
 
-    this.executeWithLoading(
-      this.notificationService.notifications$,
-      undefined,
-      'Processing notifications'
-    ).subscribe({
+    this.notificationService.notifications$.subscribe({
       next: (message) => {
         if (message && message === REFRESH_TRANSACTIONS) {
           this.loadTransactions();
@@ -123,18 +114,21 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   }
 
   loadTransactions() {
-    this.executeWithLoading(
-      this.transactionApiService.getAllTransactions(),
-      undefined,
-      'Loading transactions'
-    ).subscribe({
+    this.setLoading(true);
+    this.transactionApiService.getAllTransactions().subscribe({
       next: (value: GetTransactionDto[]) => {
+        this.setLoading(false);
         this.allTransactions.set(value);
         this.dataSource.update(ds => {
           ds.data = value;
           return ds;
         });
         this.setupCustomFilterPredicate();
+        this.showSuccess('Transactions loaded successfully!');
+      },
+      error: (error) => {
+        this.setLoading(false);
+        this.handleError(error, 'Loading transactions');
       }
     });
   }
@@ -189,22 +183,23 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       return ds;
     });
 
-    this.executeWithLoading(
-      this.transactionApiService.deleteTransaction(transactionDto.id),
-      'Transaction deleted successfully!',
-      'Deleting transaction',
-      false
-    ).subscribe({
-      error: () => {
-        this.loadTransactions();
+    this.setLoading(true);
+    this.transactionApiService.deleteTransaction(transactionDto.id).subscribe({
+      next: () => {
+        this.setLoading(false);
+        this.showSuccess('Transaction deleted successfully!');
+      },
+      error: (error) => {
+        this.setLoading(false);
+        this.handleError(error, 'Deleting transaction');
       }
     });
   }
 
   async editTransaction(transactionDto: GetTransactionDto) {
-    const result = this.executeAsync(async () => this.authService.isAuthenticatedAsync())
+    const result = await this.authService.isAuthenticatedAsync();
     if( !result) {
-      this.executeAsync(async () => this.authService.logoutAsync());
+      await this.authService.logoutAsync();
       return;
     }
 
@@ -217,11 +212,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       }
     );
 
-    this.executeWithLoading(
-      dialogRef.afterClosed(),
-      undefined,
-      'Updating transaction'
-    ).subscribe({
+    dialogRef.afterClosed().subscribe({
       next: (updatedTransaction: GetTransactionDto) => {
         if (updatedTransaction) {
           this.allTransactions?.update(transactions => transactions.map((transaction: GetTransactionDto) => {
@@ -243,14 +234,17 @@ export class TransactionComponent extends BaseComponent implements OnInit {
           ds.data = this.allTransactions();
           return ds;
         });
+      },
+      error: (error) => {
+        this.handleError(error, 'Updating transaction');
       }
     });
   }
 
-  createTransaction() {
-    const result = this.executeAsync(async () => this.authService.isAuthenticatedAsync())
+  async createTransaction() {
+    const result = await this.authService.isAuthenticatedAsync();
     if( !result) {
-      this.executeAsync(async () => this.authService.logoutAsync());
+      await this.authService.logoutAsync();
       return;
     }
 
@@ -262,11 +256,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       }
     );
 
-    this.executeWithLoading(
-      dialogRef.afterClosed(),
-      undefined,
-      'Creating transaction'
-    ).subscribe({
+    dialogRef.afterClosed().subscribe({
       next: (createdTransaction: GetTransactionDto) => {
         if (createdTransaction) {
           this.allTransactions.update(transactions => [...transactions, createdTransaction]);
@@ -275,6 +265,9 @@ export class TransactionComponent extends BaseComponent implements OnInit {
             return ds;
           });
         }
+      },
+      error: (error) => {
+        this.handleError(error, 'Creating transaction');
       }
     });
   }
@@ -289,18 +282,20 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   }
 
   getSummary(): void {
-    this.executeWithLoading(
-      this.transactionApiService.getAllTransactionsSummary(),
-      undefined,
-      'Loading summary'
-    ).subscribe({
+    this.setLoading(true);
+    this.transactionApiService.getAllTransactionsSummary().subscribe({
       next: (data) => {
+        this.setLoading(false);
         this.summary.set(data);
         this.showSummary.set(true);
 
         setTimeout(() => {
           this.showSummary.set(false);
         }, 5000);
+      },
+      error: (error) => {
+        this.setLoading(false);
+        this.handleError(error, 'Loading summary');
       }
     });
   }
@@ -333,22 +328,21 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       const requestId = uuidv4();
       const correlationId = this.correlationService.setCorrelationId(requestId);
 
-      this.importLoading.set(true);
+      this.setLoading(true);
 
-      this.executeWithLoading(
-        this.transactionApiService.uploadCsv(file, correlationId),
-        'CSV file uploaded successfully',
-        'Uploading CSV file'
-      ).subscribe({
+      this.transactionApiService.uploadCsv(file, correlationId).subscribe({
         next: (transactions) => {
+          this.setLoading(false);
           this.allTransactions.set(transactions);
           this.dataSource.update(ds => {
             ds.data = transactions;
             return ds;
           });
+          this.showSuccess('CSV file uploaded successfully!');
         },
-        complete: () => {
-          this.importLoading.set(false);
+        error: (error) => {
+          this.setLoading(false);
+          this.handleError(error, 'Uploading CSV file');
         }
       });
     } else {
