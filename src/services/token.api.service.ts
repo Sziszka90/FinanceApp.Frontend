@@ -3,7 +3,6 @@ import { environment } from '../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ValidateTokenResponse } from 'src/models/UserDtos/validate-toke-response.dto';
-import { TokenType } from 'src/models/Enums/token-type.enum';
 import { ValidateTokenRequest } from 'src/models/ValidateTokenDtos/validate-token-request.dto';
 
 @Injectable({
