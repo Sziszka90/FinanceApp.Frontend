@@ -49,8 +49,8 @@ export class AuthenticationService {
       this.saveToken(result.token);
       this.userLoggedIn.next(true);
       return result;
-    } catch {
-      throw new Error('Login failed. Please check your credentials and try again.');
+    } catch(error) {
+      throw error;
     }
   }
 
