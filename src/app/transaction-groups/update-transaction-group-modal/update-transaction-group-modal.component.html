@@ -1,15 +1,16 @@
 <div class="main-container">
   <div class="modal-header">
     <h3>Update Transaction Group</h3>
-    <p class="modal-description">Update the item and click on save!</p>
+    @if (loading()) {
+      <loader class="loader"></loader>
+    } @else {
+      <p class="modal-description">Update the item and click on save!</p>
+    }
   </div>
   @if (hasError()) {
     <div class="error-message default-font">
       {{ errorMessage() }}
     </div>
-  }
-  @if (loading()) {
-    <loader class="loader"></loader>
   }
   @if (!loading()) {
     <form class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">

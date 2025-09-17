@@ -53,7 +53,6 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
         this.setLoading(false);
         this.allTransactionGroups.set(transactionGroups);
         this.dataSource.set(new MatTableDataSource<GetTransactionGroupDto>(transactionGroups));
-        this.showSuccess('Transaction groups loaded successfully!');
       },
       error: (error) => {
         this.setLoading(false);
@@ -100,14 +99,11 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
     ));
     this.dataSource.set(new MatTableDataSource<GetTransactionGroupDto>(this.allTransactionGroups()));
 
-    this.setLoading(true);
     this.transactionApiService.deleteTransactionGroup(transactionGroup.id).subscribe({
       next: () => {
-        this.setLoading(false);
         this.showSuccess('Transaction group deleted successfully!');
       },
       error: (error) => {
-        this.setLoading(false);
         this.handleError(error, 'Deleting transaction group.');
         this.loadTransactionGroups();
       }
@@ -148,7 +144,6 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
           }));
           this.dataSource.set(new MatTableDataSource<GetTransactionGroupDto>(this.allTransactionGroups()));
         }
-        this.showSuccess('Transaction group edited successfully!');
       },
       error: (error) => {
         this.setLoading(false);

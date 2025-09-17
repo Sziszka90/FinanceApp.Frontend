@@ -18,7 +18,7 @@ export class NotificationService {
     return new Promise<void>((resolve) => {
       this.authenticationService.userLoggedIn.subscribe(async (loggedIn) => {
         if (loggedIn) {
-          const result = await this.authenticationService.isAuthenticatedAsync();
+          const result = await this.authenticationService.validateTokenAsync();
           if (!result) {
             console.warn('SignalR: User not authenticated, skipping connection initialization');
             this.stopConnection();

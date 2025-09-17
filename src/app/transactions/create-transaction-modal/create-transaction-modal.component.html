@@ -62,10 +62,10 @@
       </div>
       <label for="transactionType">Transaction Type</label>
       <div class="form-group">
-        <mat-select class="select" formControlName="transactionType">
+        <mat-select class="select" formControlName="transactionType" [compareWith]="compareCategoryObjects">
           @for (option of typeOptions; track option) {
-            <mat-option [value]="option.Value">
-              &#8226; {{ option.Name }}
+            <mat-option [value]="option.value">
+              &#8226; {{ option.name }}
             </mat-option>
           }
         </mat-select>
@@ -77,10 +77,10 @@
       </div>
       <label for="group">Group</label>
       <div class="form-group">
-        <mat-select class="select" formControlName="group">
+        <mat-select class="select" formControlName="group" [compareWith]="compareCategoryObjects">
           @for (option of groupOptions(); track option) {
             <mat-option [value]="option">
-              &#8226; {{ option.Name }}
+              &#8226; {{ option.name }}
             </mat-option>
           }
         </mat-select>

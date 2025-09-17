@@ -121,7 +121,7 @@
                   </td>
                 </ng-container>
                 <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" ></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'expense': row.TransactionType === 'Expense', 'income': row.TransactionType !== 'Expense'}"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'expense': row.transactionType === 'Expense', 'income': row.transactionType !== 'Expense'}"></tr>
               </table>
             </div>
           } @else {

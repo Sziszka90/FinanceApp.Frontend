@@ -90,7 +90,6 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
         this.setLoading(false);
         this.groupOptions.set(data);
         this.groupOptions.update(groups => [...groups, { id: '', name: 'No group' } as GetTransactionGroupDto]);
-        this.showSuccess('Transaction groups loaded successfully!');
       },
       error: (error) => {
         this.setLoading(false);
@@ -135,5 +134,9 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
 
   onClose(): void {
     this.dialogRef.close(false);
+  }
+
+  compareCategoryObjects(object1: any, object2: any) {
+    return object1 && object2 && object1.id == object2.id;
   }
 }

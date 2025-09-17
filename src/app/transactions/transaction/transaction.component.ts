@@ -127,7 +127,6 @@ export class TransactionComponent extends BaseComponent implements OnInit {
           return ds;
         });
         this.setupCustomFilterPredicate();
-        this.showSuccess('Transactions loaded successfully!');
       },
       error: (error) => {
         this.setLoading(false);
@@ -187,14 +186,11 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       return ds;
     });
 
-    this.setLoading(true);
     this.transactionApiService.deleteTransaction(transactionDto.id).subscribe({
       next: () => {
-        this.setLoading(false);
         this.showSuccess('Transaction deleted successfully!');
       },
       error: (error) => {
-        this.setLoading(false);
         this.handleError(error, 'Deleting transaction');
       }
     });
