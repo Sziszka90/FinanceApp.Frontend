@@ -43,15 +43,11 @@ export class AuthenticationService {
   }
 
   async loginAsync(loginRequestDto: LoginRequestDto): Promise<LoginResponseDto> {
-    try {
-      const result = await firstValueFrom(this.authApiService.login(loginRequestDto));
-      this.correlationService.clearAllCorrelationIds();
-      this.saveToken(result.token);
-      this.userLoggedIn.next(true);
-      return result;
-    } catch(error) {
-      throw error;
-    }
+    const result = await firstValueFrom(this.authApiService.login(loginRequestDto));
+    this.correlationService.clearAllCorrelationIds();
+    this.saveToken(result.token);
+    this.userLoggedIn.next(true);
+    return result;
   }
 
   async isAuthenticatedAsync(): Promise<boolean> {
