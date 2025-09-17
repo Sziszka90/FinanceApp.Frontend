@@ -72,20 +72,24 @@ export class RegistrationComponent extends BaseComponent {
       const formValue = this.getFormValue();
       if (!formValue) {return;}
 
-      this.executeWithLoading(
-        this.apiService.register({
+      this.setLoading(true);
+
+      this.apiService.register({
           userName: this.getFieldValue('userName') || '',
           email: this.getFieldValue('email') || '',
           password: this.getFieldValue('password') || '',
           baseCurrency: this.getFieldValue('currency') || CurrencyEnum.EUR
-        }).pipe(take(1)),
-        'Registration successful! Confirm email address',
-        'Registration failed'
-      ).subscribe({
-        next: () => {
-          this.router.navigate(['/login']);
-        }
-      });
+        }).subscribe({
+          next: () => {
+            this.setLoading(false);
+            this.showSuccess('Registration successful! Please log in.');
+            this.router.navigate(['/login']);
+          },
+          error: (error) => {
+            this.setLoading(false);
+            this.handleError(error, 'Registration failed');
+          }
+        });
     } else {
       this.markAllFieldsAsTouched();
     }

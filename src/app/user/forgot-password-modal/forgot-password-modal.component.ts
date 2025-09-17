@@ -36,13 +36,16 @@ export class ForgotPasswordRequestModalComponent extends BaseComponent {
 
     const email = this.getFieldValue<string>('email')!;
 
-    this.executeWithLoading(
-      this.userApiService.forgotPassword(email),
-      'Password reset email sent! Check your inbox.',
-      'Sending password reset email'
-    ).subscribe({
+    this.setLoading(true);
+    this.userApiService.forgotPassword(email).subscribe({
       next: () => {
+        this.setLoading(false);
+        this.showSuccess('Password reset email sent! Check your inbox.');
         this.matDialogRef.close();
+      },
+      error: (error) => {
+        this.setLoading(false);
+        this.handleError(error, 'Sending password reset email');
       }
     });
   }

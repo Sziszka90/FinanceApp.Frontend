@@ -140,13 +140,17 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
       transactionGroupId: this.getFieldValue<GetTransactionGroupDto>('group')?.id || undefined
     };
 
-    this.executeWithLoading(
-      this.transactionApiService.updateTransaction(this.data.id, updatedTransaction),
-      'Transaction updated successfully!',
-      'Updating transaction'
-    ).subscribe({
+    this.setLoading(true);
+
+    this.transactionApiService.updateTransaction(this.data.id, updatedTransaction).subscribe({
       next: (result) => {
+        this.setLoading(false);
+        this.showSuccess('Transaction updated successfully!');
         this.dialogRef.close(result);
+      },
+      error: (error) => {
+        this.setLoading(false);
+        this.handleError(error, 'Updating transaction');
       }
     });
   }

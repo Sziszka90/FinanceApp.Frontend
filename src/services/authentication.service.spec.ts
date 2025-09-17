@@ -11,6 +11,7 @@ import { LoginResponseDto } from '../models/LoginDtos/login-response.dto';
 import { ValidateTokenResponse } from '../models/UserDtos/validate-toke-response.dto';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { take } from 'rxjs/operators';
+import { TokenType } from 'src/models/Enums/token-type.enum';
 
 describe('AuthenticationService', () => {
   let service: AuthenticationService;
@@ -100,7 +101,7 @@ describe('AuthenticationService', () => {
       const validToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ exp: futureExp, sub: '123' }))}.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`;
       localStorage.setItem('authToken', validToken);
 
-      expect(await service.validateTokenAsync()).toEqual({ isSuccess: true, data: true });
+      expect(await service.validateTokenAsync()).toEqual(true);
     });
 
     it('should return false for expired token', async () => {
@@ -109,17 +110,17 @@ describe('AuthenticationService', () => {
       const expiredToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ exp: pastExp, sub: '123' }))}.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`;
       localStorage.setItem('authToken', expiredToken);
 
-      expect(await service.validateTokenAsync()).toEqual({ isSuccess: false, error: 'Token has expired.' });
+      expect(await service.validateTokenAsync()).toEqual(false);
     });
 
     it('should return false for malformed token', async () => {
       // Create a token with invalid base64 in the payload section
       localStorage.setItem('authToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid_base64_@#$.signature');
-      expect(await service.validateTokenAsync()).toEqual({ isSuccess: false, error: 'Invalid token format.' });
+      expect(await service.validateTokenAsync()).toEqual(false);
     });
 
     it('should return false when no token exists', async () => {
-      expect(await service.validateTokenAsync()).toEqual({ isSuccess: false, error: 'No token found.' });
+      expect(await service.validateTokenAsync()).toEqual(false);
     });
   });
 
@@ -131,7 +132,7 @@ describe('AuthenticationService', () => {
 
     it('should return login response from API', async () => {
       const response = await service.loginAsync(mockLoginRequest);
-      expect(response).toEqual({ isSuccess: true, data: mockLoginResponse });
+      expect(response).toEqual(mockLoginResponse);
     });
 
     it('should clear correlation IDs on login', async () => {
@@ -176,11 +177,11 @@ describe('AuthenticationService', () => {
       const validToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ exp: futureExp, sub: '123' }))}.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`;
       localStorage.setItem('authToken', validToken);
 
-      expect(await service.isAuthenticatedAsync()).toEqual({ isSuccess: true, data: true });
+      expect(await service.isAuthenticatedAsync()).toEqual(true);
     });
 
     it('should return false when user is not authenticated', async () => {
-      expect(await service.isAuthenticatedAsync()).toEqual({ isSuccess: false, error: 'User is not authenticated.' });
+      expect(await service.isAuthenticatedAsync()).toEqual(false);
     });
 
     it('should return false when token is expired', async () => {
@@ -188,7 +189,7 @@ describe('AuthenticationService', () => {
       const expiredToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ exp: pastExp, sub: '123' }))}.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`;
       localStorage.setItem('authToken', expiredToken);
 
-      expect(await service.isAuthenticatedAsync()).toEqual({ isSuccess: false, error: 'User is not authenticated.' });
+      expect(await service.isAuthenticatedAsync()).toEqual(false);
     });
 
     it('should emit false when token validation fails', () => {
@@ -210,8 +211,8 @@ describe('AuthenticationService', () => {
       tokenApiService.verifyToken.and.returnValue(of({ isValid: true }));
 
       const result = await service.validateTokenAsync(validToken);
-      expect(result).toEqual({ isSuccess: true, data: true });
-      expect(tokenApiService.verifyToken).toHaveBeenCalledWith(validToken);
+      expect(result).toEqual(true);
+      expect(tokenApiService.verifyToken).toHaveBeenCalledWith({ token: validToken, tokenType: TokenType.Login });
     });
   });
 
@@ -219,14 +220,14 @@ describe('AuthenticationService', () => {
     tokenApiService.verifyToken.and.returnValue(of({ isValid: false }));
 
     const result = await service.validateTokenAsync('invalid-token');
-    expect(result).toEqual({ isSuccess: false, error: 'Invalid token format.' });
+    expect(result).toEqual(false);
   });
 
   it('should handle API errors gracefully', async () => {
     tokenApiService.verifyToken.and.returnValue(throwError(() => new Error('API Error')));
 
     const result = await service.validateTokenAsync('test-token');
-    expect(result).toEqual({ isSuccess: false, error: 'Invalid token format.' });
+    expect(result).toEqual(false);
   });
 });
 
@@ -254,9 +255,9 @@ describe('User Information', () => {
     expect(service.getUserId()).toBeNull();
   });
 
-  it('should return null when token is malformed', () => {
+  it('should throw error when token is malformed', () => {
     localStorage.setItem('authToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid_base64_@#$.signature');
-    expect(service.getUserId()).toBeNull();
+    expect(() => service.getUserId()).toThrowError('Error decoding token');
   });
 
   it('should return null when token has no sub claim', () => {

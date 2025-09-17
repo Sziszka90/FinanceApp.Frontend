@@ -57,6 +57,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   public total = signal<Money>({ amount: 0, currency: CurrencyEnum.EUR });
   public showSummary = signal<boolean>(false);
   public summary = signal<Money | null>(null);
+  public importLoading = signal<boolean>(false);
   dataSource = signal<MatTableDataSource<GetTransactionDto>>(new MatTableDataSource<GetTransactionDto>([]));
 
   typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
@@ -115,9 +116,11 @@ export class TransactionComponent extends BaseComponent implements OnInit {
 
   loadTransactions() {
     this.setLoading(true);
+    this.importLoading.set(true);
     this.transactionApiService.getAllTransactions().subscribe({
       next: (value: GetTransactionDto[]) => {
         this.setLoading(false);
+        this.importLoading.set(false);
         this.allTransactions.set(value);
         this.dataSource.update(ds => {
           ds.data = value;
@@ -128,6 +131,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       },
       error: (error) => {
         this.setLoading(false);
+        this.importLoading.set(false);
         this.handleError(error, 'Loading transactions');
       }
     });

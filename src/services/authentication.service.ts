@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { AuthenticationApiService } from './authentication.api.service';
 import { CorrelationService } from './correlation.service';
 import { TokenApiService } from './token.api.service';
+import { TokenType } from 'src/models/Enums/token-type.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -63,7 +64,7 @@ export class AuthenticationService {
     return true;
   }
 
-  async validateTokenAsync(tokenToValidate = ''): Promise<boolean> {
+  async validateTokenAsync(tokenToValidate = '', tokenType = TokenType.Login): Promise<boolean> {
     let token = tokenToValidate;
     if (token === '') {
       token = this.getToken() ?? '';
@@ -82,13 +83,13 @@ export class AuthenticationService {
         return false;
       }
     } catch {
-      throw new Error('Invalid token format');
+      return false;
     }
 
     let result = null;
 
     try {
-      result = await firstValueFrom(this.tokenApiService.verifyToken(token));
+      result = await firstValueFrom(this.tokenApiService.verifyToken({  token, tokenType: tokenType }));
     } catch {
       throw new Error('Error verifying token');
     }

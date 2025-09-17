@@ -11,24 +11,17 @@ import { ResetPasswordComponent } from './user/reset-password/reset-password.com
 import { ProfileComponent } from './user/profile/profile.component';
 import { inject } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
-import { ComponentErrorService } from 'src/services/component-error.service';
+import { TokenType } from 'src/models/Enums/token-type.enum';
 
 const AuthGuard: CanActivateFn = async () => {
   const authService = inject(AuthenticationService);
   const router = inject(Router);
-  const componentErrorService = inject(ComponentErrorService);
 
-  try {
-    const result = await authService.isAuthenticatedAsync();
-    if (result.isSuccess) {
-      return true;
-    } else {
-      componentErrorService.showError(result.error ?? 'Authentication failed');
-      router.navigate(['/login']);
-      return false;
-    }
-  } catch {
-    componentErrorService.showError('Authentication failed');
+  const result = await authService.isAuthenticatedAsync();
+
+  if (result) {
+    return true;
+  } else {
     router.navigate(['/login']);
     return false;
   }
@@ -38,13 +31,14 @@ const ResetPasswordGuard: CanActivateFn = async (route: ActivatedRouteSnapshot) 
   const authService = inject(AuthenticationService);
   const router = inject(Router);
   const token = route.queryParamMap.get('token');
-  const result = await authService.validateTokenAsync(token ?? '');
+  const result = await authService.validateTokenAsync(token ?? '', TokenType.PasswordReset);
 
-  if (!result.isSuccess || result.data === false) {
+  if (result) {
+    return true;
+  } else {
     router.navigate(['/validation-failed']);
     return false;
   }
-  return true;
 };
 
 export const routes: Routes = [

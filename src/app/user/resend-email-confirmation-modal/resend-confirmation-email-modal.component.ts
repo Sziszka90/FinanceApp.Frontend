@@ -32,15 +32,17 @@ export class ResendConfirmationEmailModalComponent extends BaseComponent {
   onSubmit(): void {
     if (this.isFormValid()) {
       const email = this.getFieldValue<string>('email') || '';
-
-      this.executeWithLoading(
-        this.userApiService.resendConfirmationEmail(email),
-        undefined,
-        'Error sending email confirmation'
-      ).subscribe({
+      
+      this.setLoading(true);
+      this.userApiService.resendConfirmationEmail(email).subscribe({
         next: (result: ResendEmailConfirmationResponse) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+          this.setLoading(false);
           this.showSuccess(result?.message || 'Confirmation email sent successfully');
           this.matDialogRef.close();
+        },
+        error: (error) => {
+          this.setLoading(false);
+          this.handleError(error, 'Error sending email confirmation');
         }
       });
     } else {

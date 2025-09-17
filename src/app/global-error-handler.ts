@@ -3,6 +3,7 @@ import { ComponentErrorService } from 'src/services/component-error.service';
 
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
+// eslint-disable-next-line no-unused-vars
   constructor(private injector: Injector) {}
 
   handleError(error: string): void {

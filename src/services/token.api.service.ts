@@ -3,6 +3,8 @@ import { environment } from '../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ValidateTokenResponse } from 'src/models/UserDtos/validate-toke-response.dto';
+import { TokenType } from 'src/models/Enums/token-type.enum';
+import { ValidateTokenRequest } from 'src/models/ValidateTokenDtos/validate-token-request.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +14,7 @@ export class TokenApiService {
 
   private readonly apiUrl = environment?.apiUrl ?? '';
 
-  verifyToken(token: string): Observable<ValidateTokenResponse> {
-    return this.http.post<ValidateTokenResponse>(`${this.apiUrl}/api/v1/token/validate`, { Token: token });
+  verifyToken(validateTokenRequest: ValidateTokenRequest): Observable<ValidateTokenResponse> {
+    return this.http.post<ValidateTokenResponse>(`${this.apiUrl}/api/v1/token/validate`, validateTokenRequest);
   }
 }

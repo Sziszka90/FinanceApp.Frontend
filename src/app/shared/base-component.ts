@@ -5,7 +5,7 @@ import { ComponentErrorService } from 'src/services/component-error.service';
 import { Subject } from 'rxjs';
 
 @Injectable()
-export abstract class ComponentBase implements OnDestroy {
+export abstract class BaseComponent implements OnDestroy {
   protected formValidator = inject(FormValidationService);
   protected errorHandler = inject(ComponentErrorService);
 

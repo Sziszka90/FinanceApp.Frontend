@@ -14,8 +14,8 @@ import { ICONS } from 'src/models/Constants/group-icon-options.const';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { FieldValidationMessages } from 'src/services/form-validation.service';
-import { BaseComponent } from 'src/app/shared/base-component';
 import { LoaderComponent } from 'src/app/shared/loader/loader.component';
+import { BaseComponent } from 'src/app/shared/base-component';
 
 @Component({
   selector: 'transaction-modal',

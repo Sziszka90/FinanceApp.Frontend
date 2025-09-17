@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
 import { AuthenticationService } from '../../../services/authentication.service';
-
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -8,8 +7,6 @@ import { ForgotPasswordRequestModalComponent } from '../forgot-password-modal/fo
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { ResendConfirmationEmailModalComponent } from '../resend-email-confirmation-modal/resend-confirmation-email-modal.component';
 import { BaseComponent } from '../../shared/base-component';
-import { LoginResponseDto } from 'src/models/LoginDtos/login-response.dto';
-import { Result } from 'src/models/Result/result';
 
 @Component({
   selector: 'login',
@@ -21,7 +18,7 @@ import { Result } from 'src/models/Result/result';
     ReactiveFormsModule,
     RouterLink,
     LoaderComponent
-]
+  ]
 })
 export class LoginComponent extends BaseComponent {
   private authService = inject(AuthenticationService);
@@ -50,14 +47,9 @@ export class LoginComponent extends BaseComponent {
 
   async onSubmit(): Promise<void> {
     if (this.formGroup.valid) {
-      const result = await this.executeAsync<LoginResponseDto>(
-        async () => this.authService.loginAsync(this.formGroup.value),
-        undefined,
-        undefined,
-        true,
-        true
-      );
-      if (result!.token === '') {
+      const result = await this.authService.loginAsync(this.formGroup.value);
+
+      if (result.token === '') {
         this.showError('Invalid login credentials');
       } else {
         this.authService.saveToken(result!.token);

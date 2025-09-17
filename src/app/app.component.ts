@@ -32,7 +32,7 @@ export class AppComponent extends BaseComponent implements OnInit {
   showApp = false;
 
   async ngOnInit(): Promise<void> {
-    this.executeAsync<boolean>(async () => await this.authService.isAuthenticatedAsync());
+    await this.authService.isAuthenticatedAsync();
 
     this.wakeupService.showWakeupLoader$.subscribe(show => {
       this.showWakeupLoader = show;

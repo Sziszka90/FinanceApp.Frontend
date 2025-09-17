@@ -74,13 +74,17 @@ export class ResetPasswordComponent extends BaseComponent implements OnInit {
     if (this.isFormValid()) {
       const password = this.getFieldValue<string>('password') || '';
 
-      this.executeWithLoading(
-        this.userApiService.updatePassword({ password: password, token: this.token }),
-        'Password reset successfully',
-        'Failed to reset password'
-      ).subscribe({
+      this.setLoading(true);
+
+      this.userApiService.updatePassword({ password: password, token: this.token }).subscribe({
         next: () => {
+          this.setLoading(false);
+          this.showSuccess('Password reset successful! Please log in with your new password.');
           this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          this.setLoading(false);
+          this.handleError(error, 'Failed to reset password');
         }
       });
     } else {

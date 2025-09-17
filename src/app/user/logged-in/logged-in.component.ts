@@ -19,8 +19,8 @@ export class LoggedInComponent extends BaseComponent {
   public router = inject(Router);
   public authService = inject(AuthenticationService);
 
-  logout() {
-    this.executeAsync(async () => this.authService.logoutAsync());
+  async logout() {
+    await this.authService.logoutAsync();
     this.router.navigate(['/login']);
   }
 }

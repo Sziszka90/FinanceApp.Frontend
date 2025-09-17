@@ -12,7 +12,7 @@ import { ComponentErrorService } from '../../../services/component-error.service
 import { FormValidationService } from '../../../services/form-validation.service';
 import { GetUserDto } from '../../../models/UserDtos/get-user.dto';
 import { CurrencyEnum } from '../../../models/Enums/currency.enum';
-import { BaseComponent } from '../../shared/base-component';
+import { BaseComponent } from 'src/app/shared/base-component';
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;

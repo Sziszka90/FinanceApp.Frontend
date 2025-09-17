@@ -1,15 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
-
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { take } from 'rxjs';
 import { Router } from '@angular/router';
 import { UserFormModel } from 'src/models/Profile/user-form-model';
 import { MatSelectModule } from '@angular/material/select';
 import { UserApiService } from 'src/services/user.api.service';
 import { GetUserDto } from 'src/models/UserDtos/get-user.dto';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
-import { BaseComponent } from '../../shared/base-component';
 import { LoaderComponent } from '../../shared/loader/loader.component';
+import { BaseComponent } from 'src/app/shared/base-component';
 
 @Component({
   selector: 'profile',
@@ -80,16 +78,17 @@ export class ProfileComponent extends BaseComponent implements OnInit {
     isNaN(Number(key)));
 
   ngOnInit(): void {
-    this.executeWithLoading(
-      this.userApiService.getActiveUser().pipe(take(1)),
-      undefined,
-      'Failed to load user profile'
-    ).subscribe((user) => {
-      this.user = user;
-      this.formGroup.patchValue({
-        userName: user.userName,
-        currency: user.baseCurrency
-      });
+    this.userApiService.getActiveUser().subscribe({
+      next: (user) => {
+        this.user = user;
+        this.formGroup.patchValue({
+          userName: user.userName,
+          currency: user.baseCurrency
+        });
+      },
+      error: (error) => {
+        this.handleError(error, 'Failed to load user profile');
+      }
     });
   }
 
@@ -98,18 +97,21 @@ export class ProfileComponent extends BaseComponent implements OnInit {
       const formValue = this.getFormValue();
       if (!formValue) {return;}
 
-      this.executeWithLoading(
-        this.userApiService.updateUser({
+      this.setLoading(true);
+
+      this.userApiService.updateUser({
           id: this.user?.id,
           userName: this.getFieldValue('userName') || this.user?.userName,
           password: this.getFieldValue('password') || '',
           baseCurrency: this.getFieldValue('currency') ?? CurrencyEnum.EUR
-        }).pipe(take(1)),
-        'Profile updated successfully',
-        'Failed to update profile'
-      ).subscribe(() => {
-        this.router.navigate(['/']);
-      });
+        }).subscribe(() => {
+          this.setLoading(false);
+          this.router.navigate(['/']);
+        },
+        (error) => {
+          this.setLoading(false);
+          this.handleError(error, 'Failed to update profile');
+        });
     } else {
       this.markAllFieldsAsTouched();
     }
