@@ -48,15 +48,19 @@ export class LoginComponent extends BaseComponent {
   async onSubmit(): Promise<void> {
     if (this.formGroup.valid) {
       this.setLoading(true);
-      const result = await this.authService.loginAsync(this.formGroup.value);
-      this.setLoading(false);
-
-      if (result.token === '') {
-        this.showError('Invalid login credentials');
-      } else {
-        this.authService.saveToken(result!.token);
-        this.authService.userLoggedIn.next(true);
-        this.router.navigate(['/']);
+      try {
+        const result = await this.authService.loginAsync(this.formGroup.value);
+        
+        if (result.token === '') {
+          this.showError('Invalid login credentials');
+        } else {
+          this.authService.saveToken(result!.token);
+          this.authService.userLoggedIn.next(true);
+          this.router.navigate(['/']);
+        }
+      } catch (error) {
+        this.setLoading(false);
+        this.handleError(error, 'Login failed');
       }
     } else {
       this.formGroup.markAllAsTouched();
