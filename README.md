@@ -1,20 +1,51 @@
 # 💼 Personal Finance App - Frontend
 
-🌐 **A modern Angular-based frontend for sophisticated personal finance management**
+## 🌐 A modern Angular-based frontend for sophisticated personal finance management
 
 This is the frontend application for a personal finance management platform that helps users track, categorize, and analyze their financial transactions with AI-powered insights. It features an integrated chat with AI functionalities, allowing users to query and receive information about their own financial data. Built with Angular 20 and TypeScript, it provides a responsive and intuitive user interface for managing personal finances.
 
-### 🎯 Current Features
+## 🎯 Current Features
 
-✅ **User Authentication** - Login, registration, password reset with JWT integration  
-✅ **Transaction Management** - Create, view, edit, and delete transactions with rich UI  
-✅ **Transaction Groups** - Organize transactions into categories with visual indicators  
-✅ **Responsive Design** - Mobile-first approach with Angular Material components  
-✅ **Real-time Validation** - Form validation with instant feedback  
-✅ **Error Handling** - Comprehensive error management with user-friendly messages  
-✅ **Loading States** - Interactive loading indicators for better UX
+✅ **User**
 
-### 🔮 Upcoming Features
+- Login, registration, password reset with JWT integration and email confirmation
+- User profile where users can set their preferred currency
+
+✅ **Transactions**
+
+- Create, read, update, and delete transactions with rich UI and filtering
+- Import transactions from CSV files with automatic, asynchronous transaction group matching powered by AI, RabbitMQ and SignalR
+
+✅ **Transaction Groups**
+
+- Create, read, update, and delete transaction groups
+- Organize transactions into categories with visual indicators
+
+✅ **Responsive Design**
+
+- Fully adaptive layout for seamless experience on any device
+
+✅ **Real-time Validation**
+
+- Form validation with instant feedback
+
+✅ **Error Handling**
+
+- Comprehensive error management with user-friendly messages
+
+✅ **Loading States**
+
+- Interactive loading indicators for better UX
+
+✅ **Cloud Wake-Up Loader**
+
+- Displays a loader while the cloud backend service initializes, ensuring users are informed during startup delays
+
+✅ **AI-Powered Chat**
+
+- Integrated chat assistant that provides personalized insights and answers based on your financial data
+
+## 🔮 Upcoming Features
 
 For detailed upcoming features and development progress, please check our [GitHub Issues](https://github.com/Sziszka90/FinanceApp.Frontend/issues).
 
@@ -65,14 +96,15 @@ For detailed upcoming features and development progress, please check our [GitHu
 ### **Key Frontend Patterns**
 
 - **Component-Based Architecture** - Modular, reusable Angular components
-- **Reactive Programming** - RxJS for handling async data streams
+- **Reactive and Async Programming** - Reactive and async programming with RxJS and async/await for handling data streams
 - **Service Layer** - Dedicated services for API communication and state management
 - **Route Guards** - Authentication and authorization protection
 - **Reactive Forms** - Angular reactive forms with custom validators
 - **Error Boundary** - Centralized error handling and user notifications
+- **Base Component Class** - Base component class for centralized form and error handling
 - **Responsive Design** - Mobile-first CSS with Angular Flex Layout
 
-## 🚀 Tech Stack
+## 💻 Tech Stack
 
 ### **Frontend Framework**
 
@@ -89,144 +121,7 @@ For detailed upcoming features and development progress, please check our [GitHu
 - **Responsive Design** - Mobile-first approach with breakpoint management
 - **Custom Theming** - Consistent design system across the application
 
-## 🔧 Features Deep Dive
-
-### **👤 User Interface & Authentication**
-
-- **Login/Registration Forms** with reactive validation
-- **Password Reset Flow** with step-by-step guidance
-- **Profile Management** with editable user settings
-- **Authentication Guards** protecting routes and components
-
-### **💰 Transaction and Transaction Group Management UI**
-
-- **Transaction Lists** with sorting, filtering
-- **Create/Edit Modals** with rich form controls and validation
-- **Bulk Operations** with selection and confirmation dialogs
-- **CSV Import** - Bulk transaction import from CSV files
-- **Notification Service** - SignalR to notify frontend to refresh data
-- **Visual Transaction** with color-coded categories
-
-### **🎨 User Experience Features**
-
-- **Responsive Navigation** with collapsible sidebar
-- **Loading States** with skeleton screens and spinners
-- **Error Handling** with toast notifications and modal dialogs
-- **Form Validation** with real-time feedback and error messages
-
-## 🚦 Getting Started
-
-### **Prerequisites**
-
-```bash
-# Required software
-Node.js 18+ (with npm)
-Angular CLI 20+
-Git
-```
-
-### **Frontend Setup**
-
-```bash
-# Clone the repository
-git clone https://github.com/Sziszka90/FinanceApp.Frontend.git
-cd FinanceApp.Frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-ng serve
-
-# Open browser at http://localhost:4200
-```
-
-### **Environment Configuration**
-
-```typescript
-// src/environments/environment.ts
-export const environment = {
-  production: false,
-  apiUrl: 'https://localhost:5001/api'
-};
-
-// src/environments/environment.prod.ts
-export const environment = {
-  production: true,
-  apiUrl: 'https://your-api-domain.com/api'
-};
-```
-
-## 🧪 Development & Testing
-
-### **Development Commands**
-
-```bash
-# Start development server
-ng serve
-
-# Build for production
-ng build --prod
-
-# Run unit tests
-ng test
-
-# Run e2e tests
-ng e2e
-
-# Lint code
-ng lint
-
-# Generate component/service
-ng generate component my-component
-ng generate service my-service
-```
-
-### **Code Quality**
-
-```bash
-# Format code with Prettier
-npm run format
-
-# Check linting
-npm run lint
-
-# Fix linting issues
-npm run lint:fix
-```
-
-## 🐳 Docker & Deployment
-
-### **Docker Support**
-
-```dockerfile
-# Build and run with Docker
-docker build -t financeapp-frontend .
-docker run -p 80:80 financeapp-frontend
-```
-
-### **Production Build**
-
-```bash
-# Build for production
-ng build --configuration=production
-
-# Serve static files
-# Built files will be in dist/ directory
-```
-
-### **CI/CD Pipeline**
-
-**GitHub Actions** handles the complete CI/CD workflow:
-
-```yaml
-# Automated pipeline includes:
-✅ Code quality checks and linting
-✅ Automated Unit test execution
-✅ Build
-✅ Docker image creation
-✅ Deployment to hosting platform
-```
+## 🚀 Deployment
 
 **Deployment Flow:**
 
