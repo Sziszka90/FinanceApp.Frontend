@@ -1,6 +1,6 @@
-# 💼 Personal Finance App - Frontend
+# 💼 Finance App - Frontend
 
-## 🌐 A modern Angular-based frontend for sophisticated personal finance management
+## 📦 A sophisticated personal finance management platform with intelligent transaction processing
 
 This is the frontend application for a personal finance management platform that helps users track, categorize, and analyze their financial transactions with AI-powered insights. It features an integrated chat with AI functionalities, allowing users to query and receive information about their own financial data. Built with Angular 20 and TypeScript, it provides a responsive and intuitive user interface for managing personal finances.
 
@@ -121,7 +121,18 @@ For detailed upcoming features and development progress, please check our [GitHu
 - **Responsive Design** - Mobile-first approach with breakpoint management
 - **Custom Theming** - Consistent design system across the application
 
+
+## 🧪 Testing and Quality
+
+All unit tests are run automatically in the CI/CD pipeline.  
+Test coverage is checked in each build and is consistently above **50%**.
+Code quality is enforced using linting tools to ensure consistent style and catch potential errors.
+
 ## 🚀 Deployment
+
+### **Azure Container Apps**
+
+The application is deployed as **containerized microservices** on **Azure Container Apps** using GitHub Actions.
 
 **Deployment Flow:**
 
