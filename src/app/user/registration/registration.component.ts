@@ -82,7 +82,7 @@ export class RegistrationComponent extends BaseComponent {
         }).subscribe({
           next: () => {
             this.setLoading(false);
-            this.showSuccess('Registration successful! Please log in.');
+            this.showSuccess('Registration successful! Please confirm email address.');
             this.router.navigate(['/login']);
           },
           error: (error) => {

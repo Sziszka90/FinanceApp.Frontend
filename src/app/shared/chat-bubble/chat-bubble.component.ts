@@ -96,14 +96,14 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
     this.scrollToBottom();
     this.llmProcessorApiService.promptRequest({ prompt: msgToSend, userId: this.userId, correlationId: uuidv4() }).subscribe({
       next: res => {
+        this.loading = false;
         const reply = res.result || 'No response';
         this.messages.push({ text: reply, sender: 'assistant' });
-        this.loading = false;
         this.scrollToBottom();
       },
       error: err => {
-        this.messages.push({ text: 'Error sending message.', sender: 'assistant' });
         this.loading = false;
+        this.messages.push({ text: 'Error sending message.', sender: 'assistant' });
         this.scrollToBottom();
       }
     });
