@@ -14,6 +14,6 @@ export class TokenApiService {
   private readonly apiUrl = environment?.apiUrl ?? '';
 
   verifyToken(validateTokenRequest: ValidateTokenRequest): Observable<ValidateTokenResponse> {
-    return this.http.post<ValidateTokenResponse>(`${this.apiUrl}/api/v1/token/validate`, validateTokenRequest);
+    return this.http.post<ValidateTokenResponse>(`${this.apiUrl}/api/v1/token/validate`, validateTokenRequest, { withCredentials: true });
   }
 }

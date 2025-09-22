@@ -33,8 +33,6 @@ export const provideAuthInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> => {
-  const authService = inject(AuthenticationService);
-
   if (req.url.includes('llmprocessor/prompt')) {
     const token = environment.llmProcessorToken;
     const clonedRequest = req.clone({
@@ -44,13 +42,8 @@ export const provideAuthInterceptor: HttpInterceptorFn = (
     });
     return next(clonedRequest);
   }
-  const clonedRequest = req.clone({
-    setHeaders: {
-      Authorization: `Bearer ${authService.getToken()}`
-    }
-  });
 
-  return next(clonedRequest);
+  return next(req);
 };
 
 export function HttpLoaderFactory(http: HttpClient) {

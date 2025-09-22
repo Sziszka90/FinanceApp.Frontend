@@ -49,15 +49,8 @@ export class LoginComponent extends BaseComponent {
     if (this.formGroup.valid) {
       this.setLoading(true);
       try {
-        const result = await this.authService.loginAsync(this.formGroup.value);
-        
-        if (result.token === '') {
-          this.showError('Invalid login credentials');
-        } else {
-          this.authService.saveToken(result!.token);
-          this.authService.userLoggedIn.next(true);
-          this.router.navigate(['/']);
-        }
+        await this.authService.loginAsync(this.formGroup.value);
+        this.router.navigate(['/']);
       } catch (error) {
         this.setLoading(false);
         this.handleError(error, 'Login failed');

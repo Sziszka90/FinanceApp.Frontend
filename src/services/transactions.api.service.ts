@@ -21,35 +21,35 @@ export class TransactionApiService {
   constructor(private http: HttpClient) { }
 
   getAllTransactions(): Observable<GetTransactionDto[]> {
-    return this.http.get<GetTransactionDto[]>(`${this.apiUrl}/api/v1/transactions/`);
+    return this.http.get<GetTransactionDto[]>(`${this.apiUrl}/api/v1/transactions/`, { withCredentials: true });
   }
 
   getAllTransactionsSummary(): Observable<Money> {
-    return this.http.get<Money>(`${this.apiUrl}/api/v1/transactions/summary`);
+    return this.http.get<Money>(`${this.apiUrl}/api/v1/transactions/summary`, { withCredentials: true });
   }
 
   createTransaction(createTransactionDto:CreateTransactionDto): Observable<GetTransactionDto> {
-    return this.http.post<GetTransactionDto>(`${this.apiUrl}/api/v1/transactions/`, createTransactionDto);
+    return this.http.post<GetTransactionDto>(`${this.apiUrl}/api/v1/transactions/`, createTransactionDto, { withCredentials: true });
   }
 
   updateTransaction(id: string, updateTransactionDto: UpdateTransactionDto): Observable<GetTransactionDto> {
-    return this.http.put<GetTransactionDto>(`${this.apiUrl}/api/v1/transactions/${id}`, updateTransactionDto);
+    return this.http.put<GetTransactionDto>(`${this.apiUrl}/api/v1/transactions/${id}`, updateTransactionDto, { withCredentials: true });
   }
 
   deleteTransaction(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/api/v1/transactions/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/api/v1/transactions/${id}`, { withCredentials: true });
   }
 
   getAllTransactionGroups(): Observable<GetTransactionGroupDto[]> {
-    return this.http.get<GetTransactionGroupDto[]>(`${this.apiUrl}/api/v1/transactiongroups`);
+    return this.http.get<GetTransactionGroupDto[]>(`${this.apiUrl}/api/v1/transactiongroups`, { withCredentials: true });
   }
 
   getTransactionGroup(id: string): Observable<GetTransactionGroupDto> {
-    return this.http.get<GetTransactionGroupDto>(`${this.apiUrl}/api/v1/transactiongroups/${id}`);
+    return this.http.get<GetTransactionGroupDto>(`${this.apiUrl}/api/v1/transactiongroups/${id}`, { withCredentials: true });
   }
 
   createTransactionGroup(createTransactionGroupDto:CreateTransactionGroupDto): Observable<GetTransactionGroupDto> {
-    return this.http.post<GetTransactionGroupDto>(`${this.apiUrl}/api/v1/transactiongroups/`, createTransactionGroupDto);
+    return this.http.post<GetTransactionGroupDto>(`${this.apiUrl}/api/v1/transactiongroups/`, createTransactionGroupDto, { withCredentials: true });
   }
 
   updateTransactionGroup(
@@ -63,7 +63,7 @@ export class TransactionApiService {
   }
 
   deleteTransactionGroup(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/api/v1/transactiongroups/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/api/v1/transactiongroups/${id}`, { withCredentials: true });
   }
 
   uploadCsv(file: File, correlationId: string): Observable<GetTransactionDto[]> {
@@ -71,6 +71,6 @@ export class TransactionApiService {
     formData.append('file', file);
     formData.append('correlationId', correlationId);
 
-    return this.http.post<GetTransactionDto[]>(`${this.apiUrl}/api/v1/transactions/import`, formData);
+    return this.http.post<GetTransactionDto[]>(`${this.apiUrl}/api/v1/transactions/import`, formData, { withCredentials: true });
   }
 }

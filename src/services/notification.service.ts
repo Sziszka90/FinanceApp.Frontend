@@ -18,7 +18,7 @@ export class NotificationService {
     return new Promise<void>((resolve) => {
       this.authenticationService.userLoggedIn.subscribe(async (loggedIn) => {
         if (loggedIn) {
-          const result = await this.authenticationService.validateTokenAsync();
+          const result = await this.authenticationService.isAuthenticatedAsync();
           if (!result) {
             console.warn('SignalR: User not authenticated, skipping connection initialization');
             this.stopConnection();
@@ -40,43 +40,29 @@ export class NotificationService {
       this.stopConnection();
     }
 
-    const token = this.authenticationService.getToken();
-    if (!token) {
-      console.warn('SignalR: No token available, cannot establish connection');
-      return;
-    }
-
-    const isTokenValid = await this.authenticationService.validateTokenAsync();
-    if (!isTokenValid) {
-      console.warn('SignalR: Token validation failed, cannot establish connection');
-      return;
-    }
-
-    if (token.trim() === '') {
-      console.warn('SignalR: Token is empty, cannot establish connection');
+    const isAuthenticated = await this.authenticationService.isAuthenticatedAsync();
+    if (!isAuthenticated) {
+      console.warn('SignalR: User is not authenticated, cannot establish connection');
       return;
     }
 
     if (this.connectionRetryCount === 0) {
-      console.warn('SignalR: Starting new connection attempt with token validation passed');
+      console.warn('SignalR: Starting new connection attempt with authentication passed');
     } else {
       console.warn(`SignalR: Retry attempt ${this.connectionRetryCount + 1}/${this.maxAuthRetries + 1}`);
     }
 
     setTimeout(async () => {
-      await this.attemptConnectionAsync(token);
+      await this.attemptConnectionAsync();
     }, this.connectionRetryCount === 0 ? 500 : 100);
   }
 
-  private async attemptConnectionAsync(token: string): Promise<void> {
+  private async attemptConnectionAsync(): Promise<void> {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(`https://www.financeapp.fun/notificationHub`, {
-        accessTokenFactory: () => {
-          return token;
-        },
         transport: HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling,
         skipNegotiation: false,
-        withCredentials: false
+        withCredentials: true
       })
       .withAutomaticReconnect([0, 2000, 10000, 30000])
       .configureLogging(LogLevel.Debug)
@@ -135,8 +121,7 @@ export class NotificationService {
               console.warn(`SignalR: Retrying connection in 3 seconds (attempt ${this.connectionRetryCount}/${this.maxAuthRetries})`);
 
               setTimeout(async () => {
-                if (await this.authenticationService.isAuthenticatedAsync() &&
-                  await this.authenticationService.validateTokenAsync()) {
+                if (await this.authenticationService.isAuthenticatedAsync()) {
                   await this.startConnectionAsync();
                 } else {
                   console.error('SignalR: Token invalid on retry, logging out user');
@@ -186,8 +171,7 @@ export class NotificationService {
 
     return new Promise(resolve => {
       setTimeout(async () => {
-        if (await this.authenticationService.isAuthenticatedAsync() &&
-          await this.authenticationService.validateTokenAsync()) {
+        if (await this.authenticationService.isAuthenticatedAsync()) {
           await this.startConnectionAsync();
         }
         resolve();
