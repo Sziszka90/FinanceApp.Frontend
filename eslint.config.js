@@ -4,34 +4,6 @@ import typescriptParser from '@typescript-eslint/parser';
 
 export default [
   {
-    ignores: [
-      'node_modules/**',
-      'dist/**',
-      'tmp/**',
-      'out-tsc/**',
-      'coverage/**',
-      '.nyc_output/**',
-      'bazel-out/**',
-      'integration/bazel/bazel-*/**',
-      '*.bzl',
-      'chrome-profiler-events*.json',
-      'src/environments/environment.prod.ts',
-      'src/environments/environment.ts',
-      'npm-debug.log',
-      'yarn-error.log',
-      'e2e/*.js',
-      'e2e/*.map',
-      '.angular/cache/**',
-      '.sass-cache/**',
-      'connect.lock',
-      'libpeerconnection.log',
-      'testem.log',
-      'typings/**',
-      'test-results/**'
-    ]
-  },
-  js.configs.recommended,
-  {
     files: ['**/*.ts'],
     languageOptions: {
       parser: typescriptParser,
@@ -136,6 +108,7 @@ export default [
       'no-new-object': 'error'
     }
   },
+  // Test file override follows
   {
     files: ['**/*.spec.ts', '**/testing/**/*.ts'],
     languageOptions: {
@@ -181,6 +154,7 @@ export default [
         beforeAll: 'readonly',
         afterAll: 'readonly',
         expect: 'readonly',
+        expectAsync: 'readonly',
         fail: 'readonly',
         pending: 'readonly',
         spyOn: 'readonly',
@@ -197,4 +171,30 @@ export default [
       'no-console': 'off'
     }
   }
+];
+
+export const ignores = [
+  'node_modules/**',
+  'dist/**',
+  'tmp/**',
+  'out-tsc/**',
+  'coverage/**',
+  '.nyc_output/**',
+  'bazel-out/**',
+  'integration/bazel/bazel-*/**',
+  '*.bzl',
+  'chrome-profiler-events*.json',
+  'src/environments/environment.prod.ts',
+  'src/environments/environment.ts',
+  'npm-debug.log',
+  'yarn-error.log',
+  'e2e/*.js',
+  'e2e/*.map',
+  '.angular/cache/**',
+  '.sass-cache/**',
+  'connect.lock',
+  'libpeerconnection.log',
+  'testem.log',
+  'typings/**',
+  'test-results/**'
 ];
