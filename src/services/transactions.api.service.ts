@@ -58,7 +58,8 @@ export class TransactionApiService {
   ): Observable<GetTransactionGroupDto> {
     return this.http.put<GetTransactionGroupDto>(
       `${this.apiUrl}/api/v1/transactiongroups/${id}`,
-      updateTransactionGroupDto
+      updateTransactionGroupDto,
+      { withCredentials: true }
     );
   }
 

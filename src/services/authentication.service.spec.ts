@@ -1,129 +1,92 @@
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
-import { Subject, of, throwError } from 'rxjs';
-import { PLATFORM_ID } from '@angular/core';
 import { AuthenticationService } from './authentication.service';
 import { AuthenticationApiService } from './authentication.api.service';
 import { CorrelationService } from './correlation.service';
-import { TokenApiService } from './token.api.service';
+import { UserApiService } from './user.api.service';
+import { Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
 import { LoginRequestDto } from '../models/LoginDtos/login-request.dto';
 import { LoginResponseDto } from '../models/LoginDtos/login-response.dto';
-import { ValidateTokenResponse } from '../models/UserDtos/validate-toke-response.dto';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { take } from 'rxjs/operators';
-import { TokenType } from 'src/models/Enums/token-type.enum';
+
+// Mock services
+class MockAuthApiService {
+  login = jasmine.createSpy().and.returnValue(of({} as LoginResponseDto));
+  logout = jasmine.createSpy().and.returnValue(of(undefined));
+}
+class MockCorrelationService {
+  clearAllCorrelationIds = jasmine.createSpy();
+}
+class MockUserApiService {
+  getActiveUser = jasmine.createSpy().and.returnValue(of({ email: 'user123@example.com' }));
+}
+class MockRouter {
+  navigate = jasmine.createSpy();
+  navigateByUrl = jasmine.createSpy();
+}
 
 describe('AuthenticationService', () => {
   let service: AuthenticationService;
-  let authApiService: jasmine.SpyObj<AuthenticationApiService>;
-  let tokenApiService: jasmine.SpyObj<TokenApiService>;
-  let correlationService: jasmine.SpyObj<CorrelationService>;
-  let router: jasmine.SpyObj<Router>;
-
-  const mockLoginRequest: LoginRequestDto = {
-    email: 'test@example.com',
-    password: 'password123'
-  };
-
-  const mockLoginResponse: LoginResponseDto = {
-    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJleHAiOjk5OTk5OTk5OTl9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
-  };
-
-  const mockValidateTokenResponse: ValidateTokenResponse = {
-    isValid: true
-  };
+  let authApi: MockAuthApiService;
+  let correlation: MockCorrelationService;
+  let userApi: MockUserApiService;
+  let router: MockRouter;
 
   beforeEach(() => {
-    const authApiSpy = jasmine.createSpyObj('AuthenticationApiService', ['login', 'logout']);
-    const tokenApiSpy = jasmine.createSpyObj('TokenApiService', ['verifyToken']);
-    const correlationSpy = jasmine.createSpyObj('CorrelationService', ['clearAllCorrelationIds']);
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
         AuthenticationService,
-        { provide: AuthenticationApiService, useValue: authApiSpy },
-        { provide: TokenApiService, useValue: tokenApiSpy },
-        { provide: CorrelationService, useValue: correlationSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: PLATFORM_ID, useValue: 'browser' }
+        { provide: AuthenticationApiService, useClass: MockAuthApiService },
+        { provide: CorrelationService, useClass: MockCorrelationService },
+        { provide: UserApiService, useClass: MockUserApiService },
+        { provide: Router, useClass: MockRouter }
       ]
     });
     service = TestBed.inject(AuthenticationService);
-    authApiService = TestBed.inject(AuthenticationApiService) as jasmine.SpyObj<AuthenticationApiService>;
-    tokenApiService = TestBed.inject(TokenApiService) as jasmine.SpyObj<TokenApiService>;
-    correlationService = TestBed.inject(CorrelationService) as jasmine.SpyObj<CorrelationService>;
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-
-    // Setup default spy returns
-    authApiService.login.and.returnValue(of(mockLoginResponse));
-    authApiService.logout.and.returnValue(of(void 0));
-    tokenApiService.verifyToken.and.returnValue(of(mockValidateTokenResponse));
-
-    // Clear localStorage before each test
-    localStorage.clear();
+    authApi = TestBed.inject(AuthenticationApiService) as any;
+    correlation = TestBed.inject(CorrelationService) as any;
+    userApi = TestBed.inject(UserApiService) as any;
+    router = TestBed.inject(Router) as any;
   });
 
-  afterEach(() => {
-    localStorage.clear();
+  it('should login and set userLoggedIn to true', async () => {
+    const dto: LoginRequestDto = { email: 'test@test.com', password: 'pass' };
+    await service.loginAsync(dto);
+    expect(authApi.login).toHaveBeenCalledWith(dto);
+    expect(correlation.clearAllCorrelationIds).toHaveBeenCalled();
+    expect(service.userLoggedIn.value).toBeTrue();
   });
 
-  describe('Component Initialization', () => {
-    it('should be created', () => {
-      expect(service).toBeTruthy();
-    });
-
-    it('should initialize userLoggedIn as Subject', () => {
-      expect(service.userLoggedIn).toBeInstanceOf(Subject);
-    });
+  it('should logout and set userLoggedIn to false', async () => {
+    await service.logoutAsync();
+    expect(authApi.logout).toHaveBeenCalled();
+    expect(correlation.clearAllCorrelationIds).toHaveBeenCalled();
+    expect(service.userLoggedIn.value).toBeFalse();
+    expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
 
-  describe('Login Functionality', () => {
-    it('should call authApiService.login with correct parameters', () => {
-      service.loginAsync(mockLoginRequest);
-      expect(authApiService.login).toHaveBeenCalledWith(mockLoginRequest);
-    });
-
-    it('should clear correlation IDs on login', async () => {
-      await service.loginAsync(mockLoginRequest);
-      expect(correlationService.clearAllCorrelationIds).toHaveBeenCalled();
-    });
+  it('should return true for isAuthenticatedAsync when user exists', async () => {
+    const result = await service.isAuthenticatedAsync();
+    expect(userApi.getActiveUser).toHaveBeenCalled();
+    expect(result).toBeTrue();
+    expect(service.userLoggedIn.value).toBeTrue();
   });
 
-  describe('Logout Functionality', () => {
-    beforeEach(() => {
-      localStorage.setItem('authToken', 'test-token');
-    });
-
-    it('should clear token from localStorage on logout', async () => {
-      await service.logoutAsync();
-      expect(localStorage.getItem('authToken')).toBeNull();
-    });
-
-    it('should emit false on userLoggedIn subject after logout', (done) => {
-      service.userLoggedIn.pipe(take(1)).subscribe((isLoggedIn) => {
-        expect(isLoggedIn).toBe(false);
-        done();
-      });
-
-      service.logoutAsync();
-    });
-
-    it('should clear correlation IDs on logout', async () => {
-      await service.logoutAsync();
-      expect(correlationService.clearAllCorrelationIds).toHaveBeenCalled();
-    });
-
-    it('should navigate to login page on logout', async () => {
-      await service.logoutAsync();
-      expect(router.navigate).toHaveBeenCalledWith(['/login']);
-    });
+  it('should return false for isAuthenticatedAsync when user fetch fails', async () => {
+    userApi.getActiveUser.and.returnValue(throwError(() => new Error('fail')));
+    const result = await service.isAuthenticatedAsync();
+    expect(result).toBeFalse();
+    expect(service.userLoggedIn.value).toBeFalse();
   });
 
-  describe('Authentication Status', () => {
-    it('should return false when user is not authenticated', async () => {
-      expect(await service.isAuthenticatedAsync()).toEqual(false);
-    });
+  it('should get user email', async () => {
+    const email = await service.getUserEmail();
+    expect(email).toBe('user123@example.com');
+  });
+
+  it('should throw error if getUserEmail fails', async () => {
+    userApi.getActiveUser.and.returnValue(throwError(() => new Error('fail')));
+    await expectAsync(service.getUserEmail()).toBeRejectedWithError('Error fetching user email');
   });
 });

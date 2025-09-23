@@ -47,12 +47,12 @@ export class AuthenticationService {
     }
   }
 
-  async getUserId(): Promise<string> {
+  async getUserEmail(): Promise<string> {
     try {
       const user = await firstValueFrom(this.userService.getActiveUser());
-      return user?.id;
+      return user?.email;
     } catch {
-      throw new Error('Error fetching user ID');
+      throw new Error('Error fetching user email');
     }
   }
 

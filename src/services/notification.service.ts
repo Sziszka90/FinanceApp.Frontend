@@ -17,18 +17,13 @@ export class NotificationService {
   initializeAsync(): Promise<void> {
     return new Promise<void>((resolve) => {
       this.authenticationService.userLoggedIn.subscribe(async (loggedIn) => {
-        if (loggedIn) {
-          const result = await this.authenticationService.isAuthenticatedAsync();
-          if (!result) {
-            console.warn('SignalR: User not authenticated, skipping connection initialization');
-            this.stopConnection();
-            resolve();
-            return;
-          }
+        if (loggedIn && !this.hubConnection) {
           await this.startConnectionAsync();
           resolve();
         } else {
-          this.stopConnection();
+          if (!loggedIn) {
+            this.stopConnection();
+          }
           resolve();
         }
       });
@@ -38,12 +33,6 @@ export class NotificationService {
   async startConnectionAsync(): Promise<void> {
     if (this.hubConnection) {
       this.stopConnection();
-    }
-
-    const isAuthenticated = await this.authenticationService.isAuthenticatedAsync();
-    if (!isAuthenticated) {
-      console.warn('SignalR: User is not authenticated, cannot establish connection');
-      return;
     }
 
     if (this.connectionRetryCount === 0) {
@@ -92,7 +81,7 @@ export class NotificationService {
     });
 
     this.hubConnection.start()
-      .then(() => {
+      .then(async () => {
         console.warn('SignalR: Connection established successfully');
         console.warn(`SignalR: Connection state: ${this.hubConnection?.state}`);
         console.warn(`SignalR: Connection details:`, {
@@ -102,7 +91,8 @@ export class NotificationService {
 
         this.connectionRetryCount = 0;
         if (this.hubConnection) {
-          return this.hubConnection.invoke(JOIN_GROUP_METHOD, this.authenticationService.getUserId());
+          const userEmail = await this.authenticationService.getUserEmail();
+          return this.hubConnection.invoke(JOIN_GROUP_METHOD, userEmail);
         }
         return Promise.resolve();
       })
@@ -121,12 +111,7 @@ export class NotificationService {
               console.warn(`SignalR: Retrying connection in 3 seconds (attempt ${this.connectionRetryCount}/${this.maxAuthRetries})`);
 
               setTimeout(async () => {
-                if (await this.authenticationService.isAuthenticatedAsync()) {
-                  await this.startConnectionAsync();
-                } else {
-                  console.error('SignalR: Token invalid on retry, logging out user');
-                  await this.authenticationService.logoutAsync();
-                }
+                await this.startConnectionAsync();
               }, 3000);
               return;
             } else {
@@ -162,24 +147,5 @@ export class NotificationService {
           this.connectionRetryCount = 0;
         });
     }
-  }
-
-  resetAndReconnectAsync(): Promise<void> {
-    console.warn('SignalR: Resetting connection state and attempting fresh connection');
-    this.connectionRetryCount = 0;
-    this.stopConnection();
-
-    return new Promise(resolve => {
-      setTimeout(async () => {
-        if (await this.authenticationService.isAuthenticatedAsync()) {
-          await this.startConnectionAsync();
-        }
-        resolve();
-      }, 1000);
-    });
-  }
-
-  getRetryCount(): number {
-    return this.connectionRetryCount;
   }
 }

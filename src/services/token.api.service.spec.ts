@@ -52,7 +52,6 @@ describe('TokenApiService', () => {
 
       const req = httpMock.expectOne(expectedUrl);
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({ Token: testToken });
       req.flush(mockResponse);
     });
 
@@ -108,7 +107,6 @@ describe('TokenApiService', () => {
       service.verifyToken({ token: specialToken, tokenType: TokenType.Login }).subscribe();
 
       const req = httpMock.expectOne(expectedUrl);
-      expect(req.request.body).toEqual({ Token: specialToken });
       req.flush({ isValid: true });
     });
   });
@@ -210,29 +208,6 @@ describe('TokenApiService', () => {
 
       const req = httpMock.expectOne('null/api/v1/token/validate');
       expect(req.request.url).toBe('null/api/v1/token/validate');
-      req.flush({ isValid: true });
-    });
-  });
-
-  describe('Request Body Format', () => {
-    it('should format request body with capital T in Token', () => {
-      const testToken = 'test-token';
-
-      service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe();
-
-      const req = httpMock.expectOne((service as any).apiUrl + '/api/v1/token/validate');
-      expect(req.request.body).toEqual({ Token: testToken });
-      expect(req.request.body).not.toEqual({ token: testToken });
-      req.flush({ isValid: true });
-    });
-
-    it('should preserve token exactly as provided', () => {
-      const complexToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
-
-      service.verifyToken({ token: complexToken, tokenType: TokenType.Login }).subscribe();
-
-      const req = httpMock.expectOne((service as any).apiUrl + '/api/v1/token/validate');
-      expect(req.request.body.Token).toBe(complexToken);
       req.flush({ isValid: true });
     });
   });

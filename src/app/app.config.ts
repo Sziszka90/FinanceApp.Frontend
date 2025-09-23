@@ -1,4 +1,4 @@
-import { ApplicationConfig, importProvidersFrom, inject } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -16,7 +16,6 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { Observable } from 'rxjs';
-import { AuthenticationService } from '../services/authentication.service';
 import { errorInterceptor } from 'src/interceptors/error.interceptor';
 import { environment } from '../environments/environment';
 
