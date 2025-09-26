@@ -32,16 +32,17 @@ export class AppComponent extends BaseComponent implements OnInit {
   showApp = false;
 
   async ngOnInit(): Promise<void> {
-    await this.authService.isAuthenticatedAsync();
-
     this.wakeupService.showWakeupLoader$.subscribe(show => {
       this.showWakeupLoader = show;
     });
+
     this.wakeupService.showApp$.subscribe(show => {
       this.showApp = show;
     });
+
     await this.wakeupService.wakeup();
     await this.notificationService.initializeAsync();
+    await this.authService.isAuthenticatedAsync();
   }
 
   testGlobalError(): void {
