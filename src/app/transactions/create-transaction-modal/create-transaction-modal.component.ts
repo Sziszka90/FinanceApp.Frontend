@@ -80,7 +80,7 @@ export class CreateTransactionModalComponent extends BaseComponent implements On
   groupOptions = signal<GetTransactionGroupDto[]>([]);
   typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
   currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
-    isNaN(Number(key))
+    isNaN(Number(key)) && key !== 'XXX'
   );
 
   ngOnInit() {

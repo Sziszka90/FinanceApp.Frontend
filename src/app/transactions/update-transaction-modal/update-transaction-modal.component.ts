@@ -26,6 +26,7 @@ import { CurrencyEnum } from 'src/models/Enums/currency.enum';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { FieldValidationMessages } from 'src/services/form-validation.service';
 import { LoaderComponent } from 'src/app/shared/loader/loader.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'update-transaction-modal',
@@ -49,25 +50,15 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
   private transactionApiService = inject(TransactionApiService);
   public data = inject(MAT_DIALOG_DATA);
 
-  public override formGroup: FormGroup = this.fb.group({
-    name: new FormControl(this.data.name, [Validators.required, Validators.minLength(2)]),
-    description: new FormControl(this.data.description),
-    value: new FormControl(this.data.value.amount, [
-      Validators.required,
-      Validators.min(0.01)
-    ]),
-    currency: new FormControl(this.data.value.currency, Validators.required),
-    transactionDate: new FormControl(this.data.transactionDate, Validators.required),
-    transactionType: new FormControl(
-      null,
-      [Validators.required, enumValidator(TransactionTypeEnum)]
-    ),
-    group: new FormControl(
-      this.data.transactionGroup != null
-        ? this.data.transactionGroup
-        : null
-    )
-  });
+public override formGroup: FormGroup = this.fb.group({
+  name: ["", [Validators.required, Validators.minLength(2)]],
+  description: [""],
+  value: ["", [Validators.required, Validators.min(0.01)]],
+  currency: ["", Validators.required],
+  transactionDate: ["", Validators.required],
+  transactionType: [null, [Validators.required, enumValidator(TransactionTypeEnum)]],
+  group: [null] 
+});
 
   public override customValidationMessages: FieldValidationMessages = {
     name: {
@@ -92,25 +83,34 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
   groupOptions = signal<GetTransactionGroupDto[]>([]);
   typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
   currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
-    isNaN(Number(key))
+    isNaN(Number(key)) && key !== 'XXX'
   );
 
   ngOnInit(): void {
-    this.formGroup!.get('group')?.setValue(this.data.transactionGroup);
-    this.formGroup!.get('currency')?.setValue(this.data.value.currency);
-    this.formGroup!.get('transactionType')?.setValue(this.data.transactionType);
-    this.formGroup!.get('transactionDate')?.setValue(new Date(this.data.transactionDate));
-
     this.setLoading(true);
-    this.transactionApiService.getAllTransactionGroups().subscribe({
-      next: (data) => {
+    const transactionGroups$ = this.transactionApiService.getAllTransactionGroups();
+    const transaction$ = this.transactionApiService.getTransaction(this.data.id);
+
+    forkJoin([transactionGroups$, transaction$]).subscribe({
+      next: ([groups, transaction]) => {
+        this.groupOptions.set(groups);
+        this.groupOptions.update(gs => [...gs, { id: '', name: 'No group' } as GetTransactionGroupDto]);
+
+        this.formGroup!.patchValue({
+          name: transaction.name,
+          description: transaction.description,
+          value: transaction.value.amount,
+          currency: transaction.value.currency,
+          transactionDate: new Date(transaction.transactionDate),
+          transactionType: transaction.transactionType,
+          group: transaction.transactionGroup
+        });
+
         this.setLoading(false);
-        this.groupOptions.set(data);
-        this.groupOptions.update(groups => [...groups, { id: '', name: 'No group' } as GetTransactionGroupDto]);
       },
       error: (error) => {
         this.setLoading(false);
-        this.handleError(error, 'Loading transaction groups');
+        this.handleError(error, 'Loading transaction groups or transaction');
       }
     });
   }
@@ -160,6 +160,6 @@ export class UpdateTransactionModalComponent extends BaseComponent implements On
   }
 
   compareCategoryObjects(object1: any, object2: any) {
-    return object1 && object2 && object1.id == object2.id;
+    return object1.id == object2.id;
   }
 }

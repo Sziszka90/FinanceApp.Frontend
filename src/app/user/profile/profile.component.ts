@@ -75,7 +75,8 @@ export class ProfileComponent extends BaseComponent implements OnInit {
   user!: GetUserDto;
 
   currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
-    isNaN(Number(key)));
+    isNaN(Number(key)) && key !== 'XXX'
+  );
 
   ngOnInit(): void {
     this.userApiService.getActiveUser().subscribe({

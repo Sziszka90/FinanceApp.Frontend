@@ -20,6 +20,10 @@ export class TransactionApiService {
   // eslint-disable-next-line no-unused-vars
   constructor(private http: HttpClient) { }
 
+  getTransaction(id: string): Observable<GetTransactionDto> {
+    return this.http.get<GetTransactionDto>(`${this.apiUrl}/api/v1/transactions/${id}`, { withCredentials: true });
+  } 
+
   getAllTransactions(): Observable<GetTransactionDto[]> {
     return this.http.get<GetTransactionDto[]>(`${this.apiUrl}/api/v1/transactions/`, { withCredentials: true });
   }

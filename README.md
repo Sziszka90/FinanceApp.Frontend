@@ -8,7 +8,7 @@ This is the frontend application for a personal finance management platform that
 
 ✅ **User**
 
-- Login, registration, password reset with JWT integration and email confirmation
+- Login, registration, password reset with JWT integration using **HTTP Only Cookies** for secure authentication and email confirmation
 - User profile where users can set their preferred currency
 
 ✅ **Transactions**

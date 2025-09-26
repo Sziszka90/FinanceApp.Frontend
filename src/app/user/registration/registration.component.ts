@@ -64,7 +64,7 @@ export class RegistrationComponent extends BaseComponent {
   };
 
   currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
-    isNaN(Number(key))
+    isNaN(Number(key)) && key !== 'XXX'
   );
 
   onSubmit(): void {
