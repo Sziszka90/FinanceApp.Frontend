@@ -162,4 +162,8 @@ public override formGroup: FormGroup = this.fb.group({
   compareCategoryObjects(object1: any, object2: any) {
     return object1.id == object2.id;
   }
+
+  compareTypeObjects(object1: { name: string, value: TransactionTypeEnum }, object2: { name: string, value: TransactionTypeEnum }) {
+    return object1.name === object2.name;
+  }
 }

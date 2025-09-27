@@ -62,7 +62,7 @@
       </div>
       <label for="transactionType">Transaction Type</label>
       <div class="form-group">
-        <mat-select class="select" formControlName="transactionType" [compareWith]="compareCategoryObjects">
+        <mat-select class="select" formControlName="transactionType" [compareWith]="compareTypeObjects">
           @for (option of typeOptions; track option) {
             <mat-option [value]="option.value">
               &#8226; {{ option.name }}
