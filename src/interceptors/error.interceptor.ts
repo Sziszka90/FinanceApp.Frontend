@@ -2,7 +2,6 @@ import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent } from '@angul
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError, Observable, switchMap } from 'rxjs';
-import { AuthenticationApiService } from '../services/authentication.api.service';
 import { TokenApiService } from 'src/services/token.api.service';
 
 export const errorInterceptor: HttpInterceptorFn = (

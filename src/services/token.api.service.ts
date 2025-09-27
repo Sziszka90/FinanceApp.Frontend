@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ValidateTokenResponse } from 'src/models/UserDtos/validate-toke-response.dto';
 import { ValidateTokenRequest } from 'src/models/ValidateTokenDtos/validate-token-request.dto';
-import { LoginResponseDto } from 'src/models/LoginDtos/login-response.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +16,7 @@ export class TokenApiService {
   verifyToken(validateTokenRequest: ValidateTokenRequest): Observable<ValidateTokenResponse> {
     return this.http.post<ValidateTokenResponse>(`${this.apiUrl}/api/v1/token/validate`, validateTokenRequest);
   }
-  
+
   refreshToken(): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/api/v1/token/refresh`, {}, { withCredentials: true });
   }
