@@ -3,13 +3,14 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError, Observable, switchMap } from 'rxjs';
 import { AuthenticationApiService } from '../services/authentication.api.service';
+import { TokenApiService } from 'src/services/token.api.service';
 
 export const errorInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> => {
   const router = inject(Router);
-  const authApi = inject(AuthenticationApiService);
+  const authApi = inject(TokenApiService);
 
   const isRefreshRequest = req.url.includes('/refresh');
   const isRetried = req.headers.has('X-Refresh-Attempted');
