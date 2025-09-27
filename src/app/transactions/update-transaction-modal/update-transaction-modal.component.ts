@@ -83,7 +83,7 @@ public override formGroup: FormGroup = this.fb.group({
   groupOptions = signal<GetTransactionGroupDto[]>([]);
   typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
   currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
-    isNaN(Number(key)) && key !== 'XXX'
+    isNaN(Number(key))
   );
 
   ngOnInit(): void {

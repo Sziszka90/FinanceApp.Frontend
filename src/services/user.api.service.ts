@@ -15,7 +15,7 @@ export class UserApiService {
 
   private apiUrl = environment?.apiUrl ?? '';
 
-  // eslint-disable-next-line no-unused-vars
+
   constructor(private http: HttpClient) { }
 
   register(createUserDto: CreateUserDto): Observable<GetUserDto> {
