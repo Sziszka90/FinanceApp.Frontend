@@ -25,7 +25,7 @@ export const errorInterceptor: HttpInterceptorFn = (
         return authApi.refreshToken().pipe(
           switchMap(() => next(retriedReq)),
           catchError(() => {
-            if (!req.url.includes('api/v1/users')) {
+            if (!req.url.includes('api/v1/users') && !req.url.includes('api/v1/token/refresh')) {
               router.navigateByUrl('/login');
               return throwError(() => errorWithUrl);
             }
