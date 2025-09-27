@@ -26,8 +26,9 @@ export const errorInterceptor: HttpInterceptorFn = (
         return authApi.refreshToken().pipe(
           switchMap(() => next(retriedReq)),
           catchError(() => {
-            if (!router.url.includes('reset-password') || !router.url.includes('validation-failed')) {
+            if (!req.url.includes('api/v1/users')) {
               router.navigateByUrl('/login');
+              return throwError(() => errorWithUrl);
             }
             return throwError(() => errorWithUrl);
           })
