@@ -19,4 +19,8 @@ export class AuthenticationApiService {
   logout(): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/api/v1/auth/logout`, { withCredentials: true });
   }
+
+  isAuthenticated(): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiUrl}/api/v1/auth/check`, { withCredentials: true });
+  }
 }
