@@ -30,6 +30,7 @@ export class AppComponent extends BaseComponent implements OnInit {
 
   showWakeupLoader = false;
   showApp = false;
+  showChat = false;
 
   async ngOnInit(): Promise<void> {
     this.wakeupService.showWakeupLoader$.subscribe(show => {
@@ -38,6 +39,10 @@ export class AppComponent extends BaseComponent implements OnInit {
 
     this.wakeupService.showApp$.subscribe(show => {
       this.showApp = show;
+    });
+
+    this.authService.userLoggedIn.subscribe(loggedIn => {
+      this.showChat = loggedIn;
     });
 
     await this.wakeupService.wakeup();

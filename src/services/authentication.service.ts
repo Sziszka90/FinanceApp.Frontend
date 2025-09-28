@@ -43,6 +43,7 @@ export class AuthenticationService {
       this.userLoggedIn.next(true);
       return true;
     } catch {
+      this.userLoggedIn.next(false);
       return false;
     }
   }

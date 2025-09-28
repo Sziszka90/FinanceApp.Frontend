@@ -4,7 +4,9 @@
 @if (showApp) {
   <div>
     <nav-bar></nav-bar>
+  @if(showChat) {
     <chat-bubble></chat-bubble>
+  }
     <router-outlet></router-outlet>
   </div>
 }
