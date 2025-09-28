@@ -25,6 +25,7 @@ export class NavBarComponent implements OnInit {
 
   ngOnInit() {
     this.authService.userLoggedIn.subscribe((isLoggedIn) => {
+      console.log('User logged in status changed:', isLoggedIn);
       this.userLoggedIn.set(isLoggedIn);
     });
   }

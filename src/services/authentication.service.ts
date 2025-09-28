@@ -39,9 +39,9 @@ export class AuthenticationService {
 
   async isAuthenticatedAsync(): Promise<boolean> {
     try {
-      await firstValueFrom(this.authApiService.isAuthenticated());
-      this.userLoggedIn.next(true);
-      return true;
+      var result = await firstValueFrom(this.authApiService.isAuthenticated());
+      this.userLoggedIn.next(result);
+      return result;
     } catch {
       this.userLoggedIn.next(false);
       return false;
