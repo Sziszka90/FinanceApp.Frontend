@@ -108,6 +108,5 @@ jobs:
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           TAG="${{ github.event.inputs.image_tag || 'latest' }}"
-          docker build -t ghcr.io/$OWNER/finance-app-frontend:${TAG} -t ghcr.io/$OWNER/finance-app-frontend:${GITHUB_RUN_NUMBER} -f ./Frontend.Dockerfile ./
+          docker build -t ghcr.io/$OWNER/finance-app-frontend:${TAG} -f ./Frontend.Dockerfile ./
           docker push ghcr.io/$OWNER/finance-app-frontend:${TAG}
-          docker push ghcr.io/$OWNER/finance-app-frontend:${GITHUB_RUN_NUMBER}
