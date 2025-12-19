@@ -113,7 +113,7 @@ jobs:
 
       - name: Trigger Infrastructure Deployment
         run: |
-          gh workflow run deploy.yaml \
+          gh workflow run deploy.yml \
             -R Sziszka90/FinanceApp.Infrastructure.Azure \
             --ref main \
             -f image_tag="${{ github.event.inputs.image_tag || 'latest' }}"
