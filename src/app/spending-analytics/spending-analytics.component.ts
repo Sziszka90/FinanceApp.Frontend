@@ -160,7 +160,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
                 const label = context.label || '';
                 const value = context.parsed || 0;
                 const percentage = ((value / this.totalSpending()) * 100).toFixed(1);
-                return `${label}: €${value.toFixed(2)} (${percentage}%)`;
+                return `${label}: ${this.getCurrencySymbol()}${value.toFixed(2)} (${percentage}%)`;
               }
             }
           }
@@ -192,7 +192,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
               label: (context) => {
                 const value = context.parsed.y || 0;
                 const percentage = ((value / this.totalSpending()) * 100).toFixed(1);
-                return `€${value.toFixed(2)} (${percentage}%)`;
+                return `${this.getCurrencySymbol()}${value.toFixed(2)} (${percentage}%)`;
               }
             }
           }
@@ -201,7 +201,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
           y: {
             beginAtZero: true,
             ticks: {
-              callback: (value) => `€${value}`
+              callback: (value) => `${this.getCurrencySymbol()}${value}`
             }
           }
         }
