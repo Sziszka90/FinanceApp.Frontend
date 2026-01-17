@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { UserApiService } from 'src/services/user.api.service';
 import { TopTransactionGroupDto } from 'src/models/TransactionGroupDtos/top-transaction-group.dto';
@@ -24,13 +24,12 @@ interface SpendingByGroup {
 @Component({
   selector: 'spending-analytics',
   imports: [
-    CommonModule,
     LoaderComponent,
     ReactiveFormsModule,
     MatSelectModule,
     MatButtonModule,
     BsDatepickerModule
-  ],
+],
   templateUrl: './spending-analytics.component.html',
   styleUrl: './spending-analytics.component.scss',
   standalone: true
