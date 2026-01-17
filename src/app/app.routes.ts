@@ -9,6 +9,7 @@ import { TransactionGroupComponent } from './transaction-groups/transaction-grou
 import { ValidationFailedComponent } from './shared/validation-failed/validation-failed.component';
 import { ResetPasswordComponent } from './user/reset-password/reset-password.component';
 import { ProfileComponent } from './user/profile/profile.component';
+import { SpendingAnalyticsComponent } from './spending-analytics/spending-analytics.component';
 import { inject } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
 import { TokenType } from 'src/models/Enums/token-type.enum';
@@ -49,6 +50,7 @@ export const routes: Routes = [
   { path: 'registration', component: RegistrationComponent },
   { path: 'transactions', component: TransactionComponent, canActivate: [AuthGuard] },
   { path: 'transactions-groups', component: TransactionGroupComponent, canActivate: [AuthGuard] },
+  { path: 'spending-analytics', component: SpendingAnalyticsComponent, canActivate: [AuthGuard] },
   { path: 'validation-failed', component: ValidationFailedComponent },
   { path: 'reset-password', component: ResetPasswordComponent, canActivate: [ResetPasswordGuard] },
   { path: '**', component: NotFoundComponent }

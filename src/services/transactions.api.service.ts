@@ -8,6 +8,7 @@ import { UpdateTransactionDto } from 'src/models/TransactionDtos/update-transact
 import { GetTransactionGroupDto } from 'src/models/TransactionGroupDtos/get-transaction-group.dto';
 import { CreateTransactionGroupDto } from 'src/models/TransactionGroupDtos/create-transaction-group.dto';
 import { UpdateTransactionGroupDto } from 'src/models/TransactionGroupDtos/update-transaction-group.dto';
+import { TopTransactionGroupDto } from 'src/models/TransactionGroupDtos/top-transaction-group.dto';
 import { Money } from 'src/models/Money/money.dto';
 
 @Injectable({
@@ -69,6 +70,31 @@ export class TransactionApiService {
 
   deleteTransactionGroup(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/api/v1/transactiongroups/${id}`, { withCredentials: true });
+  }
+
+  getTopTransactionGroups(
+    startDate: Date,
+    endDate: Date,
+    userId?: string,
+    top?: number
+  ): Observable<TopTransactionGroupDto[]> {
+    let params: any = {
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString()
+    };
+
+    if (userId) {
+      params.userId = userId;
+    }
+
+    if (top !== undefined && top !== null) {
+      params.top = top.toString();
+    }
+
+    return this.http.get<TopTransactionGroupDto[]>(
+      `${this.apiUrl}/api/v1/transactiongroups/top`,
+      { params, withCredentials: true }
+    );
   }
 
   uploadCsv(file: File, correlationId: string): Observable<GetTransactionDto[]> {

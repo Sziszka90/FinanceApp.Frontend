@@ -6,6 +6,7 @@
         "TRANSACTIONS": "Transactions",
         "TRANSACTION_GROUPS": "Transaction Groups",
         "INVESTMENTS": "Investments",
-        "SAVINGS": "Savings"
+        "SAVINGS": "Savings",
+        "SPENDING_ANALYTICS": "Spending Analytics"
     }
 }

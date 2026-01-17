@@ -22,6 +22,9 @@
           @if (userLoggedIn()) {
             <a class="custom-dropdown-item-minimized default-font" routerLink="/transactions-groups" (click)="menuToggle()">{{ 'MENU.TRANSACTION_GROUPS' | translate }}</a>
           }
+          @if (userLoggedIn()) {
+            <a class="custom-dropdown-item-minimized default-font" routerLink="/spending-analytics" (click)="menuToggle()">{{ 'MENU.SPENDING_ANALYTICS' | translate }}</a>
+          }
         </div>
       }
     </div>
@@ -33,6 +36,9 @@
         }
         @if (userLoggedIn()) {
           <a class="custom-dropdown-item default-font" routerLink="/transactions-groups">{{ 'MENU.TRANSACTION_GROUPS' | translate }}</a>
+        }
+        @if (userLoggedIn()) {
+          <a class="custom-dropdown-item default-font" routerLink="/spending-analytics">{{ 'MENU.SPENDING_ANALYTICS' | translate }}</a>
         }
       </div>
     </div>
