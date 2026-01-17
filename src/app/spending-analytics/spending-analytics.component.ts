@@ -248,12 +248,21 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
     const user = this.user();
     if (!user) return '€';
     
-    switch (user.baseCurrency) {
-      case CurrencyEnum.EUR: return '€';
-      case CurrencyEnum.USD: return '$';
-      case CurrencyEnum.GBP: return '£';
-      case CurrencyEnum.HUF: return 'Ft';
-      default: return '€';
+    const currency = typeof user.baseCurrency === 'string' 
+      ? user.baseCurrency 
+      : CurrencyEnum[user.baseCurrency];
+    
+    switch (currency) {
+      case 'EUR':
+        return '€';
+      case 'USD':
+        return '$';
+      case 'GBP':
+        return '£';
+      case 'HUF':
+        return 'Ft';
+      default:
+        return '€';
     }
   }
 }
