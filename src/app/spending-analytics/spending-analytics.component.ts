@@ -173,7 +173,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
       data: {
         labels,
         datasets: [{
-          label: 'Amount (€)',
+          label: `Amount (${this.getCurrencySymbol()})`,
           data: amounts,
           backgroundColor: colors,
           borderWidth: 1,
