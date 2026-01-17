@@ -67,7 +67,7 @@
       <div class="analytics-content">
         <div class="summary-card">
           <h3>Total {{ filterForm.value.transactionType === 0 ? 'Expenses' : 'Income' }}</h3>
-          <p class="total-amount">€{{ totalSpending().toFixed(2) }}</p>
+          <p class="total-amount">{{ getCurrencySymbol() }}{{ totalSpending().toFixed(2) }}</p>
           <p class="transaction-count">{{ spendingData().length }} categories</p>
         </div>
 
@@ -106,7 +106,7 @@
               @for (item of spendingData(); track $index) {
                 <tr>
                   <td class="group-name">{{ item.groupName }}</td>
-                  <td class="amount">€{{ item.totalAmount.toFixed(2) }}</td>
+                  <td class="amount">{{ getCurrencySymbol() }}{{ item.totalAmount.toFixed(2) }}</td>
                   <td class="count">{{ item.transactionCount }}</td>
                   <td class="percentage">
                     {{ item.percentage?.toFixed(1) || '0.0' }}%

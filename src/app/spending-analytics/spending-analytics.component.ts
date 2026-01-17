@@ -3,6 +3,8 @@ import { Component, inject, OnInit, signal, ViewChild, ElementRef, AfterViewInit
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { UserApiService } from 'src/services/user.api.service';
 import { TopTransactionGroupDto } from 'src/models/TransactionGroupDtos/top-transaction-group.dto';
+import { GetUserDto } from 'src/models/UserDtos/get-user.dto';
+import { CurrencyEnum } from 'src/models/Enums/currency.enum';
 import { LoaderComponent } from '../shared/loader/loader.component';
 import { BaseComponent } from '../shared/base-component';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -38,7 +40,6 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
   private transactionApiService = inject(TransactionApiService);
   private userApiService = inject(UserApiService);
   private fb = inject(FormBuilder);
-  private cdr = inject(ChangeDetectorRef);
 
   @ViewChild('pieChart') pieChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('barChart') barChartRef!: ElementRef<HTMLCanvasElement>;
@@ -47,6 +48,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
   public spendingData = signal<SpendingByGroup[]>([]);
   public totalSpending = signal<number>(0);
   public chartType = signal<'pie' | 'bar'>('pie');
+  public user = signal<GetUserDto | null>(null);
 
   private pieChart: Chart | null = null;
   private barChart: Chart | null = null;
@@ -72,7 +74,10 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
     const endDate = filterValues.endDate ? new Date(filterValues.endDate) : new Date();
     
     this.userApiService.getActiveUser().pipe(
-      switchMap(user => this.transactionApiService.getTopTransactionGroups(startDate, endDate, user.id, undefined))
+      switchMap(user => {
+        this.user.set(user);
+        return this.transactionApiService.getTopTransactionGroups(startDate, endDate, user.id, undefined);
+      })
     ).subscribe({
       next: (topGroups: TopTransactionGroupDto[]) => {
         this.processTopGroups(topGroups);
@@ -237,5 +242,18 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
       startDate: null,
       endDate: null,
     });
+  }
+
+  getCurrencySymbol(): string {
+    const user = this.user();
+    if (!user) return '€';
+    
+    switch (user.baseCurrency) {
+      case CurrencyEnum.EUR: return '€';
+      case CurrencyEnum.USD: return '$';
+      case CurrencyEnum.GBP: return '£';
+      case CurrencyEnum.HUF: return 'Ft';
+      default: return '€';
+    }
   }
 }
