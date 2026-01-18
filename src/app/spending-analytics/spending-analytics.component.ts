@@ -9,10 +9,12 @@ import { LoaderComponent } from '../shared/loader/loader.component';
 import { BaseComponent } from '../shared/base-component';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { switchMap } from 'rxjs';
+import { TransactionTypeEnum } from 'src/models/Enums/transaction-type.enum';
 
 Chart.register(...registerables);
 
@@ -29,6 +31,7 @@ interface SpendingByGroup {
     LoaderComponent,
     ReactiveFormsModule,
     MatSelectModule,
+    MatSlideToggleModule,
     MatButtonModule,
     BsDatepickerModule
 ],
@@ -56,6 +59,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
   filterForm: FormGroup = this.fb.group({
     startDate: [null],
     endDate: [null],
+    transactionType: [TransactionTypeEnum.Expense],
   });
 
   ngOnInit(): void {
@@ -92,10 +96,16 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
   }
 
   private processTopGroups(topGroups: TopTransactionGroupDto[]): void {
-    const total = topGroups.reduce((sum, g) => sum + Math.abs(g.totalAmount.amount), 0);
+    const transactionType = this.filterForm.value.transactionType;
+    
+    const filteredGroups = transactionType === TransactionTypeEnum.Income
+      ? topGroups.filter(g => g.totalAmount.amount > 0)
+      : topGroups.filter(g => g.totalAmount.amount <= 0);
+    
+    const total = filteredGroups.reduce((sum, g) => sum + Math.abs(g.totalAmount.amount), 0);
     this.totalSpending.set(total);
 
-    const spendingData: SpendingByGroup[] = topGroups
+    const spendingData: SpendingByGroup[] = filteredGroups
       .map(group => {
         const amount = Math.abs(group.totalAmount.amount);
         return {

@@ -53,6 +53,50 @@
         width: 100%;
       }
 
+      .transaction-type-toggle {
+        display: flex;
+        gap: 0;
+        background: #f0f0f0;
+        border-radius: 8px;
+        padding: 4px;
+        
+        .toggle-button {
+          flex: 1;
+          padding: 0.5rem 1rem;
+          border: none;
+          background: transparent;
+          color: #666;
+          font-size: 0.9rem;
+          font-weight: 500;
+          cursor: pointer;
+          border-radius: 6px;
+          transition: all 0.2s ease;
+
+          &:hover {
+            color: #333;
+          }
+
+          &.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+        }
+      }
+
+      .toggle-label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+
+        .toggle-text {
+          font-weight: 500;
+          color: #555;
+          min-width: 80px;
+        }
+      }
+
       .date-picker {
         padding: 0.5rem;
         border: 1px solid #ddd;

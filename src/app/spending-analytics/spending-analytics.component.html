@@ -8,6 +8,26 @@
     <form [formGroup]="filterForm" class="filters-form">
 
       <div class="filter-group">
+        <label>Type</label>
+        <div class="transaction-type-toggle">
+          <button 
+            type="button"
+            class="toggle-button" 
+            [class.active]="filterForm.value.transactionType === 1" 
+            (click)="filterForm.patchValue({transactionType: 1})">
+            Income
+          </button>
+          <button 
+            type="button"
+            class="toggle-button" 
+            [class.active]="filterForm.value.transactionType === 2" 
+            (click)="filterForm.patchValue({transactionType: 2})">
+            Expense
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-group">
         <label>Start Date</label>
         <input
           type="text"
@@ -66,7 +86,7 @@
     @if (spendingData().length > 0) {
       <div class="analytics-content">
         <div class="summary-card">
-          <h3>Total Expense</h3>
+          <h3>Total {{ filterForm.value.transactionType === 1 ? 'Expenses' : 'Income' }}</h3>
           <p class="total-amount">{{ getCurrencySymbol() }}{{ totalSpending().toFixed(2) }}</p>
           <p class="transaction-count">{{ spendingData().length }} categories</p>
         </div>
