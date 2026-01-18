@@ -93,28 +93,30 @@
         <div class="data-table">
           <h3>Breakdown by Category</h3>
           <p>Total items: {{ spendingData().length }}</p>
-          <table class="spending-table">
-            <thead>
-              <tr>
-                <th>Category</th>
-                <th>Amount</th>
-                <th>Transactions</th>
-                <th>Percentage</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of spendingData(); track $index) {
+          <div class="table-wrapper">
+            <table class="spending-table">
+              <thead>
                 <tr>
-                  <td class="group-name">{{ item.groupName }}</td>
-                  <td class="amount">{{ getCurrencySymbol() }}{{ item.totalAmount.toFixed(2) }}</td>
-                  <td class="count">{{ item.transactionCount }}</td>
-                  <td class="percentage">
-                    {{ item.percentage?.toFixed(1) || '0.0' }}%
-                  </td>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Transactions</th>
+                  <th>Percentage</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (item of spendingData(); track $index) {
+                  <tr>
+                    <td class="group-name">{{ item.groupName }}</td>
+                    <td class="amount">{{ getCurrencySymbol() }}{{ item.totalAmount.toFixed(2) }}</td>
+                    <td class="count">{{ item.transactionCount }}</td>
+                    <td class="percentage">
+                      {{ item.percentage?.toFixed(1) || '0.0' }}%
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     } @else {
