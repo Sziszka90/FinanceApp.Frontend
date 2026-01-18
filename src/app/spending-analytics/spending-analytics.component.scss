@@ -121,7 +121,7 @@
     }
 
     .total-amount {
-      font-size: 3rem;
+      font-size: 1rem;
       font-weight: 700;
       margin: 0;
     }
@@ -323,7 +323,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 475px) {
   .spending-analytics-container {
     padding: 1rem;
   }
@@ -359,7 +359,7 @@
 
   .summary-card {
     .total-amount {
-      font-size: 2rem !important;
+      font-size: 1rem !important;
     }
   }
 }
