@@ -9,7 +9,8 @@ import {
   provideHttpClient,
   withInterceptors,
   HttpEvent,
-  HttpClient
+  HttpClient,
+  withXhr
 } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -51,15 +52,13 @@ export function HttpLoaderFactory(http: HttpClient) {
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(),
+    provideHttpClient(withXhr()),
     provideRouter(routes),
     provideNativeDateAdapter(),
     importProvidersFrom(BrowserAnimationsModule),
     provideRouter(routes),
     provideAnimationsAsync(),
-    provideHttpClient(
-      withInterceptors([provideAuthInterceptor, errorInterceptor])
-    ),
+    provideHttpClient(withXhr(), withInterceptors([provideAuthInterceptor, errorInterceptor])),
     importProvidersFrom([TranslateModule.forRoot(provideTranslation())]),
     provideAnimationsAsync()
   ]

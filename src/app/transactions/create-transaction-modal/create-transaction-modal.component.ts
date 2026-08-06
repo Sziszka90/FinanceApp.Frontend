@@ -1,16 +1,8 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { FormField, FormRoot, form, min, minLength, required } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import {
-  MatDialogRef
-} from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
@@ -22,8 +14,8 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
 import { BaseComponent } from 'src/app/shared/base-component';
-import { FieldValidationMessages } from 'src/services/form-validation.service';
 import { LoaderComponent } from 'src/app/shared/loader/loader.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'create-transaction-modal',
@@ -33,101 +25,87 @@ import { LoaderComponent } from 'src/app/shared/loader/loader.component';
     MatButtonModule,
     MatFormFieldModule,
     MatDatepickerModule,
-    ReactiveFormsModule,
+    FormField,
+    FormRoot,
     MatSelectModule,
     BsDatepickerModule,
     LoaderComponent
-],
+  ],
   templateUrl: './create-transaction-modal.component.html',
   styleUrl: './create-transaction-modal.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class CreateTransactionModalComponent extends BaseComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<CreateTransactionModalComponent>);
-  private fb = inject(FormBuilder);
   private transactionApiService = inject(TransactionApiService);
 
-  public override formGroup: FormGroup = this.fb.group({
-    name: new FormControl('', [Validators.required, Validators.minLength(2)]),
-    description: new FormControl(''),
-    value: new FormControl(0, [Validators.required, Validators.min(0.01)]),
-    currency: new FormControl('', Validators.required),
-    transactionDate: new FormControl(new Date(), Validators.required),
-    transactionType: new FormControl('', Validators.required),
-    group: new FormControl('')
+  readonly createTransactionModel = signal({
+    name: '',
+    description: '',
+    value: 0,
+    currency: null as CurrencyEnum | null,
+    transactionDate: new Date() as Date | null,
+    transactionType: null as TransactionTypeEnum | null,
+    group: null as GetTransactionGroupDto | null
   });
 
-  public override customValidationMessages: FieldValidationMessages = {
-    name: {
-      required: 'Transaction name is required',
-      minlength: 'Name must be at least 2 characters long'
-    },
-    value: {
-      required: 'Transaction amount is required',
-      min: 'Amount must be greater than 0'
-    },
-    currency: {
-      required: 'Please select a currency'
-    },
-    transactionDate: {
-      required: 'Transaction date is required'
-    },
-    transactionType: {
-      required: 'Please select a transaction type'
+  readonly createTransactionForm = form(this.createTransactionModel, path => {
+    required(path.name, { message: 'Transaction name is required' });
+    minLength(path.name, 2, { message: 'Name must be at least 2 characters long' });
+    required(path.value, { message: 'Transaction amount is required' });
+    min(path.value, 0.01, { message: 'Amount must be greater than 0' });
+    required(path.currency, { message: 'Please select a currency' });
+    required(path.transactionDate, { message: 'Transaction date is required' });
+    required(path.transactionType, { message: 'Please select a transaction type' });
+  }, {
+    submission: {
+      action: async () => {
+        const model = this.createTransactionModel();
+        const formattedDate = new Date(model.transactionDate ? formatDate(model.transactionDate, 'yyyy-MM-dd', 'en-US') : '');
+        this.setLoading(true);
+        try {
+          const result = await firstValueFrom(this.transactionApiService.createTransaction({
+            name: model.name,
+            description: model.description,
+            value: {
+              amount: model.value,
+              currency: model.currency!
+            },
+            transactionDate: formattedDate,
+            transactionType: model.transactionType!,
+            transactionGroupId: model.group?.id || undefined
+          }));
+          this.setLoading(false);
+          this.dialogRef.close(result);
+        } catch (error) {
+          this.setLoading(false);
+          this.handleError(error, 'Creating transaction');
+        }
+      }
     }
-  };
+  });
 
   groupOptions = signal<GetTransactionGroupDto[]>([]);
-  typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
-  currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
-    isNaN(Number(key)) && key !== 'XXX'
-  );
+  typeOptions: { name: string; value: TransactionTypeEnum }[] = [
+    { name: 'Expense', value: TransactionTypeEnum.Expense },
+    { name: 'Income', value: TransactionTypeEnum.Income }
+  ];
+  currencyOptions = (Object.values(CurrencyEnum)
+    .filter(value => typeof value === 'number' && value !== CurrencyEnum.XXX) as CurrencyEnum[]);
+  readonly CurrencyEnum = CurrencyEnum;
 
   ngOnInit() {
     this.setLoading(true);
     this.transactionApiService.getAllTransactionGroups().subscribe({
-      next: (data) => {
+      next: data => {
         this.setLoading(false);
         this.groupOptions.set(data);
         this.groupOptions.update(groups => [...groups, { id: '', name: 'No group' } as GetTransactionGroupDto]);
       },
-      error: (error) => {
+      error: error => {
         this.setLoading(false);
         this.handleError(error, 'Loading transaction groups');
-      }
-    });
-  }
-
-  onSubmit(): void {
-    if (!this.validateForm()) {
-      return;
-    }
-
-    const date: Date = this.getFieldValue<Date>('transactionDate')!;
-    const formattedDate = new Date(date ? formatDate(date, 'yyyy-MM-dd', 'en-US') : '');
-    const groupValue = this.getFieldValue<GetTransactionGroupDto>('group') || null;
-
-    const createTransactionDto = {
-      name: this.getFieldValue<string>('name')!,
-      description: this.getFieldValue<string>('description') || '',
-      value: {
-        amount: this.getFieldValue<number>('value')!,
-        currency: this.getFieldValue<CurrencyEnum>('currency')!
-      },
-      transactionDate: formattedDate,
-      transactionType: this.getFieldValue<TransactionTypeEnum>('transactionType')!,
-      transactionGroupId: groupValue?.id || undefined
-    };
-
-    this.setLoading(true);
-    this.transactionApiService.createTransaction(createTransactionDto).subscribe({
-      next: (result) => {
-        this.setLoading(false);
-        this.dialogRef.close(result);
-      },
-      error: (error) => {
-        this.setLoading(false);
-        this.handleError(error, 'Creating transaction');
       }
     });
   }

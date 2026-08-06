@@ -5,7 +5,7 @@
   </div>
 
   <div class="filters-container">
-    <form [formGroup]="filterForm" class="filters-form">
+    <form class="filters-form">
 
       <div class="filter-group">
         <label>Type</label>
@@ -13,15 +13,15 @@
           <button 
             type="button"
             class="toggle-button" 
-            [class.active]="filterForm.value.transactionType === 1" 
-            (click)="filterForm.patchValue({transactionType: 1})">
+            [class.active]="filterModel().transactionType === 1"
+            (click)="filterForm.transactionType().value.set(1)">
             Income
           </button>
           <button 
             type="button"
             class="toggle-button" 
-            [class.active]="filterForm.value.transactionType === 2" 
-            (click)="filterForm.patchValue({transactionType: 2})">
+            [class.active]="filterModel().transactionType === 2"
+            (click)="filterForm.transactionType().value.set(2)">
             Expense
           </button>
         </div>
@@ -31,7 +31,7 @@
         <label>Start Date</label>
         <input
           type="text"
-          formControlName="startDate"
+          [formField]="filterForm.startDate"
           class="form-control date-picker"
           placeholder="Select start date"
           bsDatepicker
@@ -43,7 +43,7 @@
         <label>End Date</label>
         <input
           type="text"
-          formControlName="endDate"
+          [formField]="filterForm.endDate"
           class="form-control date-picker"
           placeholder="Select end date"
           bsDatepicker
@@ -52,10 +52,10 @@
       </div>
 
       <div class="filter-actions">
-        <button mat-raised-button color="primary" (click)="loadSpendingData()">
+        <button type="button" mat-raised-button color="primary" (click)="loadSpendingData()">
           Apply Filters
         </button>
-        <button mat-button (click)="resetFilters()">
+        <button type="button" mat-button (click)="resetFilters()">
           Reset
         </button>
       </div>
@@ -86,7 +86,7 @@
     @if (spendingData().length > 0) {
       <div class="analytics-content">
         <div class="summary-card">
-          <h3>Total {{ filterForm.value.transactionType === 1 ? 'Expenses' : 'Income' }}</h3>
+          <h3>Total {{ filterModel().transactionType === 1 ? 'Expenses' : 'Income' }}</h3>
           <p class="total-amount">{{ getCurrencySymbol() }}{{ totalSpending().toFixed(2) }}</p>
           <p class="transaction-count">{{ spendingData().length }} categories</p>
         </div>
@@ -130,7 +130,7 @@
                     <td class="amount">{{ getCurrencySymbol() }}{{ item.totalAmount.toFixed(2) }}</td>
                     <td class="count">{{ item.transactionCount }}</td>
                     <td class="percentage">
-                      {{ item.percentage?.toFixed(1) || '0.0' }}%
+                      {{ item.percentage.toFixed(1) || '0.0' }}%
                     </td>
                   </tr>
                 }

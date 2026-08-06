@@ -1,7 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { FormField, FormRoot, form, minLength, validate } from '@angular/forms/signals';
+import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
-import { UserFormModel } from 'src/models/Profile/user-form-model';
 import { MatSelectModule } from '@angular/material/select';
 import { UserApiService } from 'src/services/user.api.service';
 import { GetUserDto } from 'src/models/UserDtos/get-user.dto';
@@ -11,111 +11,82 @@ import { BaseComponent } from 'src/app/shared/base-component';
 
 @Component({
   selector: 'profile',
-  imports: [
-    ReactiveFormsModule,
-    MatSelectModule,
-    LoaderComponent
-],
+  imports: [FormField, FormRoot, MatSelectModule, LoaderComponent],
   templateUrl: './profile.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent extends BaseComponent implements OnInit {
   private userApiService = inject(UserApiService);
-  private fb = inject(FormBuilder);
   private router = inject(Router);
 
-  private optionalStrongPassword(control: AbstractControl): ValidationErrors | null {
-    const value = control.value;
-
-    if (!value) {
-      return null;
-    }
-    
-    const errors: ValidationErrors = {};
-    
-    if (value.length < 8) {
-      errors['minlength'] = { requiredLength: 8, actualLength: value.length };
-    }
-    
-    if (!/[A-Z]/.test(value)) {
-      errors['pattern'] = { message: 'Must contain uppercase letter' };
-    }
-    
-    if (!/\d/.test(value)) {
-      errors['pattern'] = { message: 'Must contain number' };
-    }
-    
-    if (!/[^A-Za-z0-9]/.test(value)) {
-      errors['pattern'] = { message: 'Must contain special character' };
-    }
-    
-    return Object.keys(errors).length > 0 ? errors : null;
-  }
-
-  override formGroup: FormGroup<UserFormModel> = this.fb.group<UserFormModel>({
-    userName: new FormControl('', [Validators.minLength(2)]),
-    password: new FormControl('', [this.optionalStrongPassword.bind(this)]),
-    currency: new FormControl(CurrencyEnum.EUR)
+  readonly profileModel = signal({
+    userName: '',
+    password: '',
+    currency: CurrencyEnum.EUR
   });
 
-  override customValidationMessages = {
-    userName: {
-      required: 'User name is required',
-      minlength: 'Minimum 2 characters required'
-    },
-    password: {
-      minlength: 'Password must be at least 8 characters long',
-      pattern: 'Password must include uppercase letter, number, and special character'
-    },
-    currency: {
-      required: 'Currency is required'
+  readonly profileForm = form(this.profileModel, path => {
+    minLength(path.userName, 2, { message: 'Minimum 2 characters required' });
+    minLength(path.password, 8, { message: 'Password must be at least 8 characters long' });
+    validate(path.password, ({ value }) => {
+      const password = value();
+
+      if (!password) {
+        return undefined;
+      }
+
+      if (!/[A-Z]/.test(password) || !/\d/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+        return {
+          kind: 'pattern',
+          message: 'Password must include uppercase letter, number, and special character'
+        };
+      }
+
+      return undefined;
+    });
+  }, {
+    submission: {
+      action: async () => {
+        const model = this.profileModel();
+        this.setLoading(true);
+        try {
+          await firstValueFrom(this.userApiService.updateUser({
+            id: this.user?.id,
+            userName: model.userName || this.user?.userName,
+            password: model.password || '',
+            baseCurrency: model.currency ?? CurrencyEnum.EUR
+          }));
+          this.setLoading(false);
+          await this.router.navigate(['/']);
+        } catch (error) {
+          this.setLoading(false);
+          this.handleError(error, 'Failed to update profile');
+        }
+      }
     }
-  };
+  });
 
   user!: GetUserDto;
 
-  currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
-    isNaN(Number(key)) && key !== 'XXX'
-  );
+  currencyOptions = (Object.values(CurrencyEnum)
+    .filter(value => typeof value === 'number' && value !== CurrencyEnum.XXX) as CurrencyEnum[]);
+  readonly CurrencyEnum = CurrencyEnum;
 
   ngOnInit(): void {
     this.userApiService.getActiveUser().subscribe({
-      next: (user) => {
+      next: user => {
         this.user = user;
-        this.formGroup.patchValue({
+        this.profileModel.update(model => ({
+          ...model,
           userName: user.userName,
           currency: user.baseCurrency
-        });
+        }));
       },
-      error: (error) => {
+      error: error => {
         this.handleError(error, 'Failed to load user profile');
       }
     });
-  }
-
-  onSubmit(): void {
-    if (this.isFormValid()) {
-      const formValue = this.getFormValue();
-      if (!formValue) {return;}
-
-      this.setLoading(true);
-
-      this.userApiService.updateUser({
-          id: this.user?.id,
-          userName: this.getFieldValue('userName') || this.user?.userName,
-          password: this.getFieldValue('password') || '',
-          baseCurrency: this.getFieldValue('currency') ?? CurrencyEnum.EUR
-        }).subscribe(() => {
-          this.setLoading(false);
-          this.router.navigate(['/']);
-        },
-        (error) => {
-          this.setLoading(false);
-          this.handleError(error, 'Failed to update profile');
-        });
-    } else {
-      this.markAllFieldsAsTouched();
-    }
   }
 
   compareCategoryObjects(object1: CurrencyEnum, object2: CurrencyEnum) {

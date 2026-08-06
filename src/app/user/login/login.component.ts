@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { AuthenticationService } from '../../../services/authentication.service';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormField, FormRoot, email, form, required } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ForgotPasswordRequestModalComponent } from '../forgot-password-modal/forgot-password-modal.component';
@@ -13,22 +13,35 @@ import { BaseComponent } from '../../shared/base-component';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    RouterLink,
-    LoaderComponent
-  ]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [FormField, FormRoot, RouterLink, LoaderComponent]
 })
 export class LoginComponent extends BaseComponent {
   private authService = inject(AuthenticationService);
   private matDialog = inject(MatDialog);
   private router = inject(Router);
-  private fb = inject(FormBuilder);
+  readonly loginModel = signal({
+    email: '',
+    password: ''
+  });
 
-  override formGroup: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]]
+  readonly loginForm = form(this.loginModel, path => {
+    required(path.email, { message: 'Email is required' });
+    email(path.email, { message: 'Please enter a valid email address' });
+    required(path.password, { message: 'Password is required' });
+  }, {
+    submission: {
+      action: async () => {
+        this.setLoading(true);
+        try {
+          await this.authService.loginAsync(this.loginModel());
+          await this.router.navigate(['/']);
+        } catch (error) {
+          this.setLoading(false);
+          this.handleError(error, 'Login failed');
+        }
+      }
+    }
   });
 
   forgotPassword(): void {
@@ -45,18 +58,4 @@ export class LoginComponent extends BaseComponent {
     });
   }
 
-  async onSubmit(): Promise<void> {
-    if (this.formGroup.valid) {
-      this.setLoading(true);
-      try {
-        await this.authService.loginAsync(this.formGroup.value);
-        this.router.navigate(['/']);
-      } catch (error) {
-        this.setLoading(false);
-        this.handleError(error, 'Login failed');
-      }
-    } else {
-      this.formGroup.markAllAsTouched();
-    }
-  }
 }

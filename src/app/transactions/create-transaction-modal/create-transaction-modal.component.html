@@ -12,86 +12,91 @@
     <loader class="loader"></loader>
   }
   @if (!loading()) {
-    <form class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
+    <form class="form-container" [formRoot]="createTransactionForm">
       <label for="name">Name</label>
       <div class="form-group">
-        <input id="name" type="text" formControlName="name" required />
-        @if (hasFieldError('name')) {
-          <div class="error-message">
-            {{ getFieldErrorMessage('name') }}
-          </div>
+        <input id="name" type="text" [formField]="createTransactionForm.name" />
+        @if (createTransactionForm.name().touched() && createTransactionForm.name().invalid()) {
+          @for (error of createTransactionForm.name().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+            }
         }
       </div>
       <label for="description">Description</label>
       <div class="form-group">
-        <input id="description" type="text" formControlName="description" />
+        <input id="description" type="text" [formField]="createTransactionForm.description" />
       </div>
       <label for="value">Value</label>
       <div class="form-group">
-        <input id="value" type="number" formControlName="value" />
-        @if (hasFieldError('value')) {
-          <div class="error-message">
-            {{ getFieldErrorMessage('value') }}
-          </div>
+        <input id="value" type="number" [formField]="createTransactionForm.value" />
+        @if (createTransactionForm.value().touched() && createTransactionForm.value().invalid()) {
+          @for (error of createTransactionForm.value().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+            }
         }
       </div>
       <label for="currency">Currency</label>
       <div class="form-group">
-        <mat-select class="select" formControlName="currency">
+        <mat-select class="select" [formField]="createTransactionForm.currency">
           @for (option of currencyOptions; track option) {
             <mat-option [value]="option">
-              &#8226; {{ option }}
+              &#8226; {{ CurrencyEnum[option] }}
             </mat-option>
           }
         </mat-select>
-        @if (hasFieldError('currency')) {
-          <div class="error-message">
-            {{ getFieldErrorMessage('currency') }}
-          </div>
+        @if (createTransactionForm.currency().touched() && createTransactionForm.currency().invalid()) {
+          @for (error of createTransactionForm.currency().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+          }
         }
       </div>
       <label for="transactionDate">Transaction Date</label>
       <div class="input-with-icon">
-        <input bsDatepicker formControlName="transactionDate" type="text" placeholder="Select a date" />
+        <input bsDatepicker [formField]="createTransactionForm.transactionDate" type="text" placeholder="Select a date" />
         <i class="fa fa-calendar"></i>
-        @if (hasFieldError('transactionDate')) {
-          <div class="error-message">
-            {{ getFieldErrorMessage('transactionDate') }}
-          </div>
+        @if (createTransactionForm.transactionDate().touched() && createTransactionForm.transactionDate().invalid()) {
+          @for (error of createTransactionForm.transactionDate().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+          }
         }
       </div>
       <label for="transactionType">Transaction Type</label>
       <div class="form-group">
-        <mat-select class="select" formControlName="transactionType" [compareWith]="compareCategoryObjects">
+        <mat-select class="select" [formField]="createTransactionForm.transactionType">
           @for (option of typeOptions; track option) {
             <mat-option [value]="option.value">
               &#8226; {{ option.name }}
             </mat-option>
           }
         </mat-select>
-        @if (hasFieldError('transactionType')) {
-          <div class="error-message">
-            {{ getFieldErrorMessage('transactionType') }}
-          </div>
+        @if (createTransactionForm.transactionType().touched() && createTransactionForm.transactionType().invalid()) {
+          @for (error of createTransactionForm.transactionType().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+          }
         }
       </div>
       <label for="group">Group</label>
       <div class="form-group">
-        <mat-select class="select" formControlName="group" [compareWith]="compareCategoryObjects">
+        <mat-select class="select" [formField]="createTransactionForm.group" [compareWith]="compareCategoryObjects">
           @for (option of groupOptions(); track option) {
             <mat-option [value]="option">
               &#8226; {{ option.name }}
             </mat-option>
           }
         </mat-select>
-        @if (hasFieldError('group')) {
-          <div class="error-message">
-            {{ getFieldErrorMessage('group') }}
-          </div>
-        }
       </div>
       <div class="button-container">
-        <button [disabled]="formGroup!.invalid" class="custom-button bounce-button" type="submit">Save</button>
+        <button [disabled]="!createTransactionForm().valid()" class="custom-button bounce-button" type="submit">Save</button>
         <button class="custom-button bounce-button" type="button" (click)="onClose()">Close</button>
       </div>
     </form>

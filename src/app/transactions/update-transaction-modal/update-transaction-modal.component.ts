@@ -1,32 +1,21 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { FormField, FormRoot, form, min, minLength, required } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogRef
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 
 import { GetTransactionGroupDto } from 'src/models/TransactionGroupDtos/get-transaction-group.dto';
 import { TransactionTypeEnum } from 'src/models/Enums/transaction-type.enum';
-import { enumValidator } from 'src/helpers/helpers';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { UpdateTransactionDto } from 'src/models/TransactionDtos/update-transaction.dto';
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
 import { BaseComponent } from 'src/app/shared/base-component';
-import { FieldValidationMessages } from 'src/services/form-validation.service';
 import { LoaderComponent } from 'src/app/shared/loader/loader.component';
-import { forkJoin } from 'rxjs';
+import { firstValueFrom, forkJoin } from 'rxjs';
 
 @Component({
   selector: 'update-transaction-modal',
@@ -35,56 +24,81 @@ import { forkJoin } from 'rxjs';
     MatButtonModule,
     MatFormFieldModule,
     MatDatepickerModule,
-    ReactiveFormsModule,
+    FormField,
+    FormRoot,
     MatSelectModule,
     BsDatepickerModule,
     LoaderComponent
-],
+  ],
   templateUrl: './update-transaction-modal.component.html',
   styleUrl: './update-transaction-modal.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class UpdateTransactionModalComponent extends BaseComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<UpdateTransactionModalComponent>);
-  private fb = inject(FormBuilder);
   private transactionApiService = inject(TransactionApiService);
   public data = inject(MAT_DIALOG_DATA);
 
-public override formGroup: FormGroup = this.fb.group({
-  name: ["", [Validators.required, Validators.minLength(2)]],
-  description: [""],
-  value: ["", [Validators.required, Validators.min(0.01)]],
-  currency: ["", Validators.required],
-  transactionDate: ["", Validators.required],
-  transactionType: [null, [Validators.required, enumValidator(TransactionTypeEnum)]],
-  group: [null] 
-});
+  readonly updateTransactionModel = signal({
+    name: '',
+    description: '',
+    value: 0,
+    currency: null as CurrencyEnum | null,
+    transactionDate: null as Date | null,
+    transactionType: null as TransactionTypeEnum | null,
+    group: null as GetTransactionGroupDto | null
+  });
 
-  public override customValidationMessages: FieldValidationMessages = {
-    name: {
-      required: 'Transaction name is required',
-      minlength: 'Name must be at least 2 characters long'
-    },
-    value: {
-      required: 'Transaction amount is required',
-      min: 'Amount must be greater than 0'
-    },
-    currency: {
-      required: 'Please select a currency'
-    },
-    transactionDate: {
-      required: 'Transaction date is required'
-    },
-    transactionType: {
-      required: 'Please select a transaction type'
+  readonly updateTransactionForm = form(this.updateTransactionModel, path => {
+    required(path.name, { message: 'Transaction name is required' });
+    minLength(path.name, 2, { message: 'Name must be at least 2 characters long' });
+    required(path.value, { message: 'Transaction amount is required' });
+    min(path.value, 0.01, { message: 'Amount must be greater than 0' });
+    required(path.currency, { message: 'Please select a currency' });
+    required(path.transactionDate, { message: 'Transaction date is required' });
+    required(path.transactionType, { message: 'Please select a transaction type' });
+  }, {
+    submission: {
+      action: async () => {
+        const model = this.updateTransactionModel();
+        const transactionDate = model.transactionDate && model.transactionDate.getFullYear() !== 1
+          ? model.transactionDate
+          : undefined;
+        const updatedTransaction: UpdateTransactionDto = {
+          id: this.data.id,
+          name: model.name,
+          description: model.description,
+          value: {
+            amount: model.value,
+            currency: model.currency!
+          },
+          transactionType: model.transactionType!,
+          transactionDate,
+          transactionGroupId: model.group?.id || undefined
+        };
+        this.setLoading(true);
+        try {
+          const result = await firstValueFrom(this.transactionApiService.updateTransaction(this.data.id, updatedTransaction));
+          this.setLoading(false);
+          this.showSuccess('Transaction updated successfully!');
+          this.dialogRef.close(result);
+        } catch (error) {
+          this.setLoading(false);
+          this.handleError(error, 'Updating transaction');
+        }
+      }
     }
-  };
+  });
 
   groupOptions = signal<GetTransactionGroupDto[]>([]);
-  typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
-  currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
-    isNaN(Number(key))
-  );
+  typeOptions: { name: string; value: TransactionTypeEnum }[] = [
+    { name: 'Expense', value: TransactionTypeEnum.Expense },
+    { name: 'Income', value: TransactionTypeEnum.Income }
+  ];
+  currencyOptions = (Object.values(CurrencyEnum)
+    .filter(value => typeof value === 'number' && value !== CurrencyEnum.XXX) as CurrencyEnum[]);
+  readonly CurrencyEnum = CurrencyEnum;
 
   ngOnInit(): void {
     this.setLoading(true);
@@ -96,61 +110,21 @@ public override formGroup: FormGroup = this.fb.group({
         this.groupOptions.set(groups);
         this.groupOptions.update(gs => [...gs, { id: '', name: 'No group' } as GetTransactionGroupDto]);
 
-        this.formGroup!.patchValue({
+        this.updateTransactionModel.set({
           name: transaction.name,
-          description: transaction.description,
+          description: transaction.description ?? '',
           value: transaction.value.amount,
           currency: transaction.value.currency,
           transactionDate: new Date(transaction.transactionDate),
           transactionType: transaction.transactionType,
-          group: transaction.transactionGroup
+          group: transaction.transactionGroup ?? null
         });
 
         this.setLoading(false);
       },
-      error: (error) => {
+      error: error => {
         this.setLoading(false);
         this.handleError(error, 'Loading transaction groups or transaction');
-      }
-    });
-  }
-
-  onSubmit(): void {
-    if (!this.validateForm()) {
-      return;
-    }
-
-    let transactionDate = undefined;
-
-    const date: Date = this.getFieldValue<Date>('transactionDate')!;
-    if (date && date.getFullYear() !== 1) {
-      transactionDate = date;
-    }
-
-    const updatedTransaction: UpdateTransactionDto = {
-      id: this.data.id,
-      name: this.getFieldValue<string>('name')!,
-      description: this.getFieldValue<string>('description') || '',
-      value: {
-        amount: this.getFieldValue<number>('value')!,
-        currency: this.getFieldValue<CurrencyEnum>('currency')!
-      },
-      transactionType: this.getFieldValue<TransactionTypeEnum>('transactionType')!,
-      transactionDate: transactionDate,
-      transactionGroupId: this.getFieldValue<GetTransactionGroupDto>('group')?.id || undefined
-    };
-
-    this.setLoading(true);
-
-    this.transactionApiService.updateTransaction(this.data.id, updatedTransaction).subscribe({
-      next: (result) => {
-        this.setLoading(false);
-        this.showSuccess('Transaction updated successfully!');
-        this.dialogRef.close(result);
-      },
-      error: (error) => {
-        this.setLoading(false);
-        this.handleError(error, 'Updating transaction');
       }
     });
   }
@@ -163,7 +137,4 @@ public override formGroup: FormGroup = this.fb.group({
     return object1.id == object2.id;
   }
 
-  compareTypeObjects(object1: { name: string, value: TransactionTypeEnum }, object2: { name: string, value: TransactionTypeEnum }) {
-    return object1.name === object2.name;
-  }
 }

@@ -29,8 +29,8 @@
           }
         </div>
         <div class="chat-footer default-font">
-          <textarea [(ngModel)]="message" placeholder="Type your message..." (keydown)="onTextareaKeydown($event)"></textarea>
-          <button (click)="sendMessage()" [disabled]="loading || !message.trim()">Send</button>
+          <textarea [formField]="chatForm.message" placeholder="Type your message..." (keydown)="onTextareaKeydown($event)"></textarea>
+          <button (click)="sendMessage()" [disabled]="loading || !chatModel().message.trim()">Send</button>
         </div>
       </div>
     }

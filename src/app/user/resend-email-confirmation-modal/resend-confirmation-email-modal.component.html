@@ -11,18 +11,18 @@
     <loader></loader>
   }
   @if (!loading()) {
-    <form class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
+    <form class="form-container" [formRoot]="resendEmailForm">
       <label for="email">Email</label>
       <div class="form-group">
-        <input id="email" type="email" placeholder="Enter your email address" formControlName="email" />
-        @if (hasFieldError('email')) {
+        <input id="email" type="email" placeholder="Enter your email address" [formField]="resendEmailForm.email" />
+        @if (resendEmailForm.email().touched() && resendEmailForm.email().invalid()) {
           <div class="error-font">
-            {{ getFieldErrorMessage('email') }}
+            {{ resendEmailForm.email().errors()[0]?.message }}
           </div>
         }
       </div>
       <div class="button-container">
-        <button type="submit" [disabled]="!isFormValid()" class="custom-button bounce-button">Confirm</button>
+        <button type="submit" [disabled]="!resendEmailForm().valid()" class="custom-button bounce-button">Confirm</button>
         <button type="button" class="custom-button-inverse bounce-button" (click)="onCancel()">Cancel</button>
       </div>
     </form>

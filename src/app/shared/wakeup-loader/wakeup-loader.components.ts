@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { LoaderComponent } from '../loader/loader.component';
 
 @Component({
@@ -6,6 +6,7 @@ import { LoaderComponent } from '../loader/loader.component';
   templateUrl: './wakeup-loader.component.html',
   styleUrls: ['./wakeup-loader.component.scss'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [LoaderComponent]
 })
 export class WakeupLoaderComponent {}

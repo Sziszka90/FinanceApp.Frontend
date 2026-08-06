@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild, signal, ElementRef } from '@angular/core';
+import { Component, effect, inject, OnInit, ViewChild, signal, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
@@ -8,7 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { GetTransactionDto } from 'src/models/TransactionDtos/get-transaction.dto';
 import { UpdateTransactionModalComponent } from '../update-transaction-modal/update-transaction-modal.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormField, form } from '@angular/forms/signals';
 import { TransactionTypeEnum } from 'src/models/Enums/transaction-type.enum';
 import { MatSelectModule } from '@angular/material/select';
 import { formatDate } from '@angular/common';
@@ -34,19 +34,18 @@ import { BaseComponent } from 'src/app/shared/base-component';
     CommonModule,
     MatTableModule,
     MatSelectModule,
-    ReactiveFormsModule,
+    FormField,
     BsDatepickerModule,
     LoaderComponent
   ],
   templateUrl: './transaction.component.html',
   styleUrl: './transaction.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
-
 export class TransactionComponent extends BaseComponent implements OnInit {
   private transactionApiService = inject(TransactionApiService);
   private matDialog = inject(MatDialog);
-  private fb = inject(FormBuilder);
   private authService = inject(AuthenticationService);
   private correlationService = inject(CorrelationService);
   private notificationService = inject(NotificationService);
@@ -60,13 +59,17 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   public importLoading = signal<boolean>(false);
   dataSource = signal<MatTableDataSource<GetTransactionDto>>(new MatTableDataSource<GetTransactionDto>([]));
 
-  typeOptions: {name: string, value: TransactionTypeEnum}[] = [{ name: 'Expense', value: TransactionTypeEnum.Expense }, { name: 'Income', value: TransactionTypeEnum.Income }];
+  typeOptions: { name: string; value: TransactionTypeEnum }[] = [
+    { name: 'Expense', value: TransactionTypeEnum.Expense },
+    { name: 'Income', value: TransactionTypeEnum.Income }
+  ];
 
-  filterForm: FormGroup = this.fb.group({
-    name: [''],
-    date: [''],
-    type: []
+  readonly filterModel = signal({
+    name: '',
+    date: null as Date | null,
+    type: null as TransactionTypeEnum | null
   });
+  readonly filterForm = form(this.filterModel);
 
   displayedColumns: string[] = [
     'name',
@@ -90,10 +93,14 @@ export class TransactionComponent extends BaseComponent implements OnInit {
             const amount = item.value?.amount;
             console.log('Sorting Amount:', amount, 'for item', item);
             return amount;
-          case 'currency': return item.value.currency;
-          case 'transactionDate': return new Date(item.transactionDate);
-          case 'group': return item.transactionGroup?.name ?? '';
-          default: return (item as any)[property];
+          case 'currency':
+            return item.value.currency;
+          case 'transactionDate':
+            return new Date(item.transactionDate);
+          case 'group':
+            return item.transactionGroup?.name ?? '';
+          default:
+            return (item as any)[property];
         }
       };
       return ds;
@@ -101,12 +108,13 @@ export class TransactionComponent extends BaseComponent implements OnInit {
 
     this.loadTransactions();
 
-    this.filterForm.valueChanges.subscribe({
-      next: () => this.applyFilters()
+    effect(() => {
+      this.filterModel();
+      this.applyFilters();
     });
 
     this.notificationService.notifications$.subscribe({
-      next: (message) => {
+      next: message => {
         if (message && message === REFRESH_TRANSACTIONS) {
           this.loadTransactions();
         }
@@ -128,7 +136,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
         });
         this.setupCustomFilterPredicate();
       },
-      error: (error) => {
+      error: error => {
         this.setLoading(false);
         this.importLoading.set(false);
         this.handleError(error, 'Loading transactions');
@@ -154,19 +162,18 @@ export class TransactionComponent extends BaseComponent implements OnInit {
         const filterObj = JSON.parse(filter);
         const { name, date, type } = filterObj;
 
-        return (!name || data.name.toLowerCase().includes(name.toLowerCase())) &&
-              (!date || (
-                data.transactionDate &&
-                formatDate(data.transactionDate, 'yyyy-MM-dd', 'en-US') === date
-              )) &&
-              (!type || data.transactionType === type);
+        return (
+          (!name || data.name.toLowerCase().includes(name.toLowerCase())) &&
+          (!date || (data.transactionDate && formatDate(data.transactionDate, 'yyyy-MM-dd', 'en-US') === date)) &&
+          (!type || data.transactionType === type)
+        );
       };
       return ds;
     });
   }
 
   applyFilters() {
-    const { name, date, type } = this.filterForm.value;
+    const { name, date, type } = this.filterModel();
     const formattedDate = date ? formatDate(date, 'yyyy-MM-dd', 'en-US') : '';
 
     this.dataSource.update(ds => {
@@ -174,13 +181,13 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       return ds;
     });
 
-    if (this.sort.active && this.sort.direction !== '') {
+    if (this.sort?.active && this.sort.direction !== '') {
       this.dataSource().data = [...this.dataSource().filteredData];
     }
   }
 
   deleteTransaction(transactionDto: GetTransactionDto) {
-    this.allTransactions.update(transactions => transactions.filter((t) => t.id !== transactionDto.id));
+    this.allTransactions.update(transactions => transactions.filter(t => t.id !== transactionDto.id));
     this.dataSource.update(ds => {
       ds.data = this.allTransactions();
       return ds;
@@ -190,7 +197,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       next: () => {
         this.showSuccess('Transaction deleted successfully!');
       },
-      error: (error) => {
+      error: error => {
         this.handleError(error, 'Deleting transaction');
       }
     });
@@ -198,44 +205,43 @@ export class TransactionComponent extends BaseComponent implements OnInit {
 
   async editTransaction(transactionDto: GetTransactionDto) {
     const result = await this.authService.isAuthenticatedAsync();
-    if( !result) {
+    if (!result) {
       await this.authService.logoutAsync();
       return;
     }
 
-    const dialogRef = this.matDialog.open(
-      UpdateTransactionModalComponent,
-      {
-        autoFocus: true,
-        maxHeight: '90vh',
-        data: transactionDto
-      }
-    );
+    const dialogRef = this.matDialog.open(UpdateTransactionModalComponent, {
+      autoFocus: true,
+      maxHeight: '90vh',
+      data: transactionDto
+    });
 
     dialogRef.afterClosed().subscribe({
       next: (updatedTransaction: GetTransactionDto) => {
         if (updatedTransaction) {
-          this.allTransactions?.update(transactions => transactions.map((transaction: GetTransactionDto) => {
-            if (transaction.id === updatedTransaction.id) {
-              return {
-                ...transaction,
-                name: updatedTransaction.name,
-                description: updatedTransaction.description,
-                value: updatedTransaction.value,
-                transactionDate: updatedTransaction.transactionDate,
-                transactionType: updatedTransaction.transactionType,
-                transactionGroup: updatedTransaction.transactionGroup
-              };
-            }
-            return transaction;
-          }));
+          this.allTransactions?.update(transactions =>
+            transactions.map((transaction: GetTransactionDto) => {
+              if (transaction.id === updatedTransaction.id) {
+                return {
+                  ...transaction,
+                  name: updatedTransaction.name,
+                  description: updatedTransaction.description,
+                  value: updatedTransaction.value,
+                  transactionDate: updatedTransaction.transactionDate,
+                  transactionType: updatedTransaction.transactionType,
+                  transactionGroup: updatedTransaction.transactionGroup
+                };
+              }
+              return transaction;
+            })
+          );
         }
         this.dataSource.update(ds => {
           ds.data = this.allTransactions();
           return ds;
         });
       },
-      error: (error) => {
+      error: error => {
         this.handleError(error, 'Updating transaction');
       }
     });
@@ -243,18 +249,15 @@ export class TransactionComponent extends BaseComponent implements OnInit {
 
   async createTransaction() {
     const result = await this.authService.isAuthenticatedAsync();
-    if( !result) {
+    if (!result) {
       await this.authService.logoutAsync();
       return;
     }
 
-    const dialogRef = this.matDialog.open(
-      CreateTransactionModalComponent,
-      {
-        autoFocus: true,
-        maxHeight: '90vh'
-      }
-    );
+    const dialogRef = this.matDialog.open(CreateTransactionModalComponent, {
+      autoFocus: true,
+      maxHeight: '90vh'
+    });
 
     dialogRef.afterClosed().subscribe({
       next: (createdTransaction: GetTransactionDto) => {
@@ -266,14 +269,14 @@ export class TransactionComponent extends BaseComponent implements OnInit {
           });
         }
       },
-      error: (error) => {
+      error: error => {
         this.handleError(error, 'Creating transaction');
       }
     });
   }
 
   resetFilters() {
-    this.filterForm.reset();
+    this.filterModel.set({ name: '', date: null, type: null });
     this.dataSource.update(ds => {
       ds.filter = '';
       ds.data = this.allTransactions();
@@ -284,7 +287,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   getSummary(): void {
     this.setLoading(true);
     this.transactionApiService.getAllTransactionsSummary().subscribe({
-      next: (data) => {
+      next: data => {
         this.setLoading(false);
         this.summary.set(data);
         this.showSummary.set(true);
@@ -293,7 +296,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
           this.showSummary.set(false);
         }, 5000);
       },
-      error: (error) => {
+      error: error => {
         this.setLoading(false);
         this.handleError(error, 'Loading summary');
       }
@@ -331,7 +334,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       this.setLoading(true);
 
       this.transactionApiService.uploadCsv(file, correlationId).subscribe({
-        next: (transactions) => {
+        next: transactions => {
           this.setLoading(false);
           this.allTransactions.set(transactions);
           this.dataSource.update(ds => {
@@ -340,7 +343,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
           });
           this.showSuccess('CSV file uploaded successfully!');
         },
-        error: (error) => {
+        error: error => {
           this.setLoading(false);
           this.handleError(error, 'Uploading CSV file');
         }

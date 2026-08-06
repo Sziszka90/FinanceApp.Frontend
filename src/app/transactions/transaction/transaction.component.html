@@ -27,13 +27,12 @@
 
 <div class="filter-form-container">
   <h3 class="default-font text-color-grey">Filter Transactions</h3>
-  <form [formGroup]="filterForm" class="search-container">
+  <form class="search-container">
     <div class="form-group">
       <input
-        name="name"
         type="text"
         placeholder="Search by Name"
-        formControlName="name"
+        [formField]="filterForm.name"
         [class.disabled]="loading()"
         class="search-input"
         />
@@ -42,7 +41,7 @@
           <input
             name="date"
             bsDatepicker
-            formControlName="date"
+            [formField]="filterForm.date"
             [class.disabled]="loading()"
             type="text"
             placeholder="Select a date" />
@@ -50,12 +49,11 @@
           </div>
 
           <mat-select
-            name="type"
             class="select"
-            formControlName="type"
+            [formField]="filterForm.type"
             [class.disabled]="loading()">
             @for (option of typeOptions; track option) {
-              <mat-option [value]="option.name">
+              <mat-option [value]="option.value">
                 &#8226; {{ option.name }}
               </mat-option>
             }

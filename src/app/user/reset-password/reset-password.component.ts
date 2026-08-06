@@ -1,94 +1,74 @@
-
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { Component, inject, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
+import { FormField, FormRoot, form, minLength, pattern, required, validate } from '@angular/forms/signals';
 import { ActivatedRoute, Router } from '@angular/router';
-import { takeUntil } from 'rxjs';
+import { firstValueFrom, takeUntil } from 'rxjs';
 import { UserApiService } from 'src/services/user.api.service';
 import { BaseComponent } from '../../shared/base-component';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 
 @Component({
   selector: 'reset-password',
-  imports: [ReactiveFormsModule, LoaderComponent],
+  imports: [FormField, FormRoot, LoaderComponent],
   templateUrl: './reset-password.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './reset-password.component.scss'
 })
 export class ResetPasswordComponent extends BaseComponent implements OnInit {
   private router = inject(Router);
   private userApiService = inject(UserApiService);
   private route = inject(ActivatedRoute);
-  private fb = inject(FormBuilder);
-
   private token = '';
 
-  resetPasswordValid = signal<boolean>(true);
+  readonly resetPasswordModel = signal({
+    password: '',
+    confirmPassword: ''
+  });
 
-  override formGroup: FormGroup = this.fb.group({
-    password: [
-      '',
-      [
-        Validators.required,
-        Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$'),
-        Validators.minLength(8)
-      ]
-    ],
-    confirmPassword: [
-      '',
-      [
-        Validators.required,
-        Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$'),
-        Validators.minLength(8)
-      ]
-    ]
-  },
-  { validators: this.passwordsMatchValidator }
-  );
+  readonly resetPasswordForm = form(this.resetPasswordModel, path => {
+    required(path.password, { message: 'Password is required' });
+    minLength(path.password, 8, { message: 'Minimum 8 characters required' });
+    pattern(path.password, /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/, {
+      message: 'Password must include at least one uppercase letter, one number, and one special character'
+    });
+    required(path.confirmPassword, { message: 'Confirm password is required' });
+    minLength(path.confirmPassword, 8, { message: 'Minimum 8 characters required' });
+    pattern(path.confirmPassword, /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/, {
+      message: 'Password must include at least one uppercase letter, one number, and one special character'
+    });
+    validate(path.confirmPassword, ({ value, valueOf }) => {
+      if (!value() || value() === valueOf(path.password)) {
+        return undefined;
+      }
 
-  override customValidationMessages = {
-    password: {
-      required: 'Password is required',
-      minlength: 'Minimum 8 characters required',
-      pattern: 'Password must include at least one uppercase letter, one number, and one special character'
-    },
-    confirmPassword: {
-      required: 'Confirm password is required',
-      minlength: 'Minimum 8 characters required',
-      pattern: 'Password must include at least one uppercase letter, one number, and one special character'
+      return { kind: 'passwordsMismatch', message: 'Passwords do not match.' };
+    });
+  }, {
+    submission: {
+      action: async () => {
+        this.setLoading(true);
+        try {
+          await firstValueFrom(this.userApiService.updatePassword({
+            password: this.resetPasswordModel().password,
+            token: this.token
+          }));
+          this.setLoading(false);
+          this.showSuccess('Password reset successful! Please log in with your new password.');
+          await this.router.navigate(['/login']);
+        } catch (error) {
+          this.setLoading(false);
+          this.handleError(error, 'Failed to reset password');
+        }
+      }
     }
-  };
+  });
 
   ngOnInit(): void {
-    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.token = params.get('token') ?? '';
     });
   }
 
-  passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
-    const password = control.get('password')?.value;
-    const confirmPassword = control.get('confirmPassword')?.value;
-
-    return password === confirmPassword ? null : { passwordsMismatch: true };
-  }
-
-  onSubmit(): void {
-    if (this.isFormValid()) {
-      const password = this.getFieldValue<string>('password') || '';
-
-      this.setLoading(true);
-
-      this.userApiService.updatePassword({ password: password, token: this.token }).subscribe({
-        next: () => {
-          this.setLoading(false);
-          this.showSuccess('Password reset successful! Please log in with your new password.');
-          this.router.navigate(['/login']);
-        },
-        error: (error) => {
-          this.setLoading(false);
-          this.handleError(error, 'Failed to reset password');
-        }
-      });
-    } else {
-      this.markAllFieldsAsTouched();
-    }
+  hasPasswordMismatch(): boolean {
+    return this.resetPasswordForm.confirmPassword().errors().some(error => error.kind === 'passwordsMismatch');
   }
 }

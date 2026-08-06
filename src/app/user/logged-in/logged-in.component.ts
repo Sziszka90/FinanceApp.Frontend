@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../../services/authentication.service';
@@ -9,11 +9,8 @@ import { BaseComponent } from 'src/app/shared/base-component';
   selector: 'logged-in',
   templateUrl: './logged-in.component.html',
   styleUrls: ['./logged-in.component.scss'],
-  imports: [
-    MatToolbarModule,
-    MatButtonModule,
-    RouterLink
-  ]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [MatToolbarModule, MatButtonModule, RouterLink]
 })
 export class LoggedInComponent extends BaseComponent {
   public router = inject(Router);

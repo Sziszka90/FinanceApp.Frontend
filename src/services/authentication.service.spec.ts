@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { AuthenticationService } from './authentication.service';
 import { AuthenticationApiService } from './authentication.api.service';
+import 'jasmine';
 import { CorrelationService } from './correlation.service';
 import { UserApiService } from './user.api.service';
 import { Router } from '@angular/router';
@@ -13,6 +14,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 class MockAuthApiService {
   login = jasmine.createSpy().and.returnValue(of({} as LoginResponseDto));
   logout = jasmine.createSpy().and.returnValue(of(undefined));
+  isAuthenticated = jasmine.createSpy().and.returnValue(of(true));
 }
 class MockCorrelationService {
   clearAllCorrelationIds = jasmine.createSpy();
@@ -68,13 +70,13 @@ describe('AuthenticationService', () => {
 
   it('should return true for isAuthenticatedAsync when user exists', async () => {
     const result = await service.isAuthenticatedAsync();
-    expect(userApi.getActiveUser).toHaveBeenCalled();
+    expect(authApi.isAuthenticated).toHaveBeenCalled();
     expect(result).toBeTrue();
     expect(service.userLoggedIn.value).toBeTrue();
   });
 
-  it('should return false for isAuthenticatedAsync when user fetch fails', async () => {
-    userApi.getActiveUser.and.returnValue(throwError(() => new Error('fail')));
+  it('should return false for isAuthenticatedAsync when authentication check fails', async () => {
+    authApi.isAuthenticated.and.returnValue(throwError(() => new Error('fail')));
     const result = await service.isAuthenticatedAsync();
     expect(result).toBeFalse();
     expect(service.userLoggedIn.value).toBeFalse();

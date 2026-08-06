@@ -13,25 +13,27 @@
     </div>
   }
   @if (!loading()) {
-    <form class="form-container" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
+    <form class="form-container" [formRoot]="updateTransactionGroupForm">
       <label for="name">Name</label>
       <div class="form-group">
-        <input id="name" type="text" formControlName="name" required />
-        @if (hasFieldError('name')) {
-          <div class="error-message">
-            {{ getFieldErrorMessage('name') }}
-          </div>
+        <input id="name" type="text" [formField]="updateTransactionGroupForm.name" />
+        @if (updateTransactionGroupForm.name().touched() && updateTransactionGroupForm.name().invalid()) {
+          @for (error of updateTransactionGroupForm.name().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+          }
         }
       </div>
       <label for="description">Description</label>
       <div class="form-group">
-        <input id="description" type="text" formControlName="description" />
+        <input id="description" type="text" [formField]="updateTransactionGroupForm.description" />
       </div>
       <label class="default-font" for="groupIcon">Group Icon</label>
       <div class="form-group">
-        <mat-select class="select" formControlName="groupIcon" required>
+        <mat-select class="select" [formField]="updateTransactionGroupForm.groupIcon">
           <mat-select-trigger>
-            <i class="{{ formGroup!.get('groupIcon')?.value }}"></i>
+            <i class="{{ updateTransactionGroupForm.groupIcon().value() }}"></i>
           </mat-select-trigger>
           @for (option of groupIconOptions; track option) {
             <mat-option [value]="option">
@@ -39,14 +41,16 @@
             </mat-option>
           }
         </mat-select>
-        @if (hasFieldError('groupIcon')) {
-          <div class="error-message">
-            {{ getFieldErrorMessage('groupIcon') }}
-          </div>
+        @if (updateTransactionGroupForm.groupIcon().touched() && updateTransactionGroupForm.groupIcon().invalid()) {
+          @for (error of updateTransactionGroupForm.groupIcon().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+          }
         }
       </div>
       <div class="button-container">
-        <button [disabled]="formGroup!.invalid" class="custom-button bounce-button" type="submit">Save</button>
+        <button [disabled]="!updateTransactionGroupForm().valid()" class="custom-button bounce-button" type="submit">Save</button>
         <button class="custom-button bounce-button" type="button" (click)="onClose()">Close</button>
       </div>
     </form>

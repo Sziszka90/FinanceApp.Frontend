@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
 import { ChatBubbleComponent } from './shared/chat-bubble/chat-bubble.component';
@@ -10,14 +10,10 @@ import { BaseComponent } from './shared/base-component';
 
 @Component({
   selector: 'root',
-  imports: [
-    NavBarComponent,
-    RouterOutlet,
-    ChatBubbleComponent,
-    WakeupLoaderComponent
-  ],
+  imports: [NavBarComponent, RouterOutlet, ChatBubbleComponent, WakeupLoaderComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class AppComponent extends BaseComponent implements OnInit {
@@ -55,9 +51,8 @@ export class AppComponent extends BaseComponent implements OnInit {
   }
 
   testNetworkError(): void {
-    fetch('http://invalid-url-that-does-not-exist.com')
-      .catch(error => {
-        throw new Error('Network error test: ' + error.message);
-      });
+    fetch('http://invalid-url-that-does-not-exist.com').catch(error => {
+      throw new Error('Network error test: ' + error.message);
+    });
   }
 }

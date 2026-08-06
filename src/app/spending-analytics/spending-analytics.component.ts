@@ -1,4 +1,15 @@
-import { Component, inject, OnInit, signal, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  OnInit,
+  signal,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  ChangeDetectorRef,
+  ChangeDetectionStrategy
+} from '@angular/core';
 
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { UserApiService } from 'src/services/user.api.service';
@@ -7,7 +18,7 @@ import { GetUserDto } from 'src/models/UserDtos/get-user.dto';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
 import { LoaderComponent } from '../shared/loader/loader.component';
 import { BaseComponent } from '../shared/base-component';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormField, form } from '@angular/forms/signals';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,20 +40,20 @@ interface SpendingByGroup {
   selector: 'spending-analytics',
   imports: [
     LoaderComponent,
-    ReactiveFormsModule,
+    FormField,
     MatSelectModule,
     MatSlideToggleModule,
     MatButtonModule,
     BsDatepickerModule
-],
+  ],
   templateUrl: './spending-analytics.component.html',
   styleUrl: './spending-analytics.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class SpendingAnalyticsComponent extends BaseComponent implements OnInit {
   private transactionApiService = inject(TransactionApiService);
   private userApiService = inject(UserApiService);
-  private fb = inject(FormBuilder);
 
   @ViewChild('pieChart') pieChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('barChart') barChartRef!: ElementRef<HTMLCanvasElement>;
@@ -56,52 +67,58 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
   private pieChart: Chart | null = null;
   private barChart: Chart | null = null;
 
-  filterForm: FormGroup = this.fb.group({
-    startDate: [null],
-    endDate: [null],
-    transactionType: [TransactionTypeEnum.Expense],
+  readonly filterModel = signal({
+    startDate: null as Date | null,
+    endDate: null as Date | null,
+    transactionType: TransactionTypeEnum.Expense
   });
+  readonly filterForm = form(this.filterModel);
 
   ngOnInit(): void {
-    this.loadSpendingData();
-
-    this.filterForm.valueChanges.subscribe(() => {
+    effect(() => {
+      this.filterModel();
       this.loadSpendingData();
     });
   }
 
   loadSpendingData(): void {
     this.loading.set(true);
-    const filterValues = this.filterForm.value;
-    
-    const startDate = filterValues.startDate ? new Date(filterValues.startDate) : new Date(new Date().getFullYear(), 0, 1);
+    const filterValues = this.filterModel();
+
+    const startDate = filterValues.startDate
+      ? new Date(filterValues.startDate)
+      : new Date(new Date().getFullYear(), 0, 1);
     const endDate = filterValues.endDate ? new Date(filterValues.endDate) : new Date();
-    
-    this.userApiService.getActiveUser().pipe(
-      switchMap(user => {
-        this.user.set(user);
-        return this.transactionApiService.getTopTransactionGroups(startDate, endDate, user.id, undefined);
-      })
-    ).subscribe({
-      next: (topGroups: TopTransactionGroupDto[]) => {
-        this.processTopGroups(topGroups);
-        this.loading.set(false);
-        setTimeout(() => this.renderCharts(), 100);
-      },
-      error: (error) => {
-        console.error('Error loading data:', error);
-        this.loading.set(false);
-      }
-    });
+
+    this.userApiService
+      .getActiveUser()
+      .pipe(
+        switchMap(user => {
+          this.user.set(user);
+          return this.transactionApiService.getTopTransactionGroups(startDate, endDate, user.id, undefined);
+        })
+      )
+      .subscribe({
+        next: (topGroups: TopTransactionGroupDto[]) => {
+          this.processTopGroups(topGroups);
+          this.loading.set(false);
+          setTimeout(() => this.renderCharts(), 100);
+        },
+        error: error => {
+          console.error('Error loading data:', error);
+          this.loading.set(false);
+        }
+      });
   }
 
   private processTopGroups(topGroups: TopTransactionGroupDto[]): void {
-    const transactionType = this.filterForm.value.transactionType;
-    
-    const filteredGroups = transactionType === TransactionTypeEnum.Income
-      ? topGroups.filter(g => g.totalAmount.amount > 0)
-      : topGroups.filter(g => g.totalAmount.amount <= 0);
-    
+    const transactionType = this.filterModel().transactionType;
+
+    const filteredGroups =
+      transactionType === TransactionTypeEnum.Income
+        ? topGroups.filter(g => g.totalAmount.amount > 0)
+        : topGroups.filter(g => g.totalAmount.amount <= 0);
+
     const total = filteredGroups.reduce((sum, g) => sum + Math.abs(g.totalAmount.amount), 0);
     this.totalSpending.set(total);
 
@@ -146,12 +163,14 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
       type: 'pie',
       data: {
         labels,
-        datasets: [{
-          data: amounts,
-          backgroundColor: colors,
-          borderWidth: 2,
-          borderColor: '#fff'
-        }]
+        datasets: [
+          {
+            data: amounts,
+            backgroundColor: colors,
+            borderWidth: 2,
+            borderColor: '#fff'
+          }
+        ]
       },
       options: {
         responsive: true,
@@ -166,7 +185,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
           },
           tooltip: {
             callbacks: {
-              label: (context) => {
+              label: context => {
                 const label = context.label || '';
                 const value = context.parsed || 0;
                 const percentage = ((value / this.totalSpending()) * 100).toFixed(1);
@@ -182,13 +201,15 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
       type: 'bar',
       data: {
         labels,
-        datasets: [{
-          label: `Amount (${this.getCurrencySymbol()})`,
-          data: amounts,
-          backgroundColor: colors,
-          borderWidth: 1,
-          borderColor: colors.map(c => c.replace('0.7', '1'))
-        }]
+        datasets: [
+          {
+            label: `Amount (${this.getCurrencySymbol()})`,
+            data: amounts,
+            backgroundColor: colors,
+            borderWidth: 1,
+            borderColor: colors.map(c => c.replace('0.7', '1'))
+          }
+        ]
       },
       options: {
         responsive: true,
@@ -199,7 +220,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
           },
           tooltip: {
             callbacks: {
-              label: (context) => {
+              label: context => {
                 const value = context.parsed.y || 0;
                 const percentage = ((value / this.totalSpending()) * 100).toFixed(1);
                 return `${this.getCurrencySymbol()}${value.toFixed(2)} (${percentage}%)`;
@@ -211,7 +232,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
           y: {
             beginAtZero: true,
             ticks: {
-              callback: (value) => `${this.getCurrencySymbol()}${value}`
+              callback: value => `${this.getCurrencySymbol()}${value}`
             }
           }
         }
@@ -244,24 +265,23 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
   }
 
   toggleChartType(): void {
-    this.chartType.update(type => type === 'pie' ? 'bar' : 'pie');
+    this.chartType.update(type => (type === 'pie' ? 'bar' : 'pie'));
   }
 
   resetFilters(): void {
-    this.filterForm.patchValue({
+    this.filterModel.update(model => ({
+      ...model,
       startDate: null,
-      endDate: null,
-    });
+      endDate: null
+    }));
   }
 
   getCurrencySymbol(): string {
     const user = this.user();
     if (!user) return '€';
-    
-    const currency = typeof user.baseCurrency === 'string' 
-      ? user.baseCurrency 
-      : CurrencyEnum[user.baseCurrency];
-    
+
+    const currency = typeof user.baseCurrency === 'string' ? user.baseCurrency : CurrencyEnum[user.baseCurrency];
+
     switch (currency) {
       case 'EUR':
         return '€';

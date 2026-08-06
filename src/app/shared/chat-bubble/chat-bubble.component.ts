@@ -1,5 +1,5 @@
-import { Component, inject, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, ViewChild, ElementRef, OnInit, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
+import { FormField, form } from '@angular/forms/signals';
 import { CommonModule } from '@angular/common';
 import { LlmProcessorApiService } from 'src/services/llmprocessor.api.service';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,10 +10,8 @@ import { AuthenticationService } from 'src/services/authentication.service';
 @Component({
   selector: 'chat-bubble',
   templateUrl: './chat-bubble.component.html',
-  imports: [
-    CommonModule,
-    FormsModule
-  ],
+  imports: [CommonModule, FormField],
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./chat-bubble.component.scss']
 })
 export class ChatBubbleComponent implements OnInit, OnDestroy {
@@ -25,10 +23,11 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
   @ViewChild('chatBubble') chatBubble!: ElementRef<HTMLDivElement>;
 
   showBubble = false;
-  message = '';
+  readonly chatModel = signal({ message: '' });
+  readonly chatForm = form(this.chatModel);
   response = '';
   loading = false;
-  messages: { text: string, sender: 'user' | 'assistant' }[] = [];
+  messages: { text: string; sender: 'user' | 'assistant' }[] = [];
   dragOffsetX = 0;
   dragOffsetY = 0;
   dragging = false;
@@ -49,21 +48,27 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
     this.authService.userLoggedIn.pipe().subscribe({
       next: loggedIn => {
         this.showChatBubble = loggedIn;
-        if(loggedIn) {
-          this.userApiService.getActiveUser().pipe(take(1)).subscribe({
-            next: user => {
-              if (user) {
-                this.userId = user.id;
-                this.userName = user.userName;
-                if(this.messages.length === 0) {
-                  this.messages.push({ text: `Hi ${this.userName}! How can I assist you today?`, sender: 'assistant' });
+        if (loggedIn) {
+          this.userApiService
+            .getActiveUser()
+            .pipe(take(1))
+            .subscribe({
+              next: user => {
+                if (user) {
+                  this.userId = user.id;
+                  this.userName = user.userName;
+                  if (this.messages.length === 0) {
+                    this.messages.push({
+                      text: `Hi ${this.userName}! How can I assist you today?`,
+                      sender: 'assistant'
+                    });
+                  }
                 }
+              },
+              error: () => {
+                this.showChatBubble = false;
               }
-            },
-            error: () => {
-              this.showChatBubble = false;
-            }
-          });
+            });
         }
       }
     });
@@ -88,25 +93,27 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
   }
 
   sendMessage() {
-    if (!this.message.trim()) return;
-    const msgToSend = this.message;
-    this.message = '';
+    if (!this.chatModel().message.trim()) return;
+    const msgToSend = this.chatModel().message;
+    this.chatModel.update(model => ({ ...model, message: '' }));
     this.loading = true;
     this.messages.push({ text: msgToSend, sender: 'user' });
     this.scrollToBottom();
-    this.llmProcessorApiService.promptRequest({ prompt: msgToSend, userId: this.userId, correlationId: uuidv4() }).subscribe({
-      next: res => {
-        this.loading = false;
-        const reply = res.result || 'No response';
-        this.messages.push({ text: reply, sender: 'assistant' });
-        this.scrollToBottom();
-      },
-      error: err => {
-        this.loading = false;
-        this.messages.push({ text: 'Error sending message.', sender: 'assistant' });
-        this.scrollToBottom();
-      }
-    });
+    this.llmProcessorApiService
+      .promptRequest({ prompt: msgToSend, userId: this.userId, correlationId: uuidv4() })
+      .subscribe({
+        next: res => {
+          this.loading = false;
+          const reply = res.result || 'No response';
+          this.messages.push({ text: reply, sender: 'assistant' });
+          this.scrollToBottom();
+        },
+        error: err => {
+          this.loading = false;
+          this.messages.push({ text: 'Error sending message.', sender: 'assistant' });
+          this.scrollToBottom();
+        }
+      });
   }
 
   toggleBubble() {
@@ -157,7 +164,7 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
 
       let newRight = this.bubblePosition.right - dx;
       let newBottom = this.bubblePosition.bottom - dy;
- 
+
       newRight = Math.max(0, Math.min(newRight, viewportWidth - bubbleRect.width));
       newBottom = Math.max(0, Math.min(newBottom, viewportHeight - bubbleRect.height));
 

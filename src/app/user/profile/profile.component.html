@@ -9,7 +9,7 @@
         {{ errorMessage() }}
       </div>
     }
-    <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
+    <form class="form-element" [formRoot]="profileForm">
       <label class="default-font" for="currency">Currency</label>
       <label class="default-font" for="userName">User Name</label>
       <div class="form-group">
@@ -17,12 +17,12 @@
           class="default-font"
           id="userName"
           type="text"
-          formControlName="userName"
+          [formField]="profileForm.userName"
           placeholder="User Name"
           />
-          @if (hasFieldError('userName')) {
+          @if (profileForm.userName().touched() && profileForm.userName().invalid()) {
             <div class="error-font">
-              {{ getFieldErrorMessage('userName') }}
+              {{ profileForm.userName().errors()[0]?.message }}
             </div>
           }
         </div>
@@ -32,32 +32,27 @@
             class="default-font"
             id="password"
             type="password"
-            formControlName="password"
+            [formField]="profileForm.password"
             placeholder="Password"
             />
-            @if (hasFieldError('password')) {
+            @if (profileForm.password().touched() && profileForm.password().invalid()) {
               <div class="error-font">
-                {{ getFieldErrorMessage('password') }}
+                {{ profileForm.password().errors()[0]?.message }}
               </div>
             }
           </div>
           <label class="default-font" for="currency">Currency</label>
           <div class="form-group">
-            <mat-select class="select" formControlName="currency" [compareWith]="compareCategoryObjects" required>
+            <mat-select class="select" [formField]="profileForm.currency" [compareWith]="compareCategoryObjects">
               @for (option of currencyOptions; track option) {
                 <mat-option [value]="option">
-                  {{ option }}
+                  {{ CurrencyEnum[option] }}
                 </mat-option>
               }
             </mat-select>
-            @if (hasFieldError('Currency')) {
-              <div class="error-font">
-                {{ getFieldErrorMessage('Currency') }}
-              </div>
-            }
           </div>
           <div class="button-container">
-            <button class="bounce-button custom-button" type="submit" [disabled]="!isFormValid()">Update</button>
+            <button class="bounce-button custom-button" type="submit" [disabled]="!profileForm().valid()">Update</button>
           </div>
         </form>
       </div>

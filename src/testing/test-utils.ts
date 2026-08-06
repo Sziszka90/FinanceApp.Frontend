@@ -94,44 +94,6 @@ export class TestUtils {
   }
 
   /**
-   * Get form control value
-   */
-  static getFormControlValue(component: any, controlName: string): any {
-    return component.formGroup?.get(controlName)?.value;
-  }
-
-  /**
-   * Set form control value
-   */
-  static setFormControlValue(component: any, controlName: string, value: any): void {
-    const control = component.formGroup?.get(controlName);
-    if (control) {
-      control.setValue(value);
-      control.markAsTouched();
-    }
-  }
-
-  /**
-   * Check if form control has error
-   */
-  static hasFormControlError(component: any, controlName: string, errorType: string): boolean {
-    const control = component.formGroup?.get(controlName);
-    return control ? control.hasError(errorType) : false;
-  }
-
-  /**
-   * Trigger form control validation
-   */
-  static triggerFormValidation(component: any): void {
-    if (component.formGroup) {
-      Object.keys(component.formGroup.controls).forEach(key => {
-        component.formGroup.get(key)?.markAsTouched();
-        component.formGroup.get(key)?.updateValueAndValidity();
-      });
-    }
-  }
-
-  /**
    * Create spy object with methods
    */
   static createSpyObj<T = any>(baseName: string, methodNames: string[]): jasmine.SpyObj<T> {
@@ -284,17 +246,4 @@ export class TestUtils {
     expect(elementText).toContain(text);
   }
 
-  /**
-   * Assert that form is valid
-   */
-  static expectFormToBeValid(component: any): void {
-    expect(component.formGroup?.valid).toBe(true);
-  }
-
-  /**
-   * Assert that form is invalid
-   */
-  static expectFormToBeInvalid(component: any): void {
-    expect(component.formGroup?.valid).toBe(false);
-  }
 }

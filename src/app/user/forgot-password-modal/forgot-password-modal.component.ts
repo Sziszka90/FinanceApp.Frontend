@@ -1,54 +1,42 @@
-
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
+import { FormField, FormRoot, email, form, required } from '@angular/forms/signals';
+import { firstValueFrom } from 'rxjs';
 import { MatDialogRef } from '@angular/material/dialog';
 import { LoaderComponent } from 'src/app/shared/loader/loader.component';
 import { UserApiService } from 'src/services/user.api.service';
 import { BaseComponent } from 'src/app/shared/base-component';
-import { FieldValidationMessages } from 'src/services/form-validation.service';
 
 @Component({
   selector: 'forgot-password-modal',
-  imports: [ReactiveFormsModule, LoaderComponent],
+  imports: [FormField, FormRoot, LoaderComponent],
   templateUrl: './forgot-password-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './forgot-password-modal.component.scss'
 })
 export class ForgotPasswordRequestModalComponent extends BaseComponent {
   private userApiService = inject(UserApiService);
   private matDialogRef = inject(MatDialogRef<ForgotPasswordRequestModalComponent>);
-  private fb = inject(FormBuilder);
+  readonly forgotPasswordModel = signal({ email: '' });
 
-  public override formGroup: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]]
-  });
-
-  public override customValidationMessages: FieldValidationMessages = {
-    email: {
-      required: 'Email address is required',
-      email: 'Please enter a valid email address'
-    }
-  };
-
-  onSubmit(): void {
-    if (!this.validateForm()) {
-      return;
-    }
-
-    const email = this.getFieldValue<string>('email')!;
-
-    this.setLoading(true);
-    this.userApiService.forgotPassword(email).subscribe({
-      next: () => {
-        this.setLoading(false);
-        this.showSuccess('Password reset email sent! Check your inbox.');
-        this.matDialogRef.close();
-      },
-      error: (error) => {
-        this.setLoading(false);
-        this.handleError(error, 'Sending password reset email');
+  readonly forgotPasswordForm = form(this.forgotPasswordModel, path => {
+    required(path.email, { message: 'Email address is required' });
+    email(path.email, { message: 'Please enter a valid email address' });
+  }, {
+    submission: {
+      action: async () => {
+        this.setLoading(true);
+        try {
+          await firstValueFrom(this.userApiService.forgotPassword(this.forgotPasswordModel().email));
+          this.setLoading(false);
+          this.showSuccess('Password reset email sent! Check your inbox.');
+          this.matDialogRef.close();
+        } catch (error) {
+          this.setLoading(false);
+          this.handleError(error, 'Sending password reset email');
+        }
       }
-    });
-  }
+    }
+  });
 
   onCancel(): void {
     this.matDialogRef.close();

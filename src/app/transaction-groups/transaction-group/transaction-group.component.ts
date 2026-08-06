@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateTransactionGroupModalComponent } from '../create-transaction-group-modal/create-transaction-group-modal.component';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,31 +14,23 @@ import { BaseComponent } from 'src/app/shared/base-component';
 
 @Component({
   selector: 'transaction-group',
-  imports: [
-    MatIconModule,
-    MatButtonModule,
-    MatTableModule,
-    LoaderComponent
-],
+  imports: [MatIconModule, MatButtonModule, MatTableModule, LoaderComponent],
   templateUrl: './transaction-group.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './transaction-group.component.scss'
 })
-
 export class TransactionGroupComponent extends BaseComponent implements OnInit {
   private matDialog = inject(MatDialog);
   private transactionApiService = inject(TransactionApiService);
   private authService = inject(AuthenticationService);
 
-  displayedColumnsFull: string[] = [
-    'name',
-    'description',
-    'icon',
-    'actions'
-  ];
+  displayedColumnsFull: string[] = ['name', 'description', 'icon', 'actions'];
 
   public transactionGroups$: Observable<GetTransactionGroupDto[]> | undefined;
   public allTransactionGroups = signal<GetTransactionGroupDto[]>([]);
-  public dataSource = signal<MatTableDataSource<GetTransactionGroupDto>>(new MatTableDataSource<GetTransactionGroupDto>([]));
+  public dataSource = signal<MatTableDataSource<GetTransactionGroupDto>>(
+    new MatTableDataSource<GetTransactionGroupDto>([])
+  );
 
   touchStartX = 0;
 
@@ -49,12 +41,12 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
   loadTransactionGroups(): void {
     this.setLoading(true);
     this.transactionApiService.getAllTransactionGroups().subscribe({
-      next: (transactionGroups) => {
+      next: transactionGroups => {
         this.setLoading(false);
         this.allTransactionGroups.set(transactionGroups);
         this.dataSource.set(new MatTableDataSource<GetTransactionGroupDto>(transactionGroups));
       },
-      error: (error) => {
+      error: error => {
         this.setLoading(false);
         this.handleError(error, 'Loading transaction groups');
       }
@@ -68,17 +60,14 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
       return;
     }
 
-    const dialogRef = this.matDialog.open(
-      CreateTransactionGroupModalComponent,
-      {
-        autoFocus: true
-      }
-    );
+    const dialogRef = this.matDialog.open(CreateTransactionGroupModalComponent, {
+      autoFocus: true
+    });
 
     this.setLoading(true);
 
     dialogRef.afterClosed().subscribe({
-      next: (createdTransactionGroup) => {
+      next: createdTransactionGroup => {
         this.setLoading(false);
         if (createdTransactionGroup) {
           this.allTransactionGroups.update(groups => [...groups, createdTransactionGroup]);
@@ -86,7 +75,7 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
         }
         this.showSuccess('Transaction group created successfully!');
       },
-      error: (error) => {
+      error: error => {
         this.setLoading(false);
         this.handleError(error, 'Creating transaction group');
       }
@@ -94,16 +83,14 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
   }
 
   deleteTransactionGroup(transactionGroup: GetTransactionGroupDto) {
-    this.allTransactionGroups.update(groups => groups.filter(
-      (group) => group.id !== transactionGroup.id
-    ));
+    this.allTransactionGroups.update(groups => groups.filter(group => group.id !== transactionGroup.id));
     this.dataSource.set(new MatTableDataSource<GetTransactionGroupDto>(this.allTransactionGroups()));
 
     this.transactionApiService.deleteTransactionGroup(transactionGroup.id).subscribe({
       next: () => {
         this.showSuccess('Transaction group deleted successfully!');
       },
-      error: (error) => {
+      error: error => {
         this.handleError(error, 'Deleting transaction group.');
         this.loadTransactionGroups();
       }
@@ -116,36 +103,35 @@ export class TransactionGroupComponent extends BaseComponent implements OnInit {
       await this.authService.logoutAsync();
       return;
     }
-    const dialogRef = this.matDialog.open(
-      UpdateTransactionGroupModalComponent,
-      {
-        autoFocus: true,
-        height: 'auto',
-        data: transactionGroup
-      }
-    );
+    const dialogRef = this.matDialog.open(UpdateTransactionGroupModalComponent, {
+      autoFocus: true,
+      height: 'auto',
+      data: transactionGroup
+    });
 
     this.setLoading(true);
 
     dialogRef.afterClosed().subscribe({
-      next: (updatedTransactionGroup) => {
+      next: updatedTransactionGroup => {
         this.setLoading(false);
         if (updatedTransactionGroup) {
-          this.allTransactionGroups.update(groups => groups.map((transactionGroup) => {
-            if (transactionGroup.id === updatedTransactionGroup.id) {
-              return {
-                ...transactionGroup,
-                name: updatedTransactionGroup.name,
-                description: updatedTransactionGroup.description,
-                groupIcon: updatedTransactionGroup.groupIcon
-              };
-            }
-            return transactionGroup;
-          }));
+          this.allTransactionGroups.update(groups =>
+            groups.map(transactionGroup => {
+              if (transactionGroup.id === updatedTransactionGroup.id) {
+                return {
+                  ...transactionGroup,
+                  name: updatedTransactionGroup.name,
+                  description: updatedTransactionGroup.description,
+                  groupIcon: updatedTransactionGroup.groupIcon
+                };
+              }
+              return transactionGroup;
+            })
+          );
           this.dataSource.set(new MatTableDataSource<GetTransactionGroupDto>(this.allTransactionGroups()));
         }
       },
-      error: (error) => {
+      error: error => {
         this.setLoading(false);
         this.handleError(error, 'Editing transaction group');
       }

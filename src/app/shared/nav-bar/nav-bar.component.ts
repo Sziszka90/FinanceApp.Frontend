@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, inject, OnInit, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
 import { Router, RouterLink } from '@angular/router';
@@ -6,13 +6,10 @@ import { AuthenticationService } from 'src/services/authentication.service';
 
 @Component({
   selector: 'nav-bar',
-  imports: [
-    MatIconModule,
-    TranslateModule,
-    RouterLink
-],
+  imports: [MatIconModule, TranslateModule, RouterLink],
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class NavBarComponent implements OnInit {
@@ -24,7 +21,7 @@ export class NavBarComponent implements OnInit {
   userLoggedIn = signal<boolean>(false);
 
   ngOnInit() {
-    this.authService.userLoggedIn.subscribe((isLoggedIn) => {
+    this.authService.userLoggedIn.subscribe(isLoggedIn => {
       console.log('User logged in status changed:', isLoggedIn);
       this.userLoggedIn.set(isLoggedIn);
     });

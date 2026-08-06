@@ -1,12 +1,6 @@
-
-import { Component, inject } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
-import { take } from 'rxjs';
+import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
+import { FormField, FormRoot, email, form, minLength, pattern, required } from '@angular/forms/signals';
+import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { UserApiService } from '../../../services/user.api.service';
 import { MatSelectModule } from '@angular/material/select';
@@ -17,81 +11,57 @@ import { BaseComponent } from '../../shared/base-component';
 @Component({
   selector: 'registration',
   standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    MatSelectModule,
-    LoaderComponent
-],
+  imports: [FormField, FormRoot, MatSelectModule, LoaderComponent],
   templateUrl: './registration.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./registration.component.scss']
 })
 export class RegistrationComponent extends BaseComponent {
-  private fb = inject(FormBuilder);
   private apiService = inject(UserApiService);
   private router = inject(Router);
 
-  override formGroup: FormGroup = this.fb.group({
-    userName: ['', [Validators.required, Validators.minLength(2)]],
-    email: ['', [Validators.required, Validators.email]],
-    password: [
-      '',
-      [
-        Validators.required,
-        Validators.minLength(8),
-        Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$')
-      ]
-    ],
-    currency: ['', [Validators.required]]
+  readonly registrationModel = signal({
+    userName: '',
+    email: '',
+    password: '',
+    currency: null as CurrencyEnum | null
   });
 
-  override customValidationMessages = {
-    userName: {
-      required: 'User name is required',
-      minlength: 'Minimum 2 characters required'
-    },
-    email: {
-      required: 'Email is required',
-      email: 'Invalid email format'
-    },
-    password: {
-      required: 'Password is required',
-      minlength: 'Minimum 8 characters required',
-      pattern: 'Include uppercase letter, number, and special character'
-    },
-    currency: {
-      required: 'Currency is required'
+  readonly registrationForm = form(this.registrationModel, path => {
+    required(path.userName, { message: 'User name is required' });
+    minLength(path.userName, 2, { message: 'Minimum 2 characters required' });
+    required(path.email, { message: 'Email is required' });
+    email(path.email, { message: 'Invalid email format' });
+    required(path.password, { message: 'Password is required' });
+    minLength(path.password, 8, { message: 'Minimum 8 characters required' });
+    pattern(path.password, /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/, {
+      message: 'Include uppercase letter, number, and special character'
+    });
+    required(path.currency, { message: 'Currency is required' });
+  }, {
+    submission: {
+      action: async () => {
+        const model = this.registrationModel();
+        this.setLoading(true);
+        try {
+          await firstValueFrom(this.apiService.register({
+            userName: model.userName,
+            email: model.email,
+            password: model.password,
+            baseCurrency: model.currency ?? CurrencyEnum.EUR
+          }));
+          this.setLoading(false);
+          this.showSuccess('Registration successful! Please confirm email address.');
+          await this.router.navigate(['/login']);
+        } catch (error) {
+          this.setLoading(false);
+          this.handleError(error, 'Registration failed');
+        }
+      }
     }
-  };
+  });
 
-  currencyOptions = Object.keys(CurrencyEnum).filter((key) =>
-    isNaN(Number(key)) && key !== 'XXX'
-  );
-
-  onSubmit(): void {
-    if (this.isFormValid()) {
-      const formValue = this.getFormValue();
-      if (!formValue) {return;}
-
-      this.setLoading(true);
-
-      this.apiService.register({
-          userName: this.getFieldValue('userName') || '',
-          email: this.getFieldValue('email') || '',
-          password: this.getFieldValue('password') || '',
-          baseCurrency: this.getFieldValue('currency') || CurrencyEnum.EUR
-        }).subscribe({
-          next: () => {
-            this.setLoading(false);
-            this.showSuccess('Registration successful! Please confirm email address.');
-            this.router.navigate(['/login']);
-          },
-          error: (error) => {
-            this.setLoading(false);
-            this.handleError(error, 'Registration failed');
-          }
-        });
-    } else {
-      this.markAllFieldsAsTouched();
-    }
-  }
+  currencyOptions = (Object.values(CurrencyEnum)
+    .filter(value => typeof value === 'number' && value !== CurrencyEnum.XXX) as CurrencyEnum[]);
+  readonly CurrencyEnum = CurrencyEnum;
 }

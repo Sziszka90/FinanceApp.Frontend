@@ -3,7 +3,7 @@
 }
 @if (!loading()) {
   <div class="form-container">
-    <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
+    <form class="form-element" [formRoot]="registrationForm">
       <h3 class="default-font">Registration</h3>
       @if (hasError()) {
         <div class="error-message default-font">
@@ -16,14 +16,15 @@
           class="default-font"
           id="userName"
           type="text"
-          formControlName="userName"
-          required
+          [formField]="registrationForm.userName"
           placeholder="User Name"
           />
-          @if (hasFieldError('userName')) {
-            <div class="error-font">
-              {{ getFieldErrorMessage('userName') }}
-            </div>
+          @if (registrationForm.userName().touched() && registrationForm.userName().invalid()) {
+            @for (error of registrationForm.userName().errors(); track error.kind) {
+              <div class="error-font">
+                {{ error.message }}
+              </div>
+            }
           }
         </div>
         <label class="default-font" for="email">Email</label>
@@ -32,14 +33,15 @@
             class="default-font"
             id="email"
             type="text"
-            formControlName="email"
-            required
+            [formField]="registrationForm.email"
             placeholder="Email"
             />
-            @if (hasFieldError('email')) {
-              <div class="error-font">
-                {{ getFieldErrorMessage('email') }}
-              </div>
+            @if (registrationForm.email().touched() && registrationForm.email().invalid()) {
+              @for (error of registrationForm.email().errors(); track error.kind) {
+                <div class="error-font">
+                  {{ error.message }}
+                </div>
+              }
             }
           </div>
           <label class="default-font" for="password">Password</label>
@@ -48,32 +50,35 @@
               class="default-font"
               id="password"
               type="password"
-              formControlName="password"
-              required
+              [formField]="registrationForm.password"
               placeholder="Password"
               />
-              @if (hasFieldError('password')) {
-                <div class="error-font">
-                  {{ getFieldErrorMessage('password') }}
-                </div>
+              @if (registrationForm.password().touched() && registrationForm.password().invalid()) {
+                @for (error of registrationForm.password().errors(); track error.kind) {
+                  <div class="error-font">
+                    {{ error.message }}
+                  </div>
+                }
               }
             </div>
             <label class="default-font" for="currency">Currency</label>
             <div class="select">
-              <mat-select formControlName="currency" required>
+              <mat-select [formField]="registrationForm.currency">
                 @for (option of currencyOptions; track option) {
                   <mat-option [value]="option">
-                    {{ option }}
+                    {{ CurrencyEnum[option] }}
                   </mat-option>
                 }
               </mat-select>
-              @if (hasFieldError('currency')) {
-                <div class="error-font">
-                  {{ getFieldErrorMessage('currency') }}
-                </div>
+              @if (registrationForm.currency().touched() && registrationForm.currency().invalid()) {
+                @for (error of registrationForm.currency().errors(); track error.kind) {
+                  <div class="error-font">
+                    {{ error.message }}
+                  </div>
+                }
               }
             </div>
-            <button class="custom-button bounce-button default-font" type="submit" [disabled]="!isFormValid()">
+            <button class="custom-button bounce-button default-font" type="submit" [disabled]="!registrationForm().valid()">
               Register
             </button>
           </form>

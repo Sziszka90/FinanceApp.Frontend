@@ -3,7 +3,7 @@
 }
 @if (!loading()) {
   <div class="form-container">
-    <form class="form-element" [formGroup]="formGroup!" (ngSubmit)="onSubmit()">
+    <form class="form-element" [formRoot]="loginForm">
       <h3 class="default-font">Log In</h3>
       @if (hasError()) {
         <div class="error-message default-font">
@@ -15,15 +15,15 @@
         <input
           class="default-font"
           id="email"
-          formControlName="email"
-          required
+          [formField]="loginForm.email"
           placeholder="Email"
           />
-          @if (hasFieldError('email')) {
-            <div class="error-message default-font"
-              >
-              {{ getFieldErrorMessage('email') }}
-            </div>
+          @if (loginForm.email().touched() && loginForm.email().invalid()) {
+            @for (error of loginForm.email().errors(); track error.kind) {
+              <div class="error-message default-font">
+                {{ error.message }}
+              </div>
+            }
           }
         </div>
         <label class="default-font" for="password">Password</label>
@@ -32,19 +32,19 @@
             class="default-font"
             id="password"
             type="password"
-            formControlName="password"
-            required
+            [formField]="loginForm.password"
             placeholder="Password"
             />
-            @if (hasFieldError('password')) {
-              <div class="error-message default-font"
-                >
-                {{ getFieldErrorMessage('password') }}
-              </div>
+            @if (loginForm.password().touched() && loginForm.password().invalid()) {
+              @for (error of loginForm.password().errors(); track error.kind) {
+                <div class="error-message default-font">
+                  {{ error.message }}
+                </div>
+              }
             }
           </div>
           <div class="button-container">
-            <button class="custom-button bounce-button default-font" type="submit" [disabled]="!isFormValid()">Login</button>
+            <button class="custom-button bounce-button default-font" type="submit" [disabled]="!loginForm().valid()">Login</button>
             <button class="custom-button-inverse bounce-button default-font" type="button" routerLink="/registration">Registration</button>
             <button class="custom-button-inverse bounce-button" type="button" (click)="forgotPassword()">Forgot Password</button>
             <button class="small-action-button" type="button" (click)="resendConfirmationEmail()">Resend Email Confirmation</button>
