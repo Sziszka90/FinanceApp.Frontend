@@ -9,7 +9,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
 import { TransactionTypeEnum } from 'src/models/Enums/transaction-type.enum';
-import { TopTransactionGroupDto } from 'src/models/TransactionGroupDtos/top-transaction-group.dto';
+import { GetTransactionDto } from 'src/models/TransactionDtos/get-transaction.dto';
 import { GetUserDto } from 'src/models/UserDtos/get-user.dto';
 
 describe('SpendingAnalyticsComponent', () => {
@@ -18,9 +18,9 @@ describe('SpendingAnalyticsComponent', () => {
 
   beforeEach(async () => {
     const transactionApiService = jasmine.createSpyObj<TransactionApiService>('TransactionApiService', [
-      'getTopTransactionGroups'
+      'getAllTransactions'
     ]);
-    transactionApiService.getTopTransactionGroups.and.returnValue(of([]));
+    transactionApiService.getAllTransactions.and.returnValue(of([]));
 
     const userApiService = jasmine.createSpyObj<UserApiService>('UserApiService', ['getActiveUser']);
     userApiService.getActiveUser.and.returnValue(
@@ -100,31 +100,40 @@ describe('SpendingAnalyticsComponent', () => {
     expect(fixture.debugElement.query(By.css('.summary-card h3')).nativeElement.textContent.trim()).toBe('Total Income');
   });
 
-  it('should show expenses and income from the matching signed group totals', () => {
-    const groups = [
+  it('should show only the selected transaction type for each category', () => {
+    const transactions = [
       {
-        id: 'expense-group',
+        id: 'expense-transaction',
         name: 'Groceries',
-        totalAmount: { amount: 100, currency: CurrencyEnum.EUR },
-        transactionCount: 2,
-        percentage: 50
+        value: { amount: 100, currency: CurrencyEnum.EUR },
+        transactionType: TransactionTypeEnum.Expense,
+        transactionDate: new Date('2026-01-15'),
+        transactionGroup: { id: 'groceries', name: 'Groceries' }
       },
       {
-        id: 'income-group',
+        id: 'income-transaction',
         name: 'Salary',
-        totalAmount: { amount: -200, currency: CurrencyEnum.EUR },
-        transactionCount: 1,
-        percentage: 50
+        value: { amount: 200, currency: CurrencyEnum.EUR },
+        transactionType: 'Income' as unknown as TransactionTypeEnum,
+        transactionDate: new Date('2026-01-20'),
+        transactionGroup: { id: 'salary', name: 'Salary' }
       }
-    ] as TopTransactionGroupDto[];
-    const processTopGroups = (component as unknown as {
-      processTopGroups: (topGroups: TopTransactionGroupDto[], transactionType: TransactionTypeEnum) => void;
-    }).processTopGroups;
+    ] as GetTransactionDto[];
+    const processTransactions = (component as unknown as {
+      processTransactions: (
+        transactions: GetTransactionDto[],
+        startDate: Date,
+        endDate: Date,
+        transactionType: TransactionTypeEnum
+      ) => void;
+    }).processTransactions;
+    const startDate = new Date('2026-01-01');
+    const endDate = new Date('2026-01-31');
 
-    processTopGroups.call(component, groups, TransactionTypeEnum.Expense);
+    processTransactions.call(component, transactions, startDate, endDate, TransactionTypeEnum.Expense);
     expect(component.spendingData().map(group => group.groupName)).toEqual(['Groceries']);
 
-    processTopGroups.call(component, groups, TransactionTypeEnum.Income);
+    processTransactions.call(component, transactions, startDate, endDate, TransactionTypeEnum.Income);
     expect(component.spendingData().map(group => group.groupName)).toEqual(['Salary']);
   });
 });

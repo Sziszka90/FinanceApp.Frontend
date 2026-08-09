@@ -12,7 +12,7 @@ import {
 
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { UserApiService } from 'src/services/user.api.service';
-import { TopTransactionGroupDto } from 'src/models/TransactionGroupDtos/top-transaction-group.dto';
+import { GetTransactionDto } from 'src/models/TransactionDtos/get-transaction.dto';
 import { GetUserDto } from 'src/models/UserDtos/get-user.dto';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
 import { LoaderComponent } from '../shared/loader/loader.component';
@@ -66,6 +66,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
 
   private pieChart: Chart | null = null;
   private barChart: Chart | null = null;
+  private latestRequestId = 0;
 
   readonly filterModel = signal({
     startDate: null as Date | null,
@@ -80,6 +81,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
 
   loadSpendingData(): void {
     this.loading.set(true);
+    const requestId = ++this.latestRequestId;
     const filterValues = this.filterModel();
     const transactionType = filterValues.transactionType;
 
@@ -93,44 +95,86 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
       .pipe(
         switchMap(user => {
           this.user.set(user);
-          return this.transactionApiService.getTopTransactionGroups(startDate, endDate, user.id, undefined);
+          return this.transactionApiService.getAllTransactions();
         })
       )
       .subscribe({
-        next: (topGroups: TopTransactionGroupDto[]) => {
-          this.processTopGroups(topGroups, transactionType);
+        next: (transactions: GetTransactionDto[]) => {
+          if (requestId !== this.latestRequestId) {
+            return;
+          }
+
+          this.processTransactions(transactions, startDate, endDate, transactionType);
           this.loading.set(false);
-          setTimeout(() => this.renderCharts(), 100);
+          setTimeout(() => {
+            if (requestId === this.latestRequestId) {
+              this.renderCharts();
+            }
+          }, 100);
         },
         error: error => {
+          if (requestId !== this.latestRequestId) {
+            return;
+          }
+
           console.error('Error loading data:', error);
           this.loading.set(false);
         }
       });
   }
 
-  private processTopGroups(topGroups: TopTransactionGroupDto[], transactionType: TransactionTypeEnum): void {
-    const filteredGroups =
-      transactionType === TransactionTypeEnum.Income
-        ? topGroups.filter(g => g.totalAmount.amount <= 0)
-        : topGroups.filter(g => g.totalAmount.amount > 0);
+  private processTransactions(
+    transactions: GetTransactionDto[],
+    startDate: Date,
+    endDate: Date,
+    transactionType: TransactionTypeEnum
+  ): void {
+    const transactionsByGroup = new Map<string, SpendingByGroup>();
 
-    const total = filteredGroups.reduce((sum, g) => sum + Math.abs(g.totalAmount.amount), 0);
+    for (const transaction of transactions) {
+      const transactionDate = new Date(transaction.transactionDate);
+      if (
+        !this.matchesTransactionType(transaction.transactionType, transactionType) ||
+        transactionDate < startDate ||
+        transactionDate > endDate
+      ) {
+        continue;
+      }
+
+      const groupId = transaction.transactionGroup?.id ?? 'uncategorized';
+      const group = transactionsByGroup.get(groupId) ?? {
+        groupName: transaction.transactionGroup?.name ?? 'Uncategorized',
+        totalAmount: 0,
+        transactionCount: 0,
+        percentage: 0
+      };
+
+      group.totalAmount += Math.abs(transaction.value.amount);
+      group.transactionCount += 1;
+      transactionsByGroup.set(groupId, group);
+    }
+
+    const total = Array.from(transactionsByGroup.values()).reduce((sum, group) => sum + group.totalAmount, 0);
     this.totalSpending.set(total);
 
-    const spendingData: SpendingByGroup[] = filteredGroups
-      .map(group => {
-        const amount = Math.abs(group.totalAmount.amount);
-        return {
-          groupName: group.name,
-          totalAmount: amount,
-          transactionCount: group.transactionCount,
-          percentage: total > 0 ? (amount / total) * 100 : 0
-        };
-      })
+    const spendingData = Array.from(transactionsByGroup.values())
+      .map(group => ({
+        ...group,
+        percentage: total > 0 ? (group.totalAmount / total) * 100 : 0
+      }))
       .sort((a, b) => b.totalAmount - a.totalAmount);
 
     this.spendingData.set(spendingData);
+  }
+
+  private matchesTransactionType(
+    actualTransactionType: TransactionTypeEnum,
+    selectedTransactionType: TransactionTypeEnum
+  ): boolean {
+    return (
+      actualTransactionType === selectedTransactionType ||
+      actualTransactionType === (TransactionTypeEnum[selectedTransactionType] as unknown as TransactionTypeEnum)
+    );
   }
 
   private renderCharts(): void {
