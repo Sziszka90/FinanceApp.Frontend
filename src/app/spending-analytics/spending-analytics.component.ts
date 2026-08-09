@@ -1,6 +1,5 @@
 import {
   Component,
-  effect,
   inject,
   OnInit,
   signal,
@@ -76,15 +75,13 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
   readonly filterForm = form(this.filterModel);
 
   ngOnInit(): void {
-    effect(() => {
-      this.filterModel();
-      this.loadSpendingData();
-    });
+    this.loadSpendingData();
   }
 
   loadSpendingData(): void {
     this.loading.set(true);
     const filterValues = this.filterModel();
+    const transactionType = filterValues.transactionType;
 
     const startDate = filterValues.startDate
       ? new Date(filterValues.startDate)
@@ -101,7 +98,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
       )
       .subscribe({
         next: (topGroups: TopTransactionGroupDto[]) => {
-          this.processTopGroups(topGroups);
+          this.processTopGroups(topGroups, transactionType);
           this.loading.set(false);
           setTimeout(() => this.renderCharts(), 100);
         },
@@ -112,13 +109,11 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
       });
   }
 
-  private processTopGroups(topGroups: TopTransactionGroupDto[]): void {
-    const transactionType = this.filterModel().transactionType;
-
+  private processTopGroups(topGroups: TopTransactionGroupDto[], transactionType: TransactionTypeEnum): void {
     const filteredGroups =
       transactionType === TransactionTypeEnum.Income
-        ? topGroups.filter(g => g.totalAmount.amount > 0)
-        : topGroups.filter(g => g.totalAmount.amount <= 0);
+        ? topGroups.filter(g => g.totalAmount.amount <= 0)
+        : topGroups.filter(g => g.totalAmount.amount > 0);
 
     const total = filteredGroups.reduce((sum, g) => sum + Math.abs(g.totalAmount.amount), 0);
     this.totalSpending.set(total);
@@ -269,12 +264,18 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
     this.chartType.update(type => (type === 'pie' ? 'bar' : 'pie'));
   }
 
+  setTransactionType(transactionType: TransactionTypeEnum): void {
+    this.filterForm.transactionType().value.set(transactionType);
+    this.loadSpendingData();
+  }
+
   resetFilters(): void {
     this.filterModel.update(model => ({
       ...model,
       startDate: null,
       endDate: null
     }));
+    this.loadSpendingData();
   }
 
   getCurrencySymbol(): string {

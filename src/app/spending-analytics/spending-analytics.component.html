@@ -14,14 +14,14 @@
             type="button"
             class="toggle-button" 
             [class.active]="filterModel().transactionType === TransactionTypeEnum.Income"
-            (click)="filterForm.transactionType().value.set(TransactionTypeEnum.Income)">
+            (click)="setTransactionType(TransactionTypeEnum.Income)">
             Income
           </button>
           <button 
             type="button"
             class="toggle-button" 
             [class.active]="filterModel().transactionType === TransactionTypeEnum.Expense"
-            (click)="filterForm.transactionType().value.set(TransactionTypeEnum.Expense)">
+            (click)="setTransactionType(TransactionTypeEnum.Expense)">
             Expense
           </button>
         </div>

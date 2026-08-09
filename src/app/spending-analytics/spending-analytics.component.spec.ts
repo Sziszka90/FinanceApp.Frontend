@@ -9,6 +9,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
 import { TransactionTypeEnum } from 'src/models/Enums/transaction-type.enum';
+import { TopTransactionGroupDto } from 'src/models/TransactionGroupDtos/top-transaction-group.dto';
 import { GetUserDto } from 'src/models/UserDtos/get-user.dto';
 
 describe('SpendingAnalyticsComponent', () => {
@@ -97,5 +98,33 @@ describe('SpendingAnalyticsComponent', () => {
     fixture.detectChanges();
 
     expect(fixture.debugElement.query(By.css('.summary-card h3')).nativeElement.textContent.trim()).toBe('Total Income');
+  });
+
+  it('should show expenses and income from the matching signed group totals', () => {
+    const groups = [
+      {
+        id: 'expense-group',
+        name: 'Groceries',
+        totalAmount: { amount: 100, currency: CurrencyEnum.EUR },
+        transactionCount: 2,
+        percentage: 50
+      },
+      {
+        id: 'income-group',
+        name: 'Salary',
+        totalAmount: { amount: -200, currency: CurrencyEnum.EUR },
+        transactionCount: 1,
+        percentage: 50
+      }
+    ] as TopTransactionGroupDto[];
+    const processTopGroups = (component as unknown as {
+      processTopGroups: (topGroups: TopTransactionGroupDto[], transactionType: TransactionTypeEnum) => void;
+    }).processTopGroups;
+
+    processTopGroups.call(component, groups, TransactionTypeEnum.Expense);
+    expect(component.spendingData().map(group => group.groupName)).toEqual(['Groceries']);
+
+    processTopGroups.call(component, groups, TransactionTypeEnum.Income);
+    expect(component.spendingData().map(group => group.groupName)).toEqual(['Salary']);
   });
 });
