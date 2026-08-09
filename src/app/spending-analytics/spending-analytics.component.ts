@@ -63,6 +63,7 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
   public totalSpending = signal<number>(0);
   public chartType = signal<'pie' | 'bar'>('pie');
   public user = signal<GetUserDto | null>(null);
+  readonly TransactionTypeEnum = TransactionTypeEnum;
 
   private pieChart: Chart | null = null;
   private barChart: Chart | null = null;

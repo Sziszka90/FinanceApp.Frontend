@@ -13,15 +13,15 @@
           <button 
             type="button"
             class="toggle-button" 
-            [class.active]="filterModel().transactionType === 1"
-            (click)="filterForm.transactionType().value.set(1)">
+            [class.active]="filterModel().transactionType === TransactionTypeEnum.Income"
+            (click)="filterForm.transactionType().value.set(TransactionTypeEnum.Income)">
             Income
           </button>
           <button 
             type="button"
             class="toggle-button" 
-            [class.active]="filterModel().transactionType === 2"
-            (click)="filterForm.transactionType().value.set(2)">
+            [class.active]="filterModel().transactionType === TransactionTypeEnum.Expense"
+            (click)="filterForm.transactionType().value.set(TransactionTypeEnum.Expense)">
             Expense
           </button>
         </div>
@@ -86,7 +86,7 @@
     @if (spendingData().length > 0) {
       <div class="analytics-content">
         <div class="summary-card">
-          <h3>Total {{ filterModel().transactionType === 1 ? 'Expenses' : 'Income' }}</h3>
+          <h3>Total {{ filterModel().transactionType === TransactionTypeEnum.Income ? 'Income' : 'Expenses' }}</h3>
           <p class="total-amount">{{ getCurrencySymbol() }}{{ totalSpending().toFixed(2) }}</p>
           <p class="transaction-count">{{ spendingData().length }} categories</p>
         </div>
