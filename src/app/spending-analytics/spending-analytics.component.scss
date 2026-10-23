@@ -1,0 +1,95 @@
+@use 'base/variables' as variables;
+
+.spending-analytics-container { margin: 0 auto; max-width: 1440px; padding: clamp(1rem, 3vw, 2rem); }
+.header { margin: 0 0 1.5rem; }
+.header .title { color: variables.$text-color; font-size: clamp(1.8rem, 3vw, 2.35rem); margin: 0; }
+.header .subtitle { color: variables.$muted-color; font-size: 0.9rem; margin: 0.55rem 0 0; }
+
+.filters-container { margin-bottom: 1.25rem; padding: 1.25rem; }
+.filters-form { align-items: flex-end; display: flex; flex-wrap: wrap; gap: 1rem; }
+.filter-group { display: flex; flex: 1 1 180px; flex-direction: column; gap: 0.5rem; min-width: 150px; }
+.filter-group label { color: variables.$muted-color; font-size: 0.8rem; font-weight: 600; }
+.filter-select, .date-picker { width: 100%; }
+.transaction-type-toggle, .chart-toggle {
+  background: variables.$navigation-background;
+  border: 1px solid variables.$border-color;
+  border-radius: 9px;
+  display: flex;
+  gap: 0.2rem;
+  padding: 0.25rem;
+}
+.toggle-button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: variables.$muted-color;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  gap: 0.4rem;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0.5rem 0.8rem;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+.toggle-button:hover { color: variables.$text-color; }
+.toggle-button.active { background: variables.$primary-selected; border-color: color-mix(in srgb, var(--color-primary) 25%, transparent); color: variables.$primary-hover; }
+.filter-actions { display: flex; gap: 0.5rem; }
+.filter-actions button[mat-raised-button] { background: variables.$primary-color; color: variables.$on-primary-color; }
+.filter-actions button[mat-button] { border: 1px solid variables.$border-color; color: variables.$muted-color; }
+
+.charts-container, .data-table { margin: 0 0 1.25rem; padding: clamp(1rem, 2.5vw, 1.75rem); }
+.charts-container.hidden, .chart-wrapper.hidden { display: none; }
+.chart-wrapper h3, .data-table h3 { color: variables.$text-color; font-size: 1rem; margin: 0 0 1rem; }
+.chart-container { height: 340px; margin: 0 auto; max-width: 1050px; position: relative; }
+
+.analytics-content { display: grid; gap: 1.25rem; grid-template-columns: minmax(220px, 0.28fr) minmax(0, 1fr); }
+.summary-card {
+  align-self: start;
+  background: variables.$surface-background;
+  border: 1px solid variables.$border-color;
+  border-radius: 12px;
+  grid-column: 1;
+  padding: 1.35rem;
+}
+.summary-card h3 { color: variables.$muted-color; font-family: variables.$default-font; font-size: 0.8rem; font-weight: 600; letter-spacing: 0; margin: 0 0 0.9rem; }
+.summary-card .total-amount { color: variables.$text-color; font-family: variables.$title-font; font-size: clamp(1.75rem, 3vw, 2.25rem); font-variant-numeric: tabular-nums; font-weight: 700; letter-spacing: -0.04em; margin: 0; }
+.summary-card.income-summary .total-amount { color: variables.$green-color; }
+.summary-card.expense-summary .total-amount { color: variables.$red-color; }
+.summary-card .transaction-count { color: variables.$muted-color; font-size: 0.78rem; margin: 0.5rem 0 0; }
+.chart-controls { align-self: start; display: flex; grid-column: 2; justify-content: flex-end; }
+.chart-toggle { display: inline-flex; }
+.chart-toggle .toggle-button { flex: 0 0 auto; }
+.data-table { grid-column: 1 / -1; margin: 0; }
+.data-table > p { color: variables.$muted-color; font-size: 0.8rem; margin: -0.5rem 0 1rem; }
+.table-wrapper { overflow-x: auto; }
+.spending-table { border-collapse: collapse; min-width: 560px; width: 100%; }
+.spending-table th { background: variables.$navigation-background; border-bottom: 1px solid variables.$border-color; color: variables.$muted-color; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; padding: 0.8rem 1rem; text-align: left; text-transform: uppercase; }
+.spending-table td { border-bottom: 1px solid variables.$border-color; color: variables.$text-color; font-size: 0.85rem; padding: 0.9rem 1rem; }
+.spending-table tbody tr:hover { background: variables.$surface-elevated; }
+.spending-table td.amount, .spending-table th:nth-child(2) { font-variant-numeric: tabular-nums; text-align: right; }
+.spending-table td.amount { color: variables.$primary-hover; font-weight: 600; }
+.spending-table td.count, .spending-table td.percentage { color: variables.$muted-color; }
+.no-data { margin-top: 1rem; padding: 2.5rem 1.5rem; text-align: center; }
+.no-data p { color: variables.$muted-color; font-size: 0.9rem; margin: 0.4rem 0; }
+.no-data p:first-child { color: variables.$text-color; font-weight: 600; }
+
+@media (max-width: 760px) {
+  .analytics-content { grid-template-columns: 1fr; }
+  .summary-card, .chart-controls, .data-table { grid-column: 1; }
+  .summary-card { order: 1; }
+  .chart-controls { justify-content: flex-start; order: 2; }
+  .data-table { order: 3; }
+  .chart-container { height: 280px; }
+}
+@media (max-width: 500px) {
+  .filters-form { align-items: stretch; flex-direction: column; }
+  .filter-group { width: 100%; }
+  .filter-actions { width: 100%; }
+  .filter-actions button { flex: 1; }
+  .chart-container { height: 250px; }
+  .chart-toggle .toggle-button { padding-inline: 0.55rem; }
+}

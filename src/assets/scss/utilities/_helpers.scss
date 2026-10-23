@@ -1,0 +1,44 @@
+@use "../base/variables" as variables;
+
+.error-snackbar { background: variables.$red-color; color: variables.$app-background; }
+.info-snackbar { background: variables.$surface-elevated; color: variables.$text-color; }
+
+.error-message {
+  background: rgba(251, 113, 113, 0.08);
+  border: 1px solid rgba(251, 113, 113, 0.35);
+  border-radius: 8px;
+  color: variables.$red-color;
+  margin: 0.5rem 0 1rem;
+  overflow-wrap: anywhere;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.select {
+  appearance: none;
+  cursor: pointer;
+  min-width: 150px;
+  width: 100%;
+}
+.select:disabled { cursor: not-allowed; }
+
+.error-font { color: variables.$red-color; font-size: 0.875rem; margin-top: 0.35rem; }
+.summary { margin: 1.5rem 0; padding: 1.25rem; text-align: left; }
+
+.input-with-icon { display: flex; position: relative; width: 100%; }
+.input-with-icon input { padding-right: 2.75rem; width: 100%; }
+.input-with-icon i {
+  color: variables.$muted-color;
+  position: absolute;
+  right: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+}
+
+.mat-mdc-form-field-subscript-wrapper, .mat-mdc-form-field-bottom-align { min-height: 0; }
+mat-form-field { width: 100%; }
+
+@media (max-width: 600px) {
+  .select { min-width: 0; }
+}

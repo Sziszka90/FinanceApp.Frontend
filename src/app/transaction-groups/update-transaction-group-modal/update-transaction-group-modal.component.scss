@@ -1,0 +1,47 @@
+@use 'base/variables' as variables;
+
+h3 { color: variables.$text-color; font-size: 1.35rem; font-weight: 700; margin: 0 0 1.25rem; text-align: left; }
+
+p {
+  text-align: center;
+  color: variables.$muted-color;
+}
+
+.group-icon {
+  display: flex;
+  flex-direction: column ;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-header {
+  display: flex;
+  flex-direction: column ;
+  justify-content: center;
+  align-items: center;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem;
+}
+
+mat-select {
+  background: variables.$navigation-background;
+  border: 1px solid variables.$border-color;
+  border-radius: 8px;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+}
+
+
+.form-container {
+  box-sizing: border-box;
+  margin: 0 auto;
+  max-width: none;
+  width: 100%;
+}

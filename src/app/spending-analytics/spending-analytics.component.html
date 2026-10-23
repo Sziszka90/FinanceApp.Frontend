@@ -1,0 +1,149 @@
+<div class="spending-analytics-container">
+  <div class="header">
+    <h1 class="title">Spending Analytics</h1>
+    <p class="subtitle">Visualize your spending patterns by transaction groups</p>
+  </div>
+
+  <div class="filters-container">
+    <form class="filters-form">
+
+      <div class="filter-group">
+        <label>Type</label>
+        <div class="transaction-type-toggle">
+          <button 
+            type="button"
+            class="toggle-button" 
+            [class.active]="filterModel().transactionType === TransactionTypeEnum.Income"
+            (click)="setTransactionType(TransactionTypeEnum.Income)">
+            Income
+          </button>
+          <button 
+            type="button"
+            class="toggle-button" 
+            [class.active]="filterModel().transactionType === TransactionTypeEnum.Expense"
+            (click)="setTransactionType(TransactionTypeEnum.Expense)">
+            Expense
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Start Date</label>
+        <input
+          type="text"
+          [formField]="filterForm.startDate"
+          class="form-control date-picker"
+          placeholder="Select start date"
+          bsDatepicker
+          [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label>End Date</label>
+        <input
+          type="text"
+          [formField]="filterForm.endDate"
+          class="form-control date-picker"
+          placeholder="Select end date"
+          bsDatepicker
+          [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }"
+        />
+      </div>
+
+      <div class="filter-actions">
+        <button type="button" mat-raised-button color="primary" (click)="loadSpendingData()">
+          Apply Filters
+        </button>
+        <button type="button" mat-button (click)="resetFilters()">
+          Reset
+        </button>
+      </div>
+    </form>
+  </div>
+
+  @if (loading()) {
+    <loader></loader>
+  }
+
+  <div class="charts-container" [class.hidden]="loading() || spendingData().length === 0">
+    <div class="chart-wrapper" [class.hidden]="chartType() !== 'pie'">
+      <h3>Spending Distribution</h3>
+      <div class="chart-container">
+        <canvas #pieChart></canvas>
+      </div>
+    </div>
+
+    <div class="chart-wrapper" [class.hidden]="chartType() !== 'bar'">
+      <h3>Spending by Category</h3>
+      <div class="chart-container">
+        <canvas #barChart></canvas>
+      </div>
+    </div>
+  </div>
+
+  @if (!loading()) {
+    @if (spendingData().length > 0) {
+      <div class="analytics-content">
+        <div class="summary-card" [class.income-summary]="filterModel().transactionType === TransactionTypeEnum.Income" [class.expense-summary]="filterModel().transactionType === TransactionTypeEnum.Expense">
+          <h3>Total {{ filterModel().transactionType === TransactionTypeEnum.Income ? 'Income' : 'Expenses' }}</h3>
+          <p class="total-amount financial-value">{{ getCurrencySymbol() }}{{ totalSpending().toFixed(2) }}</p>
+          <p class="transaction-count">{{ spendingData().length }} categories</p>
+        </div>
+
+        <div class="chart-controls">
+          <div class="chart-toggle">
+            <button 
+              class="toggle-button" 
+              [class.active]="chartType() === 'pie'" 
+              (click)="chartType.set('pie')">
+              <span class="material-icons">pie_chart</span>
+              Pie Chart
+            </button>
+            <button 
+              class="toggle-button" 
+              [class.active]="chartType() === 'bar'" 
+              (click)="chartType.set('bar')">
+              <span class="material-icons">bar_chart</span>
+              Bar Chart
+            </button>
+          </div>
+        </div>
+
+        <div class="data-table">
+          <h3>Breakdown by Category</h3>
+          <p>Total items: {{ spendingData().length }}</p>
+          <div class="table-wrapper">
+            <table class="spending-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Transactions</th>
+                  <th>Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of spendingData(); track $index) {
+                  <tr>
+                    <td class="group-name">{{ item.groupName }}</td>
+                    <td class="amount">{{ getCurrencySymbol() }}{{ item.totalAmount.toFixed(2) }}</td>
+                    <td class="count">{{ item.transactionCount }}</td>
+                    <td class="percentage">
+                      {{ item.percentage.toFixed(1) || '0.0' }}%
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="no-data">
+        <p>No transactions found for the selected filters.</p>
+        <p>Try adjusting your date range or transaction type.</p>
+      </div>
+    }
+  }
+</div>

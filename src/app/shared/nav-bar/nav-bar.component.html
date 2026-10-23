@@ -1,0 +1,39 @@
+<header class="nav-bar">
+  <a class="brand" routerLink="/" aria-label="Finance App home">
+    <img class="brand-mark" src="assets/wallet-logo.svg" alt="" />
+    <span class="brand-copy">
+      <span class="title title-font">{{ 'APPNAME' | translate }}</span>
+      <span class="brand-caption">PERSONAL FINANCE</span>
+    </span>
+  </a>
+
+  <nav class="desktop-navigation" aria-label="Main navigation">
+    <a class="navigation-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ 'MENU.HOME' | translate }}</a>
+    @if (userLoggedIn()) {
+      <a class="navigation-link" routerLink="/transactions" routerLinkActive="active">{{ 'MENU.TRANSACTIONS' | translate }}</a>
+      <a class="navigation-link" routerLink="/transactions-groups" routerLinkActive="active">{{ 'MENU.TRANSACTION_GROUPS' | translate }}</a>
+      <a class="navigation-link" routerLink="/spending-analytics" routerLinkActive="active">{{ 'MENU.SPENDING_ANALYTICS' | translate }}</a>
+    }
+  </nav>
+
+  <div class="navigation-actions">
+    <button class="account-button" type="button" (click)="login()">
+      <span class="material-icons" aria-hidden="true">{{ userLoggedIn() ? 'account_circle' : 'login' }}</span>
+      <span>{{ userLoggedIn() ? 'Account' : 'Sign in' }}</span>
+    </button>
+    <button class="mobile-menu-toggle" type="button" (click)="menuToggle()" [attr.aria-expanded]="showMenu()" aria-label="Toggle navigation menu">
+      <span class="material-icons" aria-hidden="true">{{ showMenu() ? 'close' : 'menu' }}</span>
+    </button>
+  </div>
+
+  @if (showMenu()) {
+    <nav class="mobile-navigation" aria-label="Mobile navigation">
+      <a class="navigation-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="menuToggle()">{{ 'MENU.HOME' | translate }}</a>
+      @if (userLoggedIn()) {
+        <a class="navigation-link" routerLink="/transactions" routerLinkActive="active" (click)="menuToggle()">{{ 'MENU.TRANSACTIONS' | translate }}</a>
+        <a class="navigation-link" routerLink="/transactions-groups" routerLinkActive="active" (click)="menuToggle()">{{ 'MENU.TRANSACTION_GROUPS' | translate }}</a>
+        <a class="navigation-link" routerLink="/spending-analytics" routerLinkActive="active" (click)="menuToggle()">{{ 'MENU.SPENDING_ANALYTICS' | translate }}</a>
+      }
+    </nav>
+  }
+</header>

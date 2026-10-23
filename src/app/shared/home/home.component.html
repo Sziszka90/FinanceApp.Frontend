@@ -1,0 +1,114 @@
+<main class="home-page">
+  <section class="hero-section" aria-labelledby="home-title">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="eyebrow-dot"></span> PERSONAL FINANCE, MADE CLEAR</div>
+      <h1 id="home-title">A clearer view of <span>your money.</span></h1>
+      <p class="hero-description">
+        Bring your transactions and spending patterns together in one calm, considered space.
+        Know where you stand and make your next decision with confidence.
+      </p>
+      <div class="hero-actions">
+        @if (authenticated()) {
+          <a class="custom-button" routerLink="/transactions">View transactions <span aria-hidden="true">→</span></a>
+          <a class="text-link" routerLink="/spending-analytics">Explore spending analytics</a>
+        } @else {
+          <a class="custom-button" routerLink="/registration">Create your account <span aria-hidden="true">→</span></a>
+          <a class="text-link" routerLink="/login">I already have an account</a>
+        }
+      </div>
+      <div class="hero-note"><span class="material-icons" aria-hidden="true">lock</span> Your financial details stay private and secure.</div>
+    </div>
+
+    <aside class="preview-card" aria-label="Monthly spending snapshot">
+      <div class="preview-topline">
+        <div>
+          <p class="preview-kicker">MONTHLY SNAPSHOT</p>
+          <h2>Spending overview</h2>
+        </div>
+        @if (authenticated()) {
+          <select
+            class="preview-month-picker"
+            aria-label="Select snapshot month"
+            [value]="selectedMonth()"
+            (change)="onMonthChange($event)">
+            @for (month of availableMonths(); track month.value) {
+              <option [value]="month.value">{{ month.label }}</option>
+            }
+          </select>
+        } @else {
+          <span class="preview-period">This month</span>
+        }
+      </div>
+
+      @if (loading()) {
+        <div class="snapshot-state" role="status">Loading your monthly snapshot…</div>
+      } @else if (loadFailed()) {
+        <div class="snapshot-state" role="alert">
+          <span>We couldn’t load your snapshot.</span>
+          <button type="button" class="snapshot-retry" (click)="loadSnapshot()">Try again</button>
+        </div>
+      } @else if (!authenticated()) {
+        <div class="snapshot-state snapshot-sign-in">
+          <span class="material-icons" aria-hidden="true">insights</span>
+          <p>Sign in to see your spending this month.</p>
+          <a routerLink="/login">Sign in to your account <span aria-hidden="true">→</span></a>
+        </div>
+      } @else if (snapshot(); as data) {
+        <div class="preview-total-label">Total outflow ({{ data.currency }} transactions)</div>
+        <div class="preview-total">{{ formatAmount(data.total, data.currency) }}</div>
+        <div class="preview-change" [class.preview-change--lower]="data.isLowerThanPrevious" [class.preview-change--higher]="data.comparison !== null && !data.isLowerThanPrevious">
+          @if (data.comparison !== null) {
+            <span class="material-icons" aria-hidden="true">{{ data.isLowerThanPrevious ? 'south_east' : 'north_east' }}</span>
+          }
+          <span class="preview-change-caption">{{ data.comparisonText }}</span>
+        </div>
+
+        <div class="preview-chart" aria-hidden="true">
+          <div class="chart-gridline"></div><div class="chart-gridline"></div><div class="chart-gridline"></div>
+          <svg viewBox="0 0 440 120" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="snapshot-area-fill" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.22" />
+                <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <path [attr.d]="data.chartArea" fill="url(#snapshot-area-fill)" />
+            <path [attr.d]="data.chartLine" fill="none" stroke="var(--color-primary)" stroke-width="3" vector-effect="non-scaling-stroke" />
+          </svg>
+        </div>
+        <div class="preview-months">
+          @for (label of data.dateLabels; track $index) {
+            <span>{{ label }}</span>
+          }
+        </div>
+
+        <div class="preview-divider"></div>
+        <div class="preview-categories">
+          @for (category of data.categories; track category.name) {
+            <div class="category-row">
+              <span class="category-icon" aria-hidden="true">
+                @if (isFontAwesomeIcon(category.icon)) {
+                  <i [class]="category.icon"></i>
+                } @else {
+                  <span class="material-icons">{{ category.icon }}</span>
+                }
+              </span>
+              <span class="category-name">{{ category.name }}</span>
+              <span class="category-amount">{{ formatAmount(category.amount, data.currency) }}</span>
+            </div>
+          } @empty {
+            <div class="category-empty">No expenses recorded this month yet.</div>
+          }
+        </div>
+      }
+    </aside>
+  </section>
+
+  <section class="feature-strip" aria-label="Finance App features">
+    <article class="feature-item"><span class="feature-icon material-icons" aria-hidden="true">receipt_long</span><div><h2>Transactions in one place</h2><p>Keep everyday spending organized and easy to review.</p></div></article>
+    <article class="feature-item"><span class="feature-icon material-icons" aria-hidden="true">donut_small</span><div><h2>Patterns at a glance</h2><p>See how your spending is distributed by category.</p></div></article>
+    <article class="feature-item"><span class="feature-icon material-icons" aria-hidden="true">tune</span><div><h2>Built around you</h2><p>Choose your currency and shape categories your way.</p></div></article>
+  </section>
+
+  <footer class="home-footer">Finance App <span>·</span> A more thoughtful way to manage money</footer>
+</main>

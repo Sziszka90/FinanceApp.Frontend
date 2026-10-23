@@ -1,0 +1,369 @@
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  ChangeDetectorRef,
+  ChangeDetectionStrategy
+} from '@angular/core';
+
+import { TransactionApiService } from 'src/services/transactions.api.service';
+import { UserApiService } from 'src/services/user.api.service';
+import { GetTransactionDto } from 'src/models/TransactionDtos/get-transaction.dto';
+import { GetUserDto } from 'src/models/UserDtos/get-user.dto';
+import { CurrencyEnum } from 'src/models/Enums/currency.enum';
+import { LoaderComponent } from '../shared/loader/loader.component';
+import { BaseComponent } from '../shared/base-component';
+import { FormField, form } from '@angular/forms/signals';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatButtonModule } from '@angular/material/button';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { switchMap } from 'rxjs';
+import { TransactionTypeEnum } from 'src/models/Enums/transaction-type.enum';
+
+Chart.register(...registerables);
+
+interface SpendingByGroup {
+  groupName: string;
+  totalAmount: number;
+  transactionCount: number;
+  percentage: number;
+}
+
+@Component({
+  selector: 'spending-analytics',
+  imports: [
+    LoaderComponent,
+    FormField,
+    MatSelectModule,
+    MatSlideToggleModule,
+    MatButtonModule,
+    BsDatepickerModule
+  ],
+  templateUrl: './spending-analytics.component.html',
+  styleUrl: './spending-analytics.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: true
+})
+export class SpendingAnalyticsComponent extends BaseComponent implements OnInit {
+  private transactionApiService = inject(TransactionApiService);
+  private userApiService = inject(UserApiService);
+
+  @ViewChild('pieChart') pieChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('barChart') barChartRef!: ElementRef<HTMLCanvasElement>;
+
+  public override loading = signal<boolean>(false);
+  public spendingData = signal<SpendingByGroup[]>([]);
+  public totalSpending = signal<number>(0);
+  public chartType = signal<'pie' | 'bar'>('pie');
+  public user = signal<GetUserDto | null>(null);
+  readonly TransactionTypeEnum = TransactionTypeEnum;
+
+  private pieChart: Chart | null = null;
+  private barChart: Chart | null = null;
+  private latestRequestId = 0;
+
+  readonly filterModel = signal({
+    startDate: null as Date | null,
+    endDate: null as Date | null,
+    transactionType: TransactionTypeEnum.Expense
+  });
+  readonly filterForm = form(this.filterModel);
+
+  ngOnInit(): void {
+    this.loadSpendingData();
+  }
+
+  loadSpendingData(): void {
+    this.loading.set(true);
+    const requestId = ++this.latestRequestId;
+    const filterValues = this.filterModel();
+    const transactionType = filterValues.transactionType;
+
+    const startDate = filterValues.startDate
+      ? new Date(filterValues.startDate)
+      : new Date(new Date().getFullYear(), 0, 1);
+    const endDate = filterValues.endDate ? new Date(filterValues.endDate) : new Date();
+
+    this.userApiService
+      .getActiveUser()
+      .pipe(
+        switchMap(user => {
+          this.user.set(user);
+          return this.transactionApiService.getAllTransactions();
+        })
+      )
+      .subscribe({
+        next: (transactions: GetTransactionDto[]) => {
+          if (requestId !== this.latestRequestId) {
+            return;
+          }
+
+          this.processTransactions(transactions, startDate, endDate, transactionType);
+          this.loading.set(false);
+          setTimeout(() => {
+            if (requestId === this.latestRequestId) {
+              this.renderCharts();
+            }
+          }, 100);
+        },
+        error: error => {
+          if (requestId !== this.latestRequestId) {
+            return;
+          }
+
+          console.error('Error loading data:', error);
+          this.loading.set(false);
+        }
+      });
+  }
+
+  private processTransactions(
+    transactions: GetTransactionDto[],
+    startDate: Date,
+    endDate: Date,
+    transactionType: TransactionTypeEnum
+  ): void {
+    const transactionsByGroup = new Map<string, SpendingByGroup>();
+
+    for (const transaction of transactions) {
+      const transactionDate = new Date(transaction.transactionDate);
+      if (
+        !this.matchesTransactionType(transaction.transactionType, transactionType) ||
+        transactionDate < startDate ||
+        transactionDate > endDate
+      ) {
+        continue;
+      }
+
+      const groupId = transaction.transactionGroup?.id ?? 'uncategorized';
+      const group = transactionsByGroup.get(groupId) ?? {
+        groupName: transaction.transactionGroup?.name ?? 'Uncategorized',
+        totalAmount: 0,
+        transactionCount: 0,
+        percentage: 0
+      };
+
+      group.totalAmount += Math.abs(transaction.value.amount);
+      group.transactionCount += 1;
+      transactionsByGroup.set(groupId, group);
+    }
+
+    const total = Array.from(transactionsByGroup.values()).reduce((sum, group) => sum + group.totalAmount, 0);
+    this.totalSpending.set(total);
+
+    const spendingData = Array.from(transactionsByGroup.values())
+      .map(group => ({
+        ...group,
+        percentage: total > 0 ? (group.totalAmount / total) * 100 : 0
+      }))
+      .sort((a, b) => b.totalAmount - a.totalAmount);
+
+    this.spendingData.set(spendingData);
+  }
+
+  private matchesTransactionType(
+    actualTransactionType: TransactionTypeEnum,
+    selectedTransactionType: TransactionTypeEnum
+  ): boolean {
+    return (
+      actualTransactionType === selectedTransactionType ||
+      actualTransactionType === (TransactionTypeEnum[selectedTransactionType] as unknown as TransactionTypeEnum)
+    );
+  }
+
+  private renderCharts(): void {
+    if (!this.pieChartRef?.nativeElement || !this.barChartRef?.nativeElement) {
+      return;
+    }
+
+    const data = this.spendingData();
+    if (data.length === 0) {
+      console.log('No spending data available');
+      return;
+    }
+
+    const labels = data.map(d => d.groupName);
+    const amounts = data.map(d => d.totalAmount);
+    const colors = this.generateColors(data.length);
+    const chartPrimary = this.themeColor('--color-primary');
+    const chartSurface = this.themeColor('--bg-card');
+    const chartText = this.themeColor('--text-primary');
+    const chartMuted = this.themeColor('--text-secondary');
+
+    if (this.pieChart) {
+      this.pieChart.destroy();
+    }
+    if (this.barChart) {
+      this.barChart.destroy();
+    }
+
+    const pieConfig: ChartConfiguration<'pie'> = {
+      type: 'pie',
+      data: {
+        labels,
+        datasets: [
+          {
+            data: amounts,
+            backgroundColor: colors,
+            borderWidth: 2,
+            borderColor: chartSurface
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        color: chartText,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              font: { size: 12 },
+              padding: 10,
+              color: chartMuted
+            }
+          },
+          tooltip: {
+            backgroundColor: chartSurface,
+            borderColor: this.themeColor('--border-color'),
+            borderWidth: 1,
+            titleColor: chartText,
+            bodyColor: chartMuted,
+            callbacks: {
+              label: context => {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const percentage = ((value / this.totalSpending()) * 100).toFixed(1);
+                return `${label}: ${this.getCurrencySymbol()}${value.toFixed(2)} (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    const barConfig: ChartConfiguration<'bar'> = {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: `Amount (${this.getCurrencySymbol()})`,
+            data: amounts,
+            backgroundColor: chartPrimary,
+            borderWidth: 1,
+            borderColor: this.themeColor('--color-primary-hover')
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        color: chartText,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: chartSurface,
+            borderColor: this.themeColor('--border-color'),
+            borderWidth: 1,
+            titleColor: chartText,
+            bodyColor: chartMuted,
+            callbacks: {
+              label: context => {
+                const value = context.parsed.y || 0;
+                const percentage = ((value / this.totalSpending()) * 100).toFixed(1);
+                return `${this.getCurrencySymbol()}${value.toFixed(2)} (${percentage}%)`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: { color: this.themeColor('--border-color') },
+            ticks: {
+              color: chartMuted,
+              callback: value => `${this.getCurrencySymbol()}${value}`
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { color: chartMuted }
+          }
+        }
+      }
+    };
+
+    this.pieChart = new Chart(this.pieChartRef.nativeElement, pieConfig);
+    this.barChart = new Chart(this.barChartRef.nativeElement, barConfig);
+  }
+
+  private themeColor(property: string): string {
+    return getComputedStyle(document.documentElement).getPropertyValue(property).trim();
+  }
+
+  private generateColors(count: number): string[] {
+    const baseColors = [
+      '--color-primary',
+      '--chart-series-2',
+      '--chart-series-3',
+      '--chart-series-4',
+      '--chart-series-5',
+      '--chart-series-6',
+      '--chart-series-7',
+      '--chart-series-8'
+    ];
+
+    const colors: string[] = [];
+    for (let i = 0; i < count; i++) {
+      colors.push(this.themeColor(baseColors[i % baseColors.length]));
+    }
+    return colors;
+  }
+
+  toggleChartType(): void {
+    this.chartType.update(type => (type === 'pie' ? 'bar' : 'pie'));
+  }
+
+  setTransactionType(transactionType: TransactionTypeEnum): void {
+    this.filterForm.transactionType().value.set(transactionType);
+    this.loadSpendingData();
+  }
+
+  resetFilters(): void {
+    this.filterModel.update(model => ({
+      ...model,
+      startDate: null,
+      endDate: null
+    }));
+    this.loadSpendingData();
+  }
+
+  getCurrencySymbol(): string {
+    const user = this.user();
+    if (!user) return '€';
+
+    const currency = typeof user.baseCurrency === 'string' ? user.baseCurrency : CurrencyEnum[user.baseCurrency];
+
+    switch (currency) {
+      case 'EUR':
+        return '€';
+      case 'USD':
+        return '$';
+      case 'GBP':
+        return '£';
+      case 'HUF':
+        return 'Ft';
+      default:
+        return '€';
+    }
+  }
+}

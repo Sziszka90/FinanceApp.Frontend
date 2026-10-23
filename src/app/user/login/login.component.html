@@ -1,0 +1,55 @@
+@if (loading()) {
+  <loader></loader>
+}
+@if (!loading()) {
+  <div class="form-container">
+    <form class="form-element" [formRoot]="loginForm">
+      <div class="auth-brand"><img src="assets/wallet-logo.svg" alt="" /><span>Finance App</span></div>
+      <h3 class="default-font">Log In</h3>
+      @if (hasError()) {
+        <div class="error-message default-font">
+          {{ errorMessage() }}
+        </div>
+      }
+      <label class="default-font" for="email">User Email</label>
+      <div class="form-group">
+        <input
+          class="default-font"
+          id="email"
+          [formField]="loginForm.email"
+          placeholder="Email"
+          />
+          @if (loginForm.email().touched() && loginForm.email().invalid()) {
+            @for (error of loginForm.email().errors(); track error.kind) {
+              <div class="error-message default-font">
+                {{ error.message }}
+              </div>
+            }
+          }
+        </div>
+        <label class="default-font" for="password">Password</label>
+        <div class="form-group">
+          <input
+            class="default-font"
+            id="password"
+            type="password"
+            [formField]="loginForm.password"
+            placeholder="Password"
+            />
+            @if (loginForm.password().touched() && loginForm.password().invalid()) {
+              @for (error of loginForm.password().errors(); track error.kind) {
+                <div class="error-message default-font">
+                  {{ error.message }}
+                </div>
+              }
+            }
+          </div>
+          <div class="button-container">
+            <button class="custom-button bounce-button default-font" type="submit" [disabled]="!loginForm().valid()">Login</button>
+            <button class="custom-button-inverse bounce-button default-font" type="button" routerLink="/registration">Registration</button>
+            <button class="custom-button-inverse bounce-button" type="button" (click)="forgotPassword()">Forgot Password</button>
+            <button class="small-action-button" type="button" (click)="resendConfirmationEmail()">Resend Email Confirmation</button>
+          </div>
+        </form>
+      </div>
+    }

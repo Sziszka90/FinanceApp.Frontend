@@ -1,0 +1,70 @@
+@use "../base/variables" as variables;
+
+button, .custom-button, .custom-button-inverse, .custom-small-button, .small-action-button {
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.custom-button, .custom-button-inverse, .small-action-button, .custom-small-button {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: variables.$default-font;
+  font-size: 0.9rem;
+  font-weight: 600;
+  gap: 0.5rem;
+  justify-content: center;
+  line-height: 1.2;
+  margin: 0;
+  min-height: 42px;
+  padding: 0.7rem 1rem;
+  text-align: center;
+  text-decoration: none;
+}
+
+.custom-button {
+  background: variables.$primary-color;
+  border-color: variables.$primary-color;
+  color: variables.$on-primary-color;
+}
+.custom-button:hover:not(:disabled):not(.disabled) {
+  background: variables.$primary-hover;
+  border-color: variables.$primary-hover;
+  color: variables.$on-primary-color;
+  transform: translateY(-1px);
+}
+.custom-button:active:not(:disabled) { background: variables.$primary-active; border-color: variables.$primary-active; }
+
+.custom-button-inverse, .small-action-button, .custom-small-button {
+  background: variables.$surface-elevated;
+  border-color: variables.$border-color;
+  color: variables.$text-color;
+}
+.custom-button-inverse:hover:not(:disabled), .small-action-button:hover:not(:disabled),
+.custom-small-button:hover:not(:disabled) {
+  background: variables.$surface-background;
+  border-color: variables.$muted-color;
+  color: variables.$text-color;
+}
+.custom-small-button { min-height: 36px; padding: 0.45rem; }
+.small-action-button { font-size: 0.825rem; min-height: 36px; padding: 0.5rem 0.75rem; }
+
+.custom-button:disabled, .custom-button-inverse:disabled, .small-action-button:disabled,
+.custom-small-button:disabled, button.disabled {
+  background: variables.$surface-elevated;
+  border-color: variables.$border-color;
+  color: variables.$disabled-color;
+  cursor: not-allowed;
+  opacity: 0.68;
+  transform: none;
+}
+
+.bounce-button:hover { animation: none; }
+.action-button { align-items: center; display: flex; justify-content: center; margin: 1rem; width: 100%; }
+.button-container { align-items: center; display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: flex-start; margin: 1.25rem 0; }
+
+@media (max-width: 600px) {
+  .button-container { align-items: stretch; }
+  .button-container > button { flex: 1 1 100%; }
+}

@@ -1,0 +1,30 @@
+<div class="main-container">
+  <div class="modal-header">
+    <h3>Resend Confirmation Email</h3>
+  </div>
+  @if (hasError()) {
+    <div class="error-message default-font">
+      {{ errorMessage() }}
+    </div>
+  }
+  @if (loading()) {
+    <loader></loader>
+  }
+  @if (!loading()) {
+    <form class="form-container" [formRoot]="resendEmailForm">
+      <label for="email">Email</label>
+      <div class="form-group">
+        <input id="email" type="email" placeholder="Enter your email address" [formField]="resendEmailForm.email" />
+        @if (resendEmailForm.email().touched() && resendEmailForm.email().invalid()) {
+          <div class="error-font">
+            {{ resendEmailForm.email().errors()[0]?.message }}
+          </div>
+        }
+      </div>
+      <div class="button-container">
+        <button type="submit" [disabled]="!resendEmailForm().valid()" class="custom-button bounce-button">Confirm</button>
+        <button type="button" class="custom-button-inverse bounce-button" (click)="onCancel()">Cancel</button>
+      </div>
+    </form>
+  }
+</div>

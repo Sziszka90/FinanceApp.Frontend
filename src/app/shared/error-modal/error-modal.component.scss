@@ -1,0 +1,18 @@
+@use 'base/variables' as variables;
+
+.error-modal-container {
+  align-items: flex-start;
+  background: variables.$surface-background;
+  border: 1px solid color-mix(in srgb, var(--color-negative) 45%, transparent);
+  border-radius: 12px;
+  color: variables.$text-color;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: min(560px, calc(100vw - 2rem));
+  padding: 1.5rem;
+  width: 100%;
+}
+.error-modal-container h1 { color: variables.$red-color; font-size: 1.4rem; margin: 0; }
+.error-modal-container p { color: variables.$muted-color; margin: 0.25rem 0; overflow-wrap: anywhere; }
+.error-modal-container button { align-self: flex-end; color: variables.$text-color; }

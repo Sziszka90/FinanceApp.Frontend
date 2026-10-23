@@ -1,0 +1,105 @@
+<div class="main-container">
+  <div class="modal-header">
+    <h3>Update Transaction</h3>
+    <p class="modal-description">Update the item and click on save!</p>
+  </div>
+  @if (hasError()) {
+    <div class="error-message default-font">
+      {{ errorMessage() }}
+    </div>
+  }
+  @if (loading()) {
+    <loader class="loader"></loader>
+  }
+  @if (!loading()) {
+    <form class="form-container" [formRoot]="updateTransactionForm">
+      <label for="name">Name</label>
+      <div class="form-group">
+        <input id="name" type="text" [formField]="updateTransactionForm.name" />
+        @if (updateTransactionForm.name().touched() && updateTransactionForm.name().invalid()) {
+          @for (error of updateTransactionForm.name().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+          }
+        }
+      </div>
+      <label for="description">Description</label>
+      <div class="form-group">
+        <input id="description" type="text" [formField]="updateTransactionForm.description" />
+      </div>
+      <label for="value">Value</label>
+      <div class="form-group">
+        <input id="value" type="number" [formField]="updateTransactionForm.value" />
+        @if (updateTransactionForm.value().touched() && updateTransactionForm.value().invalid()) {
+          @for (error of updateTransactionForm.value().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+          }
+        }
+      </div>
+      <label for="currency">Currency</label>
+      <div class="form-group">
+        <mat-select class="select" [formField]="updateTransactionForm.currency">
+          @for (option of currencyOptions; track option) {
+            <mat-option [value]="option">
+              &#8226; {{ CurrencyEnum[option] }}
+            </mat-option>
+          }
+        </mat-select>
+        @if (updateTransactionForm.currency().touched() && updateTransactionForm.currency().invalid()) {
+          @for (error of updateTransactionForm.currency().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+          }
+        }
+      </div>
+      <label for="transactionDate">Transaction Date</label>
+      <div class="form-group">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <input id="transactionDate" matInput [matDatepicker]="transactionDatePicker" [formField]="updateTransactionForm.transactionDate" placeholder="Select a date" />
+          <mat-datepicker-toggle matIconSuffix [for]="transactionDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #transactionDatePicker></mat-datepicker>
+        </mat-form-field>
+        @if (updateTransactionForm.transactionDate().touched() && updateTransactionForm.transactionDate().invalid()) {
+          @for (error of updateTransactionForm.transactionDate().errors(); track error.kind) {
+            <div class="error-message">{{ error.message }}</div>
+          }
+        }
+      </div>
+      <label for="transactionType">Transaction Type</label>
+      <div class="form-group">
+        <mat-select class="select" [formField]="updateTransactionForm.transactionType">
+          @for (option of typeOptions; track option) {
+            <mat-option [value]="option.value">
+              &#8226; {{ option.name }}
+            </mat-option>
+          }
+        </mat-select>
+        @if (updateTransactionForm.transactionType().touched() && updateTransactionForm.transactionType().invalid()) {
+          @for (error of updateTransactionForm.transactionType().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+          }
+        }
+      </div>
+      <label for="group">Group</label>
+      <div class="form-group">
+        <mat-select class="select" [formField]="updateTransactionForm.group" [compareWith]="compareCategoryObjects">
+          @for (option of groupOptions(); track option) {
+            <mat-option [value]="option">
+              &#8226; {{ option.name }}
+            </mat-option>
+          }
+        </mat-select>
+      </div>
+      <div class="button-container">
+        <button [disabled]="!updateTransactionForm().valid()" class="custom-button bounce-button" type="submit">Save</button>
+        <button class="custom-button bounce-button" type="button" (click)="onClose()">Close</button>
+      </div>
+    </form>
+  }
+</div>

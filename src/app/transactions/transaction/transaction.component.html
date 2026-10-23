@@ -1,0 +1,169 @@
+<main class="main-container transaction-page">
+  <header class="page-heading">
+    <div>
+      <p class="page-eyebrow">YOUR FINANCES</p>
+      <h1>Transactions</h1>
+      <p class="page-description">Review and organize your everyday spending.</p>
+    </div>
+    <div class="button-container page-actions">
+      <button class="custom-button" [disabled]="loading()" (click)="createTransaction()"><span class="material-icons" aria-hidden="true">add</span> Add transaction</button>
+      <button class="custom-button-inverse" [disabled]="loading()" (click)="getSummary()"><span class="material-icons" aria-hidden="true">summarize</span> Summary</button>
+    </div>
+  </header>
+@if (showSummary()) {
+  <div class="summary default-font text-color-grey">
+    <div class="title">Sum of Transactions</div>
+    <div class="value" id="value">{{ summary()?.amount }} {{ summary()?.currency }}</div>
+  </div>
+}
+
+  <section class="drag-drop-container"
+  (dragover)="onDragOver($event)"
+  (drop)="onDrop($event)">
+  <p>Drag and drop a bank statement PDF here, or click to upload</p>
+  <input type="file" accept=".pdf,application/pdf" (change)="onFileSelect($event)" hidden #fileInput>
+  <button class="custom-button bounce-button" [class.disabled]="loading() || uploadingPdf()" type="button" (click)="!loading() && !uploadingPdf() && fileInput.click()">Upload PDF</button>
+  </section>
+
+  @if (pdfImportJobs.jobs().length > 0) {
+    <section class="pdf-import-jobs" aria-labelledby="pdf-import-jobs-heading">
+      <h2 id="pdf-import-jobs-heading">PDF imports</h2>
+      <ul>
+        @for (job of pdfImportJobs.jobs(); track job.correlationId) {
+          <li class="pdf-import-job" [class.job-failed]="job.status === 'failed'" [class.job-completed]="job.status === 'completed'">
+            <div class="job-details">
+              <span class="job-file-name">{{ job.fileName }}</span>
+              <span class="job-status">
+                @switch (job.status) {
+                  @case ('uploading') { Uploading } 
+                  @case ('queued') { Queued / processing }
+                  @case ('completed') { Imported }
+                  @case ('failed') { Failed }
+                }
+              </span>
+              @if (job.error) { <span class="job-error">{{ job.error }}</span> }
+            </div>
+            @if (job.status === 'completed' || job.status === 'failed') {
+              <button type="button" class="remove-job-button" aria-label="Remove import from list" (click)="pdfImportJobs.remove(job.correlationId)">Remove</button>
+            }
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+<div class="filter-form-container">
+  <h2 class="section-heading">Find a transaction</h2>
+  <form class="search-container">
+    <div class="form-group">
+      <input
+        type="text"
+        placeholder="Search by Name"
+        [formField]="filterForm.name"
+        [class.disabled]="loading()"
+        class="search-input"
+        />
+
+        <div class="input-with-icon">
+          <input
+            name="date"
+            bsDatepicker
+            [formField]="filterForm.date"
+            [class.disabled]="loading()"
+            type="text"
+            placeholder="Select a date" />
+            <i class="fa fa-calendar"></i>
+          </div>
+
+          <mat-select
+            class="select"
+            [formField]="filterForm.type"
+            [class.disabled]="loading()">
+            @for (option of typeOptions; track option) {
+              <mat-option [value]="option.value">
+                &#8226; {{ option.name }}
+              </mat-option>
+            }
+          </mat-select>
+        </div>
+
+        <div class="button-container">
+          <button type="button" class="custom-button bounce-button" [class.disabled]="loading()" (click)="!loading() && resetFilters()">
+            Reset Filter
+          </button>
+        </div>
+      </form>
+    </div>
+
+    @if (loading() && allTransactions().length === 0) {
+      <loader></loader>
+    }
+    @if (!loading() || allTransactions().length > 0) {
+      <div>
+        <div class="table-container mat-elevation-z8 transactions-table" style="overflow: auto; max-height: 70vh;">
+          @if (allTransactions().length > 0) {
+            <div>
+              <table mat-table [dataSource]="dataSource()" matSort class="mat-elevation-z8">
+                <ng-container class="column" matColumnDef="name">
+                  <th mat-header-cell appColumnResize *matHeaderCellDef mat-sort-header> Name </th>
+                  <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="description">
+                  <th mat-header-cell appColumnResize *matHeaderCellDef> Description </th>
+                  <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="amount">
+                  <th mat-header-cell appColumnResize *matHeaderCellDef mat-sort-header>Amount</th>
+                  <td class="financial-value" mat-cell *matCellDef="let element" [class.positive-value]="element.transactionType !== 'Expense'" [class.negative-value]="element.transactionType === 'Expense'">{{ element.value.amount }}</td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="currency">
+                  <th mat-header-cell appColumnResize *matHeaderCellDef>Currency</th>
+                  <td mat-cell *matCellDef="let element">{{ element.value.currency }}</td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="transactionDate">
+                  <th mat-header-cell appColumnResize *matHeaderCellDef mat-sort-header>Transaction Date</th>
+                  <td mat-cell *matCellDef="let element">{{ element.transactionDate | date: 'yyyy/MM/dd' }}</td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="transactionType">
+                  <th mat-header-cell appColumnResize *matHeaderCellDef>Transaction Type</th>
+                  <td mat-cell *matCellDef="let element"><span class="transaction-type" [class.income-type]="element.transactionType !== 'Expense'" [class.expense-type]="element.transactionType === 'Expense'">{{ element.transactionType }}</span></td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="group">
+                  <th mat-header-cell appColumnResize *matHeaderCellDef> Group </th>
+                  <td mat-cell *matCellDef="let element"> {{element.transactionGroup != undefined ? element.transactionGroup.name : ""}} </td>
+                </ng-container>
+                <ng-container class="column" matColumnDef="actions">
+                  <th mat-header-cell appColumnResize *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let row">
+                    <div class="action-button-container">
+                      <button class="custom-small-button bounce-button" [class.disabled]="loading()" (click)="!loading() && deleteTransaction(row)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                      <button class="custom-small-button bounce-button" [class.disabled]="loading()" (click)="!loading() && editTransaction(row)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                    </div>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" ></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'expense': row.transactionType === 'Expense', 'income': row.transactionType !== 'Expense'}"></tr>
+              </table>
+            </div>
+          } @else {
+            <div class="default-font no-transactions">
+              No transactions found.
+            </div>
+          }
+
+        </div>
+        @if (nextCursor()) {
+          <div class="load-more-container">
+            <button type="button" class="custom-button-inverse" [disabled]="loadingMore()" (click)="loadMoreTransactions()">
+              {{ loadingMore() ? 'Loading…' : 'Load more transactions' }}
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+</main>

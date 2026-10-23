@@ -1,0 +1,40 @@
+@use "variables";
+
+.default-font {
+  font-family: variables.$default-font;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.error-font {
+  color: variables.$red-color;
+  font-family: variables.$default-font;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.title-font {
+  font-family: variables.$title-font;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.letter-space { letter-spacing: 0.08em; }
+.text-color-grey { color: variables.$muted-color; }
+.text-color-green { color: variables.$green-color; }
+.text-color-blue { color: variables.$primary-color; }
+
+.gradient-text {
+  width: fit-content;
+  background: linear-gradient(100deg, variables.$text-color 10%, variables.$primary-color 100%);
+  background-clip: text;
+  color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 500px) {
+  .default-font { font-size: 0.9375rem; }
+  .title-font { font-size: 1.125rem; }
+}

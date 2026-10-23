@@ -1,0 +1,80 @@
+@use "../base/variables" as variables;
+
+.table-container {
+  background: variables.$surface-background;
+  border: 1px solid variables.$border-color;
+  border-radius: 12px;
+  margin: 1rem 0;
+  max-width: 100%;
+  overflow: auto;
+}
+
+.mat-mdc-table, table.mat-mdc-table {
+  background: transparent;
+  box-shadow: none !important;
+  min-width: 100%;
+  width: 100%;
+}
+.mat-mdc-header-row { background: variables.$navigation-background; }
+.transactions-table .mat-mdc-header-row,
+.transactions-table .mat-mdc-header-cell {
+  background-color: variables.$navigation-background !important;
+}
+.transactions-table th[appColumnResize] {
+  position: relative;
+  touch-action: none;
+  user-select: none;
+}
+.transactions-table th[appColumnResize]::after {
+  background: transparent;
+  content: "";
+  cursor: col-resize;
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 12px;
+}
+.transactions-table th[appColumnResize]:hover::after {
+  background: rgba(255, 255, 255, 0.12);
+}
+.transactions-table th[mat-sort-header] {
+  cursor: default;
+}
+.transactions-table th[mat-sort-header] .mat-sort-header-arrow {
+  cursor: pointer;
+  opacity: 0.6;
+}
+.mat-mdc-header-cell {
+  border-bottom: 1px solid variables.$border-color !important;
+  color: variables.$muted-color !important;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.045em;
+  padding: 0.9rem 1rem !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.mat-mdc-cell {
+  border-bottom: 1px solid variables.$border-color !important;
+  color: variables.$text-color !important;
+  padding: 0.8rem 1rem !important;
+}
+.mat-mdc-row { background: variables.$surface-background; transition: background-color 140ms ease; }
+.mat-mdc-row:hover { background: variables.$surface-elevated; }
+.mat-mdc-row:last-child .mat-mdc-cell { border-bottom: 0 !important; }
+.mat-mdc-row.income .mat-mdc-cell:first-child { box-shadow: inset 3px 0 variables.$green-color; }
+.mat-mdc-row.expense .mat-mdc-cell:first-child { box-shadow: inset 3px 0 variables.$red-color; }
+td.mat-column-amount { text-align: right !important; }
+.mat-column-actions { white-space: nowrap; width: 1%; }
+.action-button-container { display: flex; gap: 0.4rem; justify-content: center; }
+.no-transactions, .no-transaction-groups {
+  color: variables.$muted-color;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.income { color: variables.$green-color; }
+.expense { color: variables.$red-color; }
+
+@media (max-width: 700px) {
+  .mat-mdc-header-cell, .mat-mdc-cell { padding: 0.7rem 0.75rem !important; }
+}

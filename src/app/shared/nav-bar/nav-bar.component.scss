@@ -1,0 +1,91 @@
+@use 'base/variables' as variables;
+
+:host { display: block; position: sticky; top: 0; z-index: 1000; }
+
+.nav-bar {
+  align-items: center;
+  background: color-mix(in srgb, var(--bg-sidebar) 96%, transparent);
+  border-bottom: 1px solid variables.$border-color;
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  min-height: 72px;
+  padding: 0.75rem clamp(1rem, 4vw, 3rem);
+  position: relative;
+  backdrop-filter: blur(14px);
+}
+
+.brand { align-items: center; display: inline-flex; flex: 0 0 auto; gap: 0.75rem; }
+.brand-mark { display: block; height: 38px; width: 38px; }
+.brand-copy { display: flex; flex-direction: column; gap: 0.05rem; }
+.title { color: variables.$text-color; font-size: 1.125rem; line-height: 1.1; }
+.brand-caption { color: variables.$muted-color; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.13em; }
+
+.desktop-navigation, .navigation-actions { align-items: center; display: flex; }
+.desktop-navigation { gap: 0.3rem; margin-left: auto; }
+.navigation-link {
+  border-radius: 8px;
+  color: variables.$muted-color;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.6rem 0.75rem;
+  transition: background-color 140ms ease, color 140ms ease;
+  white-space: nowrap;
+}
+.navigation-link:hover { background: variables.$surface-elevated; color: variables.$text-color; }
+.navigation-link.active { background: variables.$primary-selected; color: variables.$primary-hover; }
+
+.navigation-actions { gap: 0.5rem; }
+.account-button, .mobile-menu-toggle {
+  align-items: center;
+  background: transparent;
+  border: 1px solid variables.$border-color;
+  border-radius: 8px;
+  color: variables.$text-color;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.875rem;
+  font-weight: 600;
+  gap: 0.5rem;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0.5rem 0.8rem;
+}
+.account-button:hover, .mobile-menu-toggle:hover { background: variables.$surface-elevated; border-color: variables.$muted-color; }
+.account-button .material-icons, .mobile-menu-toggle .material-icons { color: variables.$primary-color; font-size: 1.2rem; }
+.mobile-menu-toggle { display: none; padding: 0.45rem; width: 42px; }
+.mobile-navigation { display: none; }
+
+@media (max-width: 900px) {
+  .nav-bar { gap: 0.75rem; }
+  .desktop-navigation { gap: 0; }
+  .navigation-link { font-size: 0.8rem; padding-inline: 0.55rem; }
+}
+
+@media (max-width: 700px) {
+  .nav-bar { min-height: 64px; }
+  .desktop-navigation { display: none; }
+  .navigation-actions { margin-left: auto; }
+  .mobile-menu-toggle { display: inline-flex; }
+  .mobile-navigation {
+    background: variables.$navigation-background;
+    border: 1px solid variables.$border-color;
+    border-radius: 12px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    position: absolute;
+    right: 1rem;
+    top: calc(100% + 0.5rem);
+    width: min(18rem, calc(100vw - 2rem));
+  }
+}
+
+@media (max-width: 390px) {
+  .brand-caption { display: none; }
+  .brand-mark { height: 34px; width: 34px; }
+  .account-button { font-size: 0; gap: 0; padding: 0.5rem; width: 42px; }
+  .account-button .material-icons { font-size: 1.25rem; }
+}

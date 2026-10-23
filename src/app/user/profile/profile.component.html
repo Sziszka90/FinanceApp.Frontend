@@ -1,0 +1,147 @@
+@if (loading()) {
+  <loader></loader>
+}
+@if (!loading()) {
+  <div class="form-container">
+    <div class="profile-heading">
+      <h3 class="default-font">Profile settings</h3>
+      <button type="button" class="custom-button-inverse" (click)="logout()">Logout</button>
+    </div>
+    @if (hasError()) {
+      <div class="error-message default-font">
+        {{ errorMessage() }}
+      </div>
+    }
+    <form class="form-element" [formRoot]="profileForm">
+      <label class="default-font" for="currency">Currency</label>
+      <label class="default-font" for="userName">User Name</label>
+      <div class="form-group">
+        <input
+          class="default-font"
+          id="userName"
+          type="text"
+          [formField]="profileForm.userName"
+          placeholder="User Name"
+          />
+          @if (profileForm.userName().touched() && profileForm.userName().invalid()) {
+            <div class="error-font">
+              {{ profileForm.userName().errors()[0]?.message }}
+            </div>
+          }
+        </div>
+          <label class="default-font" for="currency">Currency</label>
+          <div class="form-group">
+            <mat-select class="select" [formField]="profileForm.currency" [compareWith]="compareCategoryObjects">
+              @for (option of currencyOptions; track option) {
+                <mat-option [value]="option">
+                  {{ CurrencyEnum[option] }}
+                </mat-option>
+              }
+            </mat-select>
+          </div>
+          <div class="button-container">
+            <button class="bounce-button custom-button" type="submit" [disabled]="!profileForm().valid()">Update</button>
+          </div>
+        </form>
+
+        <section class="password-settings">
+          <div class="password-settings-heading">
+            <h3 class="default-font">Password</h3>
+            <button type="button" class="custom-button-inverse" (click)="togglePasswordChangeForm()">
+              {{ showPasswordChangeForm() ? 'Cancel' : 'Change password' }}
+            </button>
+          </div>
+          @if (showPasswordChangeForm()) {
+            <label class="default-font" for="newPassword">New password</label>
+            <div class="form-group">
+              <input
+                class="default-font"
+                id="newPassword"
+                type="password"
+                autocomplete="new-password"
+                [value]="newPassword()"
+                (input)="newPassword.set($any($event.target).value)" />
+            </div>
+            <label class="default-font" for="confirmNewPassword">Confirm new password</label>
+            <div class="form-group">
+              <input
+                class="default-font"
+                id="confirmNewPassword"
+                type="password"
+                autocomplete="new-password"
+                [value]="confirmNewPassword()"
+                (input)="confirmNewPassword.set($any($event.target).value)" />
+            </div>
+            @if (newPassword() && !newPasswordIsValid()) {
+              <p class="error-font">Use at least 8 characters with uppercase and lowercase letters, a number, and a special character.</p>
+            }
+            @if (confirmNewPassword() && !passwordsMatch()) {
+              <p class="error-font">The passwords do not match.</p>
+            }
+            <div class="button-container">
+              <button type="button" class="custom-button" [disabled]="!newPasswordIsValid() || !passwordsMatch()" (click)="changePassword()">Save new password</button>
+            </div>
+          }
+        </section>
+
+        <section class="bank-prompt-settings">
+          <h3 class="default-font">Bank statement prompts</h3>
+          <p class="default-font">Save instructions for each bank. The selected prompt will be used when you upload a statement PDF.</p>
+
+          <label class="default-font" for="selectedBankPrompt">Prompt to use for PDF uploads</label>
+          <div class="form-group">
+            <select
+              id="selectedBankPrompt"
+              class="default-font"
+              [value]="selectedBankStatementPromptId() ?? ''"
+              (change)="selectBankStatementPrompt($event)">
+              <option value="">Use the standard prompt</option>
+              @for (prompt of bankStatementPrompts(); track prompt.id) {
+                <option [value]="prompt.id">{{ prompt.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="saved-bank-prompts">
+            @for (prompt of bankStatementPrompts(); track prompt.id) {
+              <div class="saved-bank-prompt">
+                <div>
+                  <strong>{{ prompt.name }}</strong>
+                  @if (prompt.isSelected) { <span> · In use</span> }
+                </div>
+                <div class="saved-bank-prompt-actions">
+                  <button type="button" class="custom-button-inverse" (click)="editBankStatementPrompt(prompt)">Edit</button>
+                  <button type="button" class="custom-button-inverse" (click)="deleteBankStatementPrompt(prompt)">Delete</button>
+                </div>
+              </div>
+            }
+          </div>
+
+          <label class="default-font" for="bankPromptName">{{ editingPromptId() ? 'Edit prompt name' : 'New prompt name' }}</label>
+          <input
+            id="bankPromptName"
+            class="default-font"
+            maxlength="100"
+            [value]="promptName()"
+            (input)="promptName.set($any($event.target).value)"
+            placeholder="e.g. My Bank statement" />
+
+          <label class="default-font" for="bankPromptInstructions">Instructions for this bank</label>
+          <textarea
+            id="bankPromptInstructions"
+            class="default-font"
+            maxlength="4000"
+            rows="5"
+            [value]="promptInstructions()"
+            (input)="promptInstructions.set($any($event.target).value)"
+            placeholder="Explain how dates, amounts, or transaction details appear in this bank's statement."></textarea>
+
+          <div class="button-container">
+            <button type="button" class="custom-button" (click)="saveBankStatementPrompt()">{{ editingPromptId() ? 'Save changes' : 'Save prompt' }}</button>
+            @if (editingPromptId()) {
+              <button type="button" class="custom-button-inverse" (click)="cancelPromptEdit()">Cancel</button>
+            }
+          </div>
+        </section>
+      </div>
+    }

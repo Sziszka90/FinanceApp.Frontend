@@ -1,0 +1,34 @@
+$app-background: #121619;
+$navigation-background: #191e22;
+$surface-background: #22282d;
+$surface-elevated: #2a3035;
+$border-color: #343b40;
+
+$primary-color: #448cf0;
+$primary-hover: #65a4f5;
+$primary-active: #3378d4;
+$primary-selected: #1b2d45;
+$focus-color: #80b7ff;
+$on-primary-color: #121619;
+
+$text-color: #f1f3f4;
+$muted-color: #a4adb3;
+$disabled-color: #778187;
+$green-color: #39d66b;
+$red-color: #fb7171;
+$warning-color: #d9a34d;
+
+$background-color: $app-background;
+$secondary-color: $navigation-background;
+$navbar-color: $navigation-background;
+$card-background-color: $surface-background;
+$card-hover-color: $surface-elevated;
+$input-background-color: $navigation-background;
+$muted-text-color: $muted-color;
+$income-color: $green-color;
+$expense-color: $red-color;
+$green-hover-color: $primary-hover;
+
+$default-font: "Inter", sans-serif;
+$title-font: "Manrope", sans-serif;
+$code-font: "Inter", sans-serif;

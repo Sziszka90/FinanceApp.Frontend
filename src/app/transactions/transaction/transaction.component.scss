@@ -1,0 +1,82 @@
+@use 'base/variables' as variables;
+
+.page-heading { align-items: flex-end; }
+.page-actions { margin: 0; }
+.page-actions .material-icons { font-size: 1.1rem; }
+.summary { display: flex; flex-direction: column; gap: 0.25rem; margin: 0 0 1.25rem; }
+.summary .title { color: variables.$muted-color; font-family: variables.$default-font; font-size: 0.8rem; }
+.summary .value { color: variables.$text-color; font-family: variables.$title-font; font-size: 1.5rem; font-variant-numeric: tabular-nums; font-weight: 700; }
+
+.drag-drop-container {
+  align-items: center;
+  background: variables.$navigation-background;
+  border: 1px dashed variables.$border-color;
+  border-radius: 12px;
+  color: variables.$muted-color;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0 0 1.25rem;
+  padding: 1.2rem;
+  text-align: center;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+.drag-drop-container:hover { background: variables.$surface-background; border-color: variables.$primary-color; }
+.drag-drop-container p { margin: 0; }
+.drag-drop-container .custom-button { min-height: 36px; padding: 0.55rem 0.8rem; }
+.upload-status { color: variables.$muted-color; font-size: 0.9rem; }
+.pdf-import-jobs {
+  background: variables.$surface-background;
+  border: 1px solid variables.$border-color;
+  border-radius: 12px;
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.25rem;
+}
+.pdf-import-jobs h2 { color: variables.$text-color; font-size: 1rem; margin: 0 0 0.75rem; }
+.pdf-import-jobs ul { list-style: none; margin: 0; padding: 0; }
+.pdf-import-job { align-items: center; border-top: 1px solid variables.$border-color; display: flex; gap: 1rem; justify-content: space-between; padding: 0.75rem 0; }
+.pdf-import-job:first-child { border-top: 0; padding-top: 0; }
+.job-details { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.job-file-name { color: variables.$text-color; overflow-wrap: anywhere; }
+.job-status, .job-error { color: variables.$muted-color; font-size: 0.85rem; }
+.job-completed .job-status { color: variables.$green-color; }
+.job-failed .job-status, .job-error { color: variables.$red-color; }
+.remove-job-button { background: transparent; border: 0; color: variables.$muted-color; cursor: pointer; flex: 0 0 auto; font: inherit; font-size: 0.85rem; }
+.remove-job-button:hover { color: variables.$text-color; }
+
+.filter-form-container {
+  background: variables.$surface-background;
+  border: 1px solid variables.$border-color;
+  border-radius: 12px;
+  margin: 0 0 1rem;
+  padding: 1.25rem;
+}
+.section-heading { color: variables.$text-color; font-size: 1rem; margin: 0 0 1rem; }
+.search-container { width: 100%; }
+.search-container .form-group { align-items: stretch; display: grid; gap: 0.75rem; grid-template-columns: 1fr 1fr minmax(150px, 0.7fr); margin: 0; width: 100%; }
+.search-container .button-container { justify-content: flex-end; margin: 0.75rem 0 0; }
+.search-container .button-container button { min-height: 36px; }
+.input-with-icon input { width: 100%; }
+.sort-buttons { align-items: center; display: flex; flex-direction: column; justify-content: center; }
+.sort-buttons mat-icon { color: variables.$primary-color; cursor: pointer; font-size: 1rem; }
+.sorting-header { display: flex; flex-direction: row; }
+.transaction-type { border-radius: 999px; display: inline-flex; font-size: 0.72rem; font-weight: 600; padding: 0.22rem 0.55rem; }
+.income-type { background: color-mix(in srgb, var(--color-positive) 12%, transparent); color: variables.$green-color; }
+.expense-type { background: color-mix(in srgb, var(--color-negative) 12%, transparent); color: variables.$red-color; }
+.positive-value { color: variables.$green-color !important; }
+.negative-value { color: variables.$red-color !important; }
+
+@media (max-width: 800px) {
+  .search-container .form-group { grid-template-columns: 1fr 1fr; }
+  .search-container .form-group > .select { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .page-heading { align-items: stretch; }
+  .page-actions { flex-direction: row; }
+  .page-actions > button { flex: 1 1 0; }
+  .search-container .form-group { grid-template-columns: 1fr; }
+  .search-container .form-group > .select { grid-column: auto; }
+}
+
+.load-more-container { display: flex; justify-content: center; padding: 1rem 0 1.5rem; }
+.load-more-container button { min-width: 220px; }

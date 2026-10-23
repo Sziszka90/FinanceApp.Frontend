@@ -1,0 +1,57 @@
+<div class="main-container">
+  <div class="modal-header">
+    <h3>Create Transaction Group</h3>
+    <p class="modal-description">Create the item and click on save!</p>
+  </div>
+  @if (hasError()) {
+    <div class="error-message default-font">
+      {{ errorMessage() }}
+    </div>
+  }
+  @if (loading()) {
+    <loader class="loader"></loader>
+  }
+  @if (!loading()) {
+    <form class="form-container" [formRoot]="createTransactionGroupForm">
+      <label for="name">Name</label>
+      <div class="form-group">
+        <input id="name" type="text" [formField]="createTransactionGroupForm.name" />
+        @if (createTransactionGroupForm.name().touched() && createTransactionGroupForm.name().invalid()) {
+          @for (error of createTransactionGroupForm.name().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+          }
+        }
+      </div>
+      <label for="description">Description</label>
+      <div class="form-group">
+        <input id="description" type="text" [formField]="createTransactionGroupForm.description" />
+      </div>
+      <label class="default-font" for="groupIcon">Group Icon</label>
+      <div class="form-group">
+        <mat-select class="select" [formField]="createTransactionGroupForm.groupIcon">
+          <mat-select-trigger>
+            <i class="{{ createTransactionGroupForm.groupIcon().value() }}"></i>
+          </mat-select-trigger>
+          @for (option of groupIconOptions; track option) {
+            <mat-option [value]="option">
+              <i class="{{ option }}"></i>
+            </mat-option>
+          }
+        </mat-select>
+        @if (createTransactionGroupForm.groupIcon().touched() && createTransactionGroupForm.groupIcon().invalid()) {
+          @for (error of createTransactionGroupForm.groupIcon().errors(); track error.kind) {
+            <div class="error-message">
+              {{ error.message }}
+            </div>
+          }
+        }
+      </div>
+      <div class="button-container">
+        <button [disabled]="!createTransactionGroupForm().valid()" class="custom-button bounce-button" type="submit">Save</button>
+        <button class="custom-button bounce-button" type="button" (click)="onClose()">Close</button>
+      </div>
+    </form>
+  }
+</div>

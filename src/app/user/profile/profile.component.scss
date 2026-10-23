@@ -1,0 +1,69 @@
+@use 'base/variables' as variables;
+
+.form-container { max-width: 520px; }
+.form-container h3 { color: variables.$text-color; font-size: 1.5rem; font-weight: 700; }
+.profile-heading { align-items: center; display: flex; justify-content: space-between; gap: 1rem; }
+.profile-heading h3 { margin: 0; }
+.form-container .button-container { width: 100%; }
+.password-settings {
+  border-top: 1px solid #444;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+}
+.password-settings-heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.password-settings-heading h3 { margin: 0; }
+.password-settings input { box-sizing: border-box; width: 100%; }
+.password-settings .error-font { margin: 0 0 0.75rem; }
+
+.bank-prompt-settings {
+  border-top: 1px solid #444;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+}
+
+.bank-prompt-settings > p {
+  margin: 0 0 1rem;
+}
+
+.bank-prompt-settings input,
+.bank-prompt-settings textarea,
+.bank-prompt-settings select {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.bank-prompt-settings textarea {
+  resize: vertical;
+}
+
+.saved-bank-prompts {
+  margin: 1rem 0;
+}
+
+.saved-bank-prompt {
+  align-items: flex-start;
+  border-bottom: 1px solid #444;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+}
+
+.saved-bank-prompt-actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin: 0;
+}
+
+.saved-bank-prompt p {
+  margin: 0.25rem 0 0;
+  white-space: pre-wrap;
+}

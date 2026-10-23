@@ -1,0 +1,87 @@
+@if (loading()) {
+  <loader></loader>
+}
+@if (!loading()) {
+  <div class="form-container">
+    <form class="form-element" [formRoot]="registrationForm">
+      <div class="auth-brand"><img src="assets/wallet-logo.svg" alt="" /><span>Finance App</span></div>
+      <h3 class="default-font">Registration</h3>
+      @if (hasError()) {
+        <div class="error-message default-font">
+          {{ errorMessage() }}
+        </div>
+      }
+      <label class="default-font" for="userName">User Name</label>
+      <div class="form-group">
+        <input
+          class="default-font"
+          id="userName"
+          type="text"
+          [formField]="registrationForm.userName"
+          placeholder="User Name"
+          />
+          @if (registrationForm.userName().touched() && registrationForm.userName().invalid()) {
+            @for (error of registrationForm.userName().errors(); track error.kind) {
+              <div class="error-font">
+                {{ error.message }}
+              </div>
+            }
+          }
+        </div>
+        <label class="default-font" for="email">Email</label>
+        <div class="form-group">
+          <input
+            class="default-font"
+            id="email"
+            type="text"
+            [formField]="registrationForm.email"
+            placeholder="Email"
+            />
+            @if (registrationForm.email().touched() && registrationForm.email().invalid()) {
+              @for (error of registrationForm.email().errors(); track error.kind) {
+                <div class="error-font">
+                  {{ error.message }}
+                </div>
+              }
+            }
+          </div>
+          <label class="default-font" for="password">Password</label>
+          <div class="form-group">
+            <input
+              class="default-font"
+              id="password"
+              type="password"
+              [formField]="registrationForm.password"
+              placeholder="Password"
+              />
+              @if (registrationForm.password().touched() && registrationForm.password().invalid()) {
+                @for (error of registrationForm.password().errors(); track error.kind) {
+                  <div class="error-font">
+                    {{ error.message }}
+                  </div>
+                }
+              }
+            </div>
+            <label class="default-font" for="currency">Currency</label>
+            <div class="select">
+              <mat-select [formField]="registrationForm.currency">
+                @for (option of currencyOptions; track option) {
+                  <mat-option [value]="option">
+                    {{ CurrencyEnum[option] }}
+                  </mat-option>
+                }
+              </mat-select>
+              @if (registrationForm.currency().touched() && registrationForm.currency().invalid()) {
+                @for (error of registrationForm.currency().errors(); track error.kind) {
+                  <div class="error-font">
+                    {{ error.message }}
+                  </div>
+                }
+              }
+            </div>
+            <button class="custom-button bounce-button default-font" type="submit" [disabled]="!registrationForm().valid()">
+              Register
+            </button>
+          </form>
+        </div>
+      }

@@ -1,0 +1,12 @@
+@use 'base/variables' as variables;
+
+.groups-page > .page-heading { align-items: flex-end; }
+.groups-page .page-heading > .custom-button { flex: 0 0 auto; }
+.groups-page .table-container { margin: 0; }
+.groups-page .no-transaction-groups { font-size: 0.95rem; }
+.groups-page .mat-column-icon { color: variables.$primary-hover; }
+
+@media (max-width: 600px) {
+  .groups-page > .page-heading { align-items: stretch; }
+  .groups-page .page-heading > .custom-button { align-self: stretch; }
+}

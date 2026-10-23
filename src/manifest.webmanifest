@@ -1,0 +1,17 @@
+{
+  "name": "Finance App",
+  "short_name": "Finance",
+  "description": "A clear, thoughtful space to organize and understand your personal finances.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121619",
+  "theme_color": "#121619",
+  "icons": [
+    {
+      "src": "assets/wallet-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

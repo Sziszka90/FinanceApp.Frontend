@@ -1,0 +1,6 @@
+@use 'base/variables' as variables;
+
+.form-container { max-width: 480px; }
+.form-container h3 { color: variables.$text-color; font-size: 1.5rem; font-weight: 700; }
+.form-element .button-container { margin-top: 1.25rem; }
+.form-element .small-action-button { min-height: 40px; width: 100%; }

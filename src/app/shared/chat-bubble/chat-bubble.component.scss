@@ -1,0 +1,45 @@
+@use 'base/variables' as variables;
+
+.chat-bubble { bottom: 1.5rem; position: fixed; right: 1.5rem; z-index: 1100; }
+.chat-toggle {
+  align-items: center;
+  background: variables.$primary-color;
+  border: 1px solid variables.$primary-color;
+  border-radius: 50%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  color: variables.$on-primary-color;
+  cursor: pointer;
+  display: flex;
+  height: 54px;
+  justify-content: center;
+  width: 54px;
+}
+.chat-toggle:hover { background: variables.$primary-hover; }
+.chat-toggle .material-icons { font-size: 1.45rem; }
+.chat-window {
+  bottom: 68px;
+  display: flex;
+  flex-direction: column;
+  height: min(460px, calc(100vh - 120px));
+  padding: 1rem;
+  position: absolute;
+  right: 0;
+  width: min(360px, calc(100vw - 2rem));
+}
+.chat-header { border-bottom: 1px solid variables.$border-color; color: variables.$text-color; font-weight: 700; margin: 0 0 0.75rem; padding-bottom: 0.75rem; }
+.chat-body { flex: 1; margin-bottom: 0.75rem; max-height: none; overflow-y: auto; }
+.chat-message { border-radius: 12px; font-size: 0.85rem; line-height: 1.5; margin: 0 0 0.65rem; max-width: 82%; padding: 0.65rem 0.8rem; word-break: break-word; }
+.chat-message.user { background: variables.$primary-selected; color: variables.$text-color; margin-left: auto; text-align: left; }
+.chat-message.assistant { background: variables.$navigation-background; border: 1px solid variables.$border-color; color: variables.$text-color; margin-right: auto; text-align: left; }
+.chat-footer { align-items: flex-end; display: flex; gap: 0.5rem; }
+.chat-footer textarea { flex: 1; min-height: 68px; padding: 0.65rem; resize: vertical; }
+.chat-footer button { background: variables.$primary-color; border: 1px solid variables.$primary-color; border-radius: 8px; color: variables.$on-primary-color; cursor: pointer; font-weight: 600; min-height: 42px; padding: 0.55rem 0.85rem; }
+.chat-footer button:hover:not(:disabled) { background: variables.$primary-hover; }
+.chat-footer button:disabled { background: variables.$surface-elevated; border-color: variables.$border-color; color: variables.$disabled-color; cursor: not-allowed; }
+.chat-loader { align-items: center; display: flex; height: 40px; justify-content: center; margin-bottom: 0.5rem; }
+.chat-loader .dot { animation: jump 0.8s ease-in-out infinite; background: variables.$primary-color; border-radius: 50%; height: 7px; margin: 0 3px; width: 7px; }
+.chat-loader .dot:nth-child(2) { animation-delay: 0.15s; }
+.chat-loader .dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes jump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@media (max-width: 480px) { .chat-bubble { bottom: 1rem; right: 1rem; } }

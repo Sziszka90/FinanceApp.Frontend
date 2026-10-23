@@ -1,0 +1,9 @@
+@use 'base/variables' as variables;
+
+h3 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 400;
+  font-size: x-large;
+  color: variables.$text-color;
+}

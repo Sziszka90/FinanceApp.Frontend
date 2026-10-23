@@ -1,0 +1,5 @@
+@use 'base/variables' as variables;
+
+.form-container { max-width: 520px; }
+.form-container h3 { color: variables.$text-color; font-size: 1.5rem; font-weight: 700; }
+.form-element > .select { margin-top: 0.25rem; }

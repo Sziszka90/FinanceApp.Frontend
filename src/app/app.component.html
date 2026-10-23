@@ -1,0 +1,9 @@
+@if (showWakeupLoader()) {
+  <wakeup-loader></wakeup-loader>
+}
+@if (showApp()) {
+  <div>
+    <nav-bar></nav-bar>
+    <router-outlet></router-outlet>
+  </div>
+}

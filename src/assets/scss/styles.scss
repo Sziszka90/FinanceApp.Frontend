@@ -1,0 +1,186 @@
+@use "base/variables" as variables;
+@use "base/typography";
+@use "utilities/helpers";
+@use "utilities/buttons";
+@use "layout/container";
+@use "layout/table";
+@use "@angular/material" as mat;
+
+html {
+  @include mat.theme((
+    color: (theme-type: dark, primary: mat.$azure-palette, tertiary: mat.$blue-palette),
+    typography: variables.$default-font,
+    density: 0,
+  ));
+
+  color-scheme: dark;
+  --bg-app: #{variables.$app-background};
+  --bg-sidebar: #{variables.$navigation-background};
+  --bg-section: #{variables.$navigation-background};
+  --bg-card: #{variables.$surface-background};
+  --bg-card-hover: #{variables.$surface-elevated};
+  --color-primary: #{variables.$primary-color};
+  --color-primary-hover: #{variables.$primary-hover};
+  --color-primary-active: #{variables.$primary-active};
+  --color-primary-selected: #{variables.$primary-selected};
+  --color-on-primary: #{variables.$on-primary-color};
+  --text-primary: #{variables.$text-color};
+  --text-secondary: #{variables.$muted-color};
+  --text-disabled: #{variables.$disabled-color};
+  --color-positive: #{variables.$green-color};
+  --color-negative: #{variables.$red-color};
+  --color-warning: #{variables.$warning-color};
+  --chart-series-2: #73A6E6;
+  --chart-series-3: #7F929B;
+  --chart-series-4: #{variables.$warning-color};
+  --chart-series-5: #6C8F7A;
+  --chart-series-6: #{variables.$muted-color};
+  --chart-series-7: #577294;
+  --chart-series-8: #A78F71;
+  --bg-input: #{variables.$input-background-color};
+  --border-color: #{variables.$border-color};
+  --focus-ring: #{variables.$focus-color};
+  --bg-button-secondary: #{variables.$surface-elevated};
+
+  --mat-sys-primary: #{variables.$primary-color};
+  --mat-sys-on-primary: #{variables.$on-primary-color};
+  --mat-sys-secondary: #{variables.$muted-color};
+  --mat-sys-tertiary: #{variables.$primary-color};
+  --mat-sys-surface: #{variables.$navigation-background};
+  --mat-sys-surface-container: #{variables.$navigation-background};
+  --mat-sys-surface-container-low: #{variables.$app-background};
+  --mat-sys-surface-container-high: #{variables.$surface-background};
+  --mat-sys-on-surface: #{variables.$text-color};
+  --mat-sys-background: #{variables.$app-background};
+  --mat-sys-on-background: #{variables.$text-color};
+  --mat-sys-outline: #{variables.$border-color};
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  min-height: 100%;
+  margin: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background: variables.$app-background;
+  color: variables.$text-color;
+  font-family: variables.$default-font;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+body, button, input, textarea, select { font-family: variables.$default-font; }
+
+button, input, textarea, select { font-size: inherit; }
+
+h1, h2, h3, h4, h5, h6 {
+  color: variables.$text-color;
+  font-family: variables.$title-font;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin-top: 0;
+}
+
+h1 { font-weight: 750; }
+h2, h3, h4 { font-weight: 650; }
+p { color: variables.$muted-color; }
+a { color: variables.$text-color; text-decoration: none; }
+a:hover { color: variables.$primary-hover; }
+button { color: inherit; }
+:focus-visible { outline: 2px solid variables.$focus-color; outline-offset: 3px; }
+
+.root { min-height: 100vh; }
+.page-heading {
+  align-items: flex-end;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin: 0 0 1.5rem;
+}
+.page-heading h1 { font-size: clamp(1.8rem, 3vw, 2.35rem); margin: 0; }
+.page-eyebrow { color: variables.$muted-color; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; margin: 0 0 0.45rem; }
+.page-description { color: variables.$muted-color; font-size: 0.9rem; margin: 0.55rem 0 0; }
+.section-heading { font-family: variables.$title-font; }
+.financial-value, .tabular-nums, td.mat-column-amount {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Shared input treatment, including native controls and Material fields. */
+input, textarea, select, .select {
+  background: variables.$navigation-background;
+  border: 1px solid variables.$border-color;
+  border-radius: 8px;
+  color: variables.$text-color;
+  min-height: 44px;
+  padding: 0.7rem 0.85rem;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+input::placeholder, textarea::placeholder { color: variables.$disabled-color; opacity: 1; }
+input:focus, textarea:focus, select:focus, .select:focus-within {
+  background: variables.$navigation-background;
+  border-color: variables.$focus-color;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-ring) 18%, transparent);
+  color: variables.$text-color;
+  outline: none;
+}
+input:disabled, textarea:disabled, select:disabled { color: variables.$disabled-color; cursor: not-allowed; }
+label { color: variables.$muted-color; font-size: 0.875rem; font-weight: 500; }
+
+.mat-mdc-form-field { color: variables.$text-color; }
+.mdc-text-field--filled, .mdc-text-field--outlined {
+  background: variables.$navigation-background !important;
+  border-radius: 8px !important;
+}
+.mdc-text-field--filled .mdc-line-ripple::before,
+.mdc-text-field--outlined .mdc-notched-outline__leading,
+.mdc-text-field--outlined .mdc-notched-outline__notch,
+.mdc-text-field--outlined .mdc-notched-outline__trailing { border-color: variables.$border-color !important; }
+.mat-mdc-select-value, .mat-mdc-select-arrow, .mat-mdc-form-field-infix,
+.mat-mdc-input-element { color: variables.$text-color !important; }
+.mat-mdc-select-panel, .mat-datepicker-content, .mat-calendar {
+  background: variables.$surface-background !important;
+  color: variables.$text-color !important;
+}
+.mat-mdc-option { color: variables.$text-color !important; }
+.mat-mdc-option:hover, .mat-mdc-option.mdc-list-item--selected { background: variables.$primary-selected !important; }
+.mat-calendar-body-cell-content, .mat-calendar-body-label, .mat-calendar-table-header,
+.mat-calendar-arrow { color: variables.$text-color !important; }
+.mat-calendar-body-selected { background: variables.$primary-color !important; color: variables.$on-primary-color !important; }
+
+/* Shared content surfaces and dialogs. */
+.form-container, .filters-container, .charts-container, .data-table,
+.table-container, .summary, .chat-window, .no-data {
+  background: variables.$surface-background;
+  border: 1px solid variables.$border-color;
+  border-radius: 12px;
+  box-shadow: none;
+  color: variables.$text-color;
+}
+.cdk-overlay-pane .mat-mdc-dialog-surface {
+  background: variables.$surface-background !important;
+  border: 1px solid variables.$border-color;
+  border-radius: 14px !important;
+  color: variables.$text-color;
+}
+.cdk-overlay-dark-backdrop { background: rgba(5, 8, 10, 0.72); }
+.bs-datepicker { background: variables.$surface-background !important; border: 1px solid variables.$border-color; border-radius: 10px; }
+.bs-datepicker-head { background: variables.$primary-color !important; }
+.bs-datepicker-body { background: variables.$surface-background !important; border-color: variables.$border-color !important; }
+.bs-datepicker-body table td span { color: variables.$text-color; }
+.bs-datepicker-body table td span.selected, .bs-datepicker-body table td span[class*="select"] { background: variables.$primary-color !important; color: variables.$on-primary-color !important; }
+input[type="checkbox"], input[type="radio"] { accent-color: variables.$primary-color; height: 16px; min-height: 16px; padding: 0; width: 16px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+@media (max-width: 600px) {
+  .page-heading { align-items: stretch; flex-direction: column; }
+  .page-heading > .custom-button { align-self: flex-start; }
+}
