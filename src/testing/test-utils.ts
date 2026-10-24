@@ -7,7 +7,6 @@ import { of, throwError } from 'rxjs';
  * Test utilities for Angular Finance App unit tests
  */
 export class TestUtils {
-
   /**
    * Find element by CSS selector
    */
@@ -86,7 +85,9 @@ export class TestUtils {
    */
   static isElementVisible<T>(fixture: ComponentFixture<T>, selector: string): boolean {
     const element = this.findElement(fixture, selector);
-    if (!element) {return false;}
+    if (!element) {
+      return false;
+    }
 
     const nativeElement = element.nativeElement;
     const style = window.getComputedStyle(nativeElement);
@@ -218,7 +219,7 @@ export class TestUtils {
    */
   static createMockJwtToken(payload: any = {}, expiresInHours = 1): string {
     const header = { alg: 'HS256', typ: 'JWT' };
-    const exp = Math.floor(Date.now() / 1000) + (expiresInHours * 3600);
+    const exp = Math.floor(Date.now() / 1000) + expiresInHours * 3600;
     const fullPayload = { exp, ...payload };
 
     return `${btoa(JSON.stringify(header))}.${btoa(JSON.stringify(fullPayload))}.mock-signature`;
@@ -245,5 +246,4 @@ export class TestUtils {
     const elementText = this.getElementText(fixture, selector);
     expect(elementText).toContain(text);
   }
-
 }

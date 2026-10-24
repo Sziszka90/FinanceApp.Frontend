@@ -3,7 +3,6 @@ import { ComponentErrorService } from 'src/services/component-error.service';
 
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
-
   constructor(private injector: Injector) {}
 
   handleError(error: string): void {

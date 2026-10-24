@@ -316,7 +316,8 @@ describe('TransactionApiService', () => {
       const expectedUrl = `${mockEnvironment.apiUrl}/api/v1/transactiongroups/${groupId}`;
 
       it('should update existing transaction group', () => {
-        service.updateTransactionGroup(groupId, mockUpdateTransactionGroup)
+        service
+          .updateTransactionGroup(groupId, mockUpdateTransactionGroup)
           .subscribe((group: GetTransactionGroupDto) => {
             expect(group).toEqual(mockTransactionGroup);
           });

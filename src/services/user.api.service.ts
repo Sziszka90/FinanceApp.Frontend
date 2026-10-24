@@ -13,11 +13,9 @@ import { BankStatementPromptDto, SaveBankStatementPromptDto } from 'src/models/U
   providedIn: 'root'
 })
 export class UserApiService {
-
   private apiUrl = environment?.apiUrl ?? '';
 
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   register(createUserDto: CreateUserDto): Observable<GetUserDto> {
     return this.http.post<GetUserDto>(`${this.apiUrl}/api/v1/users`, createUserDto, { withCredentials: true });
@@ -32,15 +30,21 @@ export class UserApiService {
   }
 
   getBankStatementPrompts(): Observable<BankStatementPromptDto[]> {
-    return this.http.get<BankStatementPromptDto[]>(`${this.apiUrl}/api/v1/bankstatementprompts`, { withCredentials: true });
+    return this.http.get<BankStatementPromptDto[]>(`${this.apiUrl}/api/v1/bankstatementprompts`, {
+      withCredentials: true
+    });
   }
 
   createBankStatementPrompt(prompt: SaveBankStatementPromptDto): Observable<BankStatementPromptDto> {
-    return this.http.post<BankStatementPromptDto>(`${this.apiUrl}/api/v1/bankstatementprompts`, prompt, { withCredentials: true });
+    return this.http.post<BankStatementPromptDto>(`${this.apiUrl}/api/v1/bankstatementprompts`, prompt, {
+      withCredentials: true
+    });
   }
 
   updateBankStatementPrompt(id: string, prompt: SaveBankStatementPromptDto): Observable<BankStatementPromptDto> {
-    return this.http.put<BankStatementPromptDto>(`${this.apiUrl}/api/v1/bankstatementprompts/${id}`, prompt, { withCredentials: true });
+    return this.http.put<BankStatementPromptDto>(`${this.apiUrl}/api/v1/bankstatementprompts/${id}`, prompt, {
+      withCredentials: true
+    });
   }
 
   selectBankStatementPrompt(id: string | null): Observable<boolean> {
@@ -62,6 +66,10 @@ export class UserApiService {
   }
 
   resendConfirmationEmail(email: string): Observable<ResendEmailConfirmationResponse> {
-    return this.http.post<ResendEmailConfirmationResponse>(`${this.apiUrl}/api/v1/users/email-confirmation`, { email }, { withCredentials: true });
+    return this.http.post<ResendEmailConfirmationResponse>(
+      `${this.apiUrl}/api/v1/users/email-confirmation`,
+      { email },
+      { withCredentials: true }
+    );
   }
 }

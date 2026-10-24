@@ -30,7 +30,9 @@ export class AppComponent extends BaseComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.notificationService.imported$.subscribe(correlationId => this.pdfImportJobs.complete(correlationId));
-    this.notificationService.importErrors$.subscribe(({ correlationId, reason }) => this.pdfImportJobs.fail(correlationId, reason));
+    this.notificationService.importErrors$.subscribe(({ correlationId, reason }) =>
+      this.pdfImportJobs.fail(correlationId, reason)
+    );
 
     this.wakeupService.showWakeupLoader$.subscribe(show => {
       this.showWakeupLoader.set(show);

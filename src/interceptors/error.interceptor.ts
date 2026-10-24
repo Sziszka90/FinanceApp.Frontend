@@ -15,7 +15,8 @@ export const errorInterceptor: HttpInterceptorFn = (
   const isRetried = req.headers.has('X-Refresh-Attempted');
 
   return next(req).pipe(
-    catchError((error: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+    catchError((error: any) => {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       console.error('HTTP Error caught by interceptor:', error);
 
       const errorWithUrl = { ...error, url: req.url };
@@ -42,4 +43,3 @@ export const errorInterceptor: HttpInterceptorFn = (
     })
   );
 };
-

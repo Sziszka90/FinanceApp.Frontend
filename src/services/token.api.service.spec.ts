@@ -46,7 +46,7 @@ describe('TokenApiService', () => {
     it('should send POST request to validate endpoint', () => {
       const mockResponse: ValidateTokenResponse = { isValid: true };
 
-      service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe((response) => {
+      service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe(response => {
         expect(response).toEqual(mockResponse);
       });
 
@@ -58,7 +58,7 @@ describe('TokenApiService', () => {
     it('should return valid token response', () => {
       const mockResponse: ValidateTokenResponse = { isValid: true };
 
-      service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe((response) => {
+      service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe(response => {
         expect(response.isValid).toBe(true);
       });
 
@@ -69,7 +69,7 @@ describe('TokenApiService', () => {
     it('should return invalid token response', () => {
       const mockResponse: ValidateTokenResponse = { isValid: false };
 
-      service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe((response) => {
+      service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe(response => {
         expect(response.isValid).toBe(false);
       });
 
@@ -80,7 +80,7 @@ describe('TokenApiService', () => {
     it('should handle HTTP errors', () => {
       service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe({
         next: () => fail('Should have failed'),
-        error: (error) => {
+        error: error => {
           expect(error.status).toBe(500);
         }
       });
@@ -92,7 +92,7 @@ describe('TokenApiService', () => {
     it('should handle network errors', () => {
       service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe({
         next: () => fail('Should have failed'),
-        error: (error) => {
+        error: error => {
           expect(error.error).toBeInstanceOf(ProgressEvent);
         }
       });
@@ -118,7 +118,7 @@ describe('TokenApiService', () => {
     it('should handle 401 Unauthorized', () => {
       service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe({
         next: () => fail('Should have failed'),
-        error: (error) => {
+        error: error => {
           expect(error.status).toBe(401);
           expect(error.statusText).toBe('Unauthorized');
         }
@@ -131,7 +131,7 @@ describe('TokenApiService', () => {
     it('should handle 403 Forbidden', () => {
       service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe({
         next: () => fail('Should have failed'),
-        error: (error) => {
+        error: error => {
           expect(error.status).toBe(403);
         }
       });
@@ -143,7 +143,7 @@ describe('TokenApiService', () => {
     it('should handle 404 Not Found', () => {
       service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe({
         next: () => fail('Should have failed'),
-        error: (error) => {
+        error: error => {
           expect(error.status).toBe(404);
         }
       });
@@ -155,7 +155,7 @@ describe('TokenApiService', () => {
     it('should handle 422 Unprocessable Entity', () => {
       service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe({
         next: () => fail('Should have failed'),
-        error: (error) => {
+        error: error => {
           expect(error.status).toBe(422);
         }
       });
@@ -167,7 +167,7 @@ describe('TokenApiService', () => {
     it('should handle timeout errors', () => {
       service.verifyToken({ token: testToken, tokenType: TokenType.Login }).subscribe({
         next: () => fail('Should have failed'),
-        error: (error) => {
+        error: error => {
           expect(error.status).toBe(0);
         }
       });

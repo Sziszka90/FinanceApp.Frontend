@@ -13,7 +13,9 @@ export class AuthenticationApiService {
   private apiUrl = environment?.apiUrl ?? '';
 
   login(loginRequestDto: LoginRequestDto): Observable<LoginResponseDto> {
-    return this.http.post<LoginResponseDto>(`${this.apiUrl}/api/v1/auth/login`, loginRequestDto, { withCredentials: true });
+    return this.http.post<LoginResponseDto>(`${this.apiUrl}/api/v1/auth/login`, loginRequestDto, {
+      withCredentials: true
+    });
   }
 
   logout(): Observable<void> {

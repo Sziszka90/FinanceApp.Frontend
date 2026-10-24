@@ -32,10 +32,10 @@ export class ComponentErrorService {
     if (error && typeof error === 'object') {
       const err = error as any;
       return (
-        err?.error?.message as string ??
-        err?.error?.error?.message as string ??
-        err?.error?.error as string ??
-        err?.message as string ??
+        (err?.error?.message as string) ??
+        (err?.error?.error?.message as string) ??
+        (err?.error?.error as string) ??
+        (err?.message as string) ??
         'An unexpected error occurred'
       );
     }

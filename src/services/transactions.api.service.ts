@@ -10,17 +10,18 @@ import { CreateTransactionGroupDto } from 'src/models/TransactionGroupDtos/creat
 import { UpdateTransactionGroupDto } from 'src/models/TransactionGroupDtos/update-transaction-group.dto';
 import { TopTransactionGroupDto } from 'src/models/TransactionGroupDtos/top-transaction-group.dto';
 import { Money } from 'src/models/Money/money.dto';
-import { TransactionCursorPageDto, TransactionPageFilter } from 'src/models/TransactionDtos/transaction-cursor-page.dto';
+import {
+  TransactionCursorPageDto,
+  TransactionPageFilter
+} from 'src/models/TransactionDtos/transaction-cursor-page.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TransactionApiService {
-
   private apiUrl = environment?.apiUrl ?? '';
 
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getTransaction(id: string): Observable<GetTransactionDto> {
     return this.http.get<GetTransactionDto>(`${this.apiUrl}/api/v1/transactions/${id}`, { withCredentials: true });
@@ -30,12 +31,24 @@ export class TransactionApiService {
     return this.http.get<GetTransactionDto[]>(`${this.apiUrl}/api/v1/transactions/`, { withCredentials: true });
   }
 
-  getTransactionsPage(pageSize = 50, cursor?: string | null, filter?: TransactionPageFilter): Observable<TransactionCursorPageDto> {
+  getTransactionsPage(
+    pageSize = 50,
+    cursor?: string | null,
+    filter?: TransactionPageFilter
+  ): Observable<TransactionCursorPageDto> {
     let params = new HttpParams().set('pageSize', pageSize);
-    if (cursor) params = params.set('cursor', cursor);
-    if (filter?.transactionName) params = params.set('transactionFilter.transactionName', filter.transactionName);
-    if (filter?.transactionDate) params = params.set('transactionFilter.transactionDate', filter.transactionDate);
-    if (filter?.transactionType) params = params.set('transactionFilter.transactionType', filter.transactionType);
+    if (cursor) {
+      params = params.set('cursor', cursor);
+    }
+    if (filter?.transactionName) {
+      params = params.set('transactionFilter.transactionName', filter.transactionName);
+    }
+    if (filter?.transactionDate) {
+      params = params.set('transactionFilter.transactionDate', filter.transactionDate);
+    }
+    if (filter?.transactionType) {
+      params = params.set('transactionFilter.transactionType', filter.transactionType);
+    }
 
     return this.http.get<TransactionCursorPageDto>(`${this.apiUrl}/api/v1/transactions/page`, {
       params,
@@ -47,12 +60,16 @@ export class TransactionApiService {
     return this.http.get<Money>(`${this.apiUrl}/api/v1/transactions/summary`, { withCredentials: true });
   }
 
-  createTransaction(createTransactionDto:CreateTransactionDto): Observable<GetTransactionDto> {
-    return this.http.post<GetTransactionDto>(`${this.apiUrl}/api/v1/transactions/`, createTransactionDto, { withCredentials: true });
+  createTransaction(createTransactionDto: CreateTransactionDto): Observable<GetTransactionDto> {
+    return this.http.post<GetTransactionDto>(`${this.apiUrl}/api/v1/transactions/`, createTransactionDto, {
+      withCredentials: true
+    });
   }
 
   updateTransaction(id: string, updateTransactionDto: UpdateTransactionDto): Observable<GetTransactionDto> {
-    return this.http.put<GetTransactionDto>(`${this.apiUrl}/api/v1/transactions/${id}`, updateTransactionDto, { withCredentials: true });
+    return this.http.put<GetTransactionDto>(`${this.apiUrl}/api/v1/transactions/${id}`, updateTransactionDto, {
+      withCredentials: true
+    });
   }
 
   deleteTransaction(id: string): Observable<void> {
@@ -60,15 +77,23 @@ export class TransactionApiService {
   }
 
   getAllTransactionGroups(): Observable<GetTransactionGroupDto[]> {
-    return this.http.get<GetTransactionGroupDto[]>(`${this.apiUrl}/api/v1/transactiongroups`, { withCredentials: true });
+    return this.http.get<GetTransactionGroupDto[]>(`${this.apiUrl}/api/v1/transactiongroups`, {
+      withCredentials: true
+    });
   }
 
   getTransactionGroup(id: string): Observable<GetTransactionGroupDto> {
-    return this.http.get<GetTransactionGroupDto>(`${this.apiUrl}/api/v1/transactiongroups/${id}`, { withCredentials: true });
+    return this.http.get<GetTransactionGroupDto>(`${this.apiUrl}/api/v1/transactiongroups/${id}`, {
+      withCredentials: true
+    });
   }
 
-  createTransactionGroup(createTransactionGroupDto:CreateTransactionGroupDto): Observable<GetTransactionGroupDto> {
-    return this.http.post<GetTransactionGroupDto>(`${this.apiUrl}/api/v1/transactiongroups/`, createTransactionGroupDto, { withCredentials: true });
+  createTransactionGroup(createTransactionGroupDto: CreateTransactionGroupDto): Observable<GetTransactionGroupDto> {
+    return this.http.post<GetTransactionGroupDto>(
+      `${this.apiUrl}/api/v1/transactiongroups/`,
+      createTransactionGroupDto,
+      { withCredentials: true }
+    );
   }
 
   updateTransactionGroup(
@@ -105,10 +130,10 @@ export class TransactionApiService {
       params.top = top.toString();
     }
 
-    return this.http.get<TopTransactionGroupDto[]>(
-      `${this.apiUrl}/api/v1/transactiongroups/top`,
-      { params, withCredentials: true }
-    );
+    return this.http.get<TopTransactionGroupDto[]>(`${this.apiUrl}/api/v1/transactiongroups/top`, {
+      params,
+      withCredentials: true
+    });
   }
 
   uploadPdf(file: File, correlationId: string): Observable<string> {

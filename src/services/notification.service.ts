@@ -29,9 +29,9 @@ export class NotificationService {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   initializeAsync(): Promise<void> {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       let initialStateHandled = false;
-      this.authenticationService.userLoggedIn.subscribe((loggedIn) => {
+      this.authenticationService.userLoggedIn.subscribe(loggedIn => {
         this.isLoggedIn = loggedIn;
         if (loggedIn) {
           void this.startConnectionAsync();
@@ -119,7 +119,7 @@ export class NotificationService {
       }
     });
 
-    connection.onclose((error) => {
+    connection.onclose(error => {
       if (error) {
         console.error('SignalR: Connection closed', error);
       }
@@ -165,7 +165,7 @@ export class NotificationService {
     this.hubConnection = null;
     this.connectionRetryCount = 0;
     if (connection) {
-      void connection.stop().catch((error) => {
+      void connection.stop().catch(error => {
         console.error('SignalR: Error stopping connection', error);
       });
     }

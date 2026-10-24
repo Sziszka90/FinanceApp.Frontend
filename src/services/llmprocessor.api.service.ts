@@ -17,4 +17,3 @@ export class LlmProcessorApiService {
     return this.http.post<PromptResponseDto>(`${this.apiUrl}/llmprocessor/prompt`, request);
   }
 }
-

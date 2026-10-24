@@ -26,7 +26,7 @@ export class PdfImportJobsService {
   }
 
   markQueued(correlationId: string): void {
-    this.updateJob(correlationId, job => job.status === 'uploading' ? { ...job, status: 'queued' } : job);
+    this.updateJob(correlationId, job => (job.status === 'uploading' ? { ...job, status: 'queued' } : job));
   }
 
   complete(correlationId: string): void {
@@ -46,8 +46,10 @@ export class PdfImportJobsService {
   }
 
   private updateJob(correlationId: string, update: (job: PdfImportJob) => PdfImportJob): void {
-    if (!this.getJob(correlationId)) return;
-    this.updateJobs(jobs => jobs.map(job => job.correlationId === correlationId ? update(job) : job));
+    if (!this.getJob(correlationId)) {
+      return;
+    }
+    this.updateJobs(jobs => jobs.map(job => (job.correlationId === correlationId ? update(job) : job)));
   }
 
   private updateJobs(update: (jobs: PdfImportJob[]) => PdfImportJob[]): void {
@@ -71,7 +73,12 @@ export class PdfImportJobsService {
 
   private prune(jobs: PdfImportJob[]): PdfImportJob[] {
     const cutoff = Date.now() - JOB_RETENTION_MS;
-    return jobs.filter(job => job && typeof job.correlationId === 'string' &&
-      typeof job.fileName === 'string' && Date.parse(job.createdAt) >= cutoff);
+    return jobs.filter(
+      job =>
+        job &&
+        typeof job.correlationId === 'string' &&
+        typeof job.fileName === 'string' &&
+        Date.parse(job.createdAt) >= cutoff
+    );
   }
 }
