@@ -13,10 +13,6 @@ on:
         description: 'Target environment'
         required: true
         default: 'production'
-      image_tag:
-        description: 'Docker image tag'
-        required: false
-        default: 'latest'
 
 jobs:
   code-quality:
@@ -105,16 +101,20 @@ jobs:
         working-directory: ./
 
       - name: Build and Push Frontend image
+        env:
+          OWNER: ${{ github.repository_owner }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          TAG="${{ github.event.inputs.image_tag || 'latest' }}"
-          docker build -t ghcr.io/$OWNER/finance-app-frontend:${TAG} -f ./Frontend.Dockerfile ./
-          docker push ghcr.io/$OWNER/finance-app-frontend:${TAG}
+          owner="$(printf '%s' "$OWNER" | tr '[:upper:]' '[:lower:]')"
+          docker build -t "ghcr.io/$owner/finance-app-frontend:$IMAGE_TAG" -f ./Frontend.Dockerfile ./
+          docker push "ghcr.io/$owner/finance-app-frontend:$IMAGE_TAG"
 
       - name: Trigger Infrastructure Deployment
+        env:
+          GH_TOKEN: ${{ secrets.GHCR_PAT }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           gh workflow run deploy.yml \
             -R Sziszka90/FinanceApp.Infrastructure.Azure \
-            --ref main
-        env:
-          GH_TOKEN: ${{ secrets.GHCR_PAT }}
+            --ref main \
+            -f frontendImageTag="$IMAGE_TAG"
