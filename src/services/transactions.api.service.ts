@@ -10,6 +10,7 @@ import { CreateTransactionGroupDto } from 'src/models/TransactionGroupDtos/creat
 import { UpdateTransactionGroupDto } from 'src/models/TransactionGroupDtos/update-transaction-group.dto';
 import { TopTransactionGroupDto } from 'src/models/TransactionGroupDtos/top-transaction-group.dto';
 import { Money } from 'src/models/Money/money.dto';
+import { TransactionTypeEnum } from 'src/models/Enums/transaction-type.enum';
 import {
   TransactionCursorPageDto,
   TransactionPageFilter
@@ -47,7 +48,8 @@ export class TransactionApiService {
       params = params.set('transactionFilter.transactionDate', filter.transactionDate);
     }
     if (filter?.transactionType) {
-      params = params.set('transactionFilter.transactionType', filter.transactionType);
+      // The API expects the enum name, while the frontend enum uses numeric values.
+      params = params.set('transactionFilter.transactionType', TransactionTypeEnum[filter.transactionType]);
     }
 
     return this.http.get<TransactionCursorPageDto>(`${this.apiUrl}/api/v1/transactions/page`, {

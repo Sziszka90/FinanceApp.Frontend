@@ -12,7 +12,9 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { FormField, form } from '@angular/forms/signals';
 import { TransactionTypeEnum } from 'src/models/Enums/transaction-type.enum';
 import { MatSelectModule } from '@angular/material/select';
-import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { CreateTransactionModalComponent } from '../create-transaction-modal/create-transaction-modal.component';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
@@ -35,7 +37,9 @@ import { ColumnResizeDirective } from '../../shared/directives/column-resize.dir
     MatSortModule,
     MatSelectModule,
     FormField,
-    BsDatepickerModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
     LoaderComponent,
     ColumnResizeDirective
   ],
