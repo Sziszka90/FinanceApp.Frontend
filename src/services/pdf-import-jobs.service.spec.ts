@@ -1,14 +1,28 @@
+import { TestBed } from '@angular/core/testing';
+import { EMPTY } from 'rxjs';
 import { PdfImportJobsService } from './pdf-import-jobs.service';
+import { TransactionApiService } from './transactions.api.service';
 
 describe('PdfImportJobsService', () => {
   const storageKey = 'finance-app.pdf-import-jobs';
   let service: PdfImportJobsService;
 
+  function createService(): PdfImportJobsService {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        PdfImportJobsService,
+        { provide: TransactionApiService, useValue: { getPdfImportStatus: () => EMPTY } }
+      ]
+    });
+    return TestBed.inject(PdfImportJobsService);
+  }
+
   beforeEach(() => {
     localStorage.removeItem(storageKey);
     jasmine.clock().install();
     jasmine.clock().mockDate(new Date('2026-10-24T12:00:00.000Z'));
-    service = new PdfImportJobsService();
+    service = createService();
   });
 
   afterEach(() => {
@@ -48,7 +62,7 @@ describe('PdfImportJobsService', () => {
       createdAt: new Date().toISOString()
     }]));
 
-    service = new PdfImportJobsService();
+    service = createService();
 
     expect(service.getJob('correlation-3')?.fileName).toBe('saved-statement.pdf');
   });
