@@ -62,22 +62,46 @@
                 }
               }
             </div>
-            <label class="default-font" for="currency">Currency</label>
-            <div class="select">
-              <mat-select [formField]="registrationForm.currency">
-                @for (option of currencyOptions; track option) {
-                  <mat-option [value]="option">
-                    {{ CurrencyEnum[option] }}
-                  </mat-option>
-                }
-              </mat-select>
-              @if (registrationForm.currency().touched() && registrationForm.currency().invalid()) {
-                @for (error of registrationForm.currency().errors(); track error.kind) {
+          <label class="default-font" for="confirmPassword">Confirm Password</label>
+          <div class="form-group">
+            <input
+              class="default-font"
+              id="confirmPassword"
+              type="password"
+              [formField]="registrationForm.confirmPassword"
+              placeholder="Confirm Password"
+              />
+              @if (registrationForm.confirmPassword().touched() && registrationForm.confirmPassword().invalid() && !hasPasswordMismatch()) {
+                @for (error of registrationForm.confirmPassword().errors(); track error.kind) {
                   <div class="error-font">
                     {{ error.message }}
                   </div>
                 }
               }
+              @if (registrationForm.confirmPassword().touched() && hasPasswordMismatch()) {
+                <div class="error-font">
+                  Passwords do not match
+                </div>
+              }
+            </div>
+            <label class="default-font" for="currency">Currency</label>
+            <div class="form-group">
+              <div class="select">
+                <mat-select [formField]="registrationForm.currency">
+                  @for (option of currencyOptions; track option) {
+                    <mat-option [value]="option">
+                      {{ CurrencyEnum[option] }}
+                    </mat-option>
+                  }
+                </mat-select>
+                @if (registrationForm.currency().touched() && registrationForm.currency().invalid()) {
+                  @for (error of registrationForm.currency().errors(); track error.kind) {
+                    <div class="error-font">
+                      {{ error.message }}
+                    </div>
+                  }
+                }
+              </div>
             </div>
             <button class="custom-button bounce-button default-font" type="submit" [disabled]="!registrationForm().valid()">
               Register

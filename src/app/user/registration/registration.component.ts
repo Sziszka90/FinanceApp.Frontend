@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
-import { FormField, FormRoot, email, form, minLength, pattern, required } from '@angular/forms/signals';
+import { FormField, FormRoot, email, form, minLength, pattern, required, validate } from '@angular/forms/signals';
 import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { UserApiService } from '../../../services/user.api.service';
@@ -24,6 +24,7 @@ export class RegistrationComponent extends BaseComponent {
     userName: '',
     email: '',
     password: '',
+    confirmPassword: '',
     currency: null as CurrencyEnum | null
   });
 
@@ -36,6 +37,14 @@ export class RegistrationComponent extends BaseComponent {
     minLength(path.password, 8, { message: 'Minimum 8 characters required' });
     pattern(path.password, /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/, {
       message: 'Include uppercase letter, number, and special character'
+    });
+    required(path.confirmPassword, { message: 'Please confirm your password' });
+    validate(path.confirmPassword, ({ value, valueOf }) => {
+      if (!value() || value() === valueOf(path.password)) {
+        return undefined;
+      }
+
+      return { kind: 'passwordsMismatch', message: 'Passwords do not match' };
     });
     required(path.currency, { message: 'Currency is required' });
   }, {
@@ -64,4 +73,8 @@ export class RegistrationComponent extends BaseComponent {
   currencyOptions = (Object.values(CurrencyEnum)
     .filter(value => typeof value === 'number' && value !== CurrencyEnum.XXX) as CurrencyEnum[]);
   readonly CurrencyEnum = CurrencyEnum;
+
+  hasPasswordMismatch(): boolean {
+    return this.registrationForm.confirmPassword().errors().some(error => error.kind === 'passwordsMismatch');
+  }
 }
