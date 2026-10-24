@@ -54,6 +54,16 @@ describe('PdfImportJobsService', () => {
     expect(service.jobs()).toEqual([]);
   });
 
+  it('marks imports that never leave the queue as failed so they can be retried', () => {
+    service.add('correlation-queue-timeout', 'queued-statement.pdf');
+    service.markQueued('correlation-queue-timeout');
+
+    jasmine.clock().tick(5 * 60 * 1000);
+
+    expect(service.getJob('correlation-queue-timeout')?.status).toBe('failed');
+    expect(service.getJob('correlation-queue-timeout')?.error).toContain('Retry this import');
+  });
+
   it('restores valid jobs from browser storage', () => {
     localStorage.setItem(storageKey, JSON.stringify([{
       correlationId: 'correlation-3',
