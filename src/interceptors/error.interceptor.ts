@@ -1,4 +1,4 @@
-import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError, Observable, switchMap } from 'rxjs';
@@ -15,8 +15,7 @@ export const errorInterceptor: HttpInterceptorFn = (
   const isRetried = req.headers.has('X-Refresh-Attempted');
 
   return next(req).pipe(
-    catchError((error: any) => {
-      // eslint-disable-line @typescript-eslint/no-explicit-any
+    catchError((error: HttpErrorResponse) => {
       console.error('HTTP Error caught by interceptor:', error);
 
       const errorWithUrl = { ...error, url: req.url };

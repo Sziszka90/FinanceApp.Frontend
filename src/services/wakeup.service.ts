@@ -26,11 +26,11 @@ export class WakeupService {
   async wakeup() {
     const delays = Array(5).fill(15000);
     try {
-      let response: unknown = null;
+      let responseStatus: number | null = null;
       let shouldRetry = true;
       for (let i = 0; i < 5 && shouldRetry; i++) {
         try {
-          response = await firstValueFrom(this.wakeupApiService.wakeup());
+          responseStatus = (await firstValueFrom(this.wakeupApiService.wakeup())).status;
           break;
         } catch {
           if (i === 4) {
@@ -44,7 +44,7 @@ export class WakeupService {
           }
         }
       }
-      this.showApp = (response as any)?.status === 200;
+      this.showApp = responseStatus === 200;
     } finally {
       this.showWakeupLoader = false;
     }

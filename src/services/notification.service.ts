@@ -56,10 +56,6 @@ export class NotificationService {
     try {
       const connection = this.getOrCreateConnection();
       await connection.start();
-      console.info('SignalR: Connection established', {
-        baseUrl: connection.baseUrl,
-        connectionId: connection.connectionId
-      });
       this.connectionRetryCount = 0;
       await this.joinUserGroup(connection);
     } catch (error) {
@@ -93,7 +89,6 @@ export class NotificationService {
       .build();
 
     connection.on(TRANSACTIONS_MATCHED_NOTIFICATION, () => {
-      console.info('SignalR: Received transaction refresh notification');
       this.notificationSubject.next();
     });
 
@@ -110,7 +105,6 @@ export class NotificationService {
     });
 
     connection.onreconnected(async () => {
-      console.info('SignalR: Reconnected; joining user group again');
       try {
         await this.joinUserGroup(connection);
       } catch (error) {
@@ -135,7 +129,6 @@ export class NotificationService {
   private async joinUserGroup(connection: HubConnection): Promise<void> {
     const userEmail = await this.authenticationService.getUserEmail();
     await connection.invoke(JOIN_GROUP_METHOD, userEmail);
-    console.info('SignalR: Joined transaction notification group');
   }
 
   private scheduleReconnect(): void {

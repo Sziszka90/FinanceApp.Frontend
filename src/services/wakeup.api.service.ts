@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 export class WakeupApiService {
   private http = inject(HttpClient);
 
-  wakeup(): Observable<HttpResponse<Object>> {
-    return this.http.post<Object>(`${environment.apiUrl}/api/v1/wakeup`, {}, { observe: 'response' });
+  wakeup(): Observable<HttpResponse<unknown>> {
+    return this.http.post<unknown>(`${environment.apiUrl}/api/v1/wakeup`, {}, { observe: 'response' });
   }
 }

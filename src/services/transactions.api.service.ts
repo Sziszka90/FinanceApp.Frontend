@@ -119,7 +119,7 @@ export class TransactionApiService {
     userId?: string,
     top?: number
   ): Observable<TopTransactionGroupDto[]> {
-    const params: any = {
+    const params: Record<string, string | number> = {
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString()
     };

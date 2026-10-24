@@ -30,12 +30,18 @@ export class ComponentErrorService {
     }
 
     if (error && typeof error === 'object') {
-      const err = error as any;
+      const err = error as Record<string, unknown>;
+      const body = err['error'];
+      const bodyRecord = body && typeof body === 'object' ? body as Record<string, unknown> : null;
+      const nestedError = bodyRecord?.['error'];
+      const nestedErrorRecord = nestedError && typeof nestedError === 'object'
+        ? nestedError as Record<string, unknown>
+        : null;
       return (
-        (err?.error?.message as string) ??
-        (err?.error?.error?.message as string) ??
-        (err?.error?.error as string) ??
-        (err?.message as string) ??
+        (bodyRecord?.['message'] as string | undefined) ??
+        (nestedErrorRecord?.['message'] as string | undefined) ??
+        (nestedError as string | undefined) ??
+        (err['message'] as string | undefined) ??
         'An unexpected error occurred'
       );
     }
