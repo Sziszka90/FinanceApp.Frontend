@@ -13,10 +13,20 @@ export interface PdfImportJob {
 const STORAGE_KEY = 'finance-app.pdf-import-jobs';
 const MAX_JOBS = 20;
 const JOB_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
+const JOB_PROCESSING_TIMEOUT_MS = 30 * 60 * 1000;
+const JOB_PROCESSING_TIMEOUT_MESSAGE =
+  'No completion response arrived within 30 minutes. Check your transactions before retrying this PDF.';
 
 @Injectable({ providedIn: 'root' })
 export class PdfImportJobsService {
   readonly jobs = signal<PdfImportJob[]>(this.readJobs());
+
+  constructor() {
+    this.failStaleJobs();
+    if (typeof window !== 'undefined') {
+      window.setInterval(() => this.failStaleJobs(), 60_000);
+    }
+  }
 
   add(correlationId: string, fileName: string): void {
     this.updateJobs(jobs => [
@@ -50,6 +60,21 @@ export class PdfImportJobsService {
       return;
     }
     this.updateJobs(jobs => jobs.map(job => (job.correlationId === correlationId ? update(job) : job)));
+  }
+
+  private failStaleJobs(): void {
+    const cutoff = Date.now() - JOB_PROCESSING_TIMEOUT_MS;
+    if (!this.jobs().some(job => (job.status === 'uploading' || job.status === 'queued') && Date.parse(job.createdAt) <= cutoff)) {
+      return;
+    }
+
+    this.updateJobs(jobs =>
+      jobs.map(job =>
+        (job.status === 'uploading' || job.status === 'queued') && Date.parse(job.createdAt) <= cutoff
+          ? { ...job, status: 'failed', error: JOB_PROCESSING_TIMEOUT_MESSAGE }
+          : job
+      )
+    );
   }
 
   private updateJobs(update: (jobs: PdfImportJob[]) => PdfImportJob[]): void {
