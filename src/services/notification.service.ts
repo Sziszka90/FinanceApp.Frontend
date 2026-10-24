@@ -20,6 +20,8 @@ export class NotificationService {
   public notifications$ = this.notificationSubject.asObservable();
   private importedSubject = new Subject<string>();
   public imported$ = this.importedSubject.asObservable();
+  private importProcessingSubject = new Subject<string>();
+  public importProcessing$ = this.importProcessingSubject.asObservable();
   private importErrorSubject = new Subject<{ correlationId: string; reason: string }>();
   public importErrors$ = this.importErrorSubject.asObservable();
   private connectionRetryCount = 0;
@@ -94,6 +96,10 @@ export class NotificationService {
 
     connection.on('TransactionsImportedNotification', (correlationId: string) => {
       this.importedSubject.next(correlationId);
+    });
+
+    connection.on('TransactionsImportProcessingNotification', (correlationId: string) => {
+      this.importProcessingSubject.next(correlationId);
     });
 
     connection.on('TransactionsImportFailedNotification', (message: string) => {

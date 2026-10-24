@@ -36,7 +36,8 @@
               <span class="job-status">
                 @switch (job.status) {
                   @case ('uploading') { Uploading } 
-                  @case ('queued') { Queued / processing }
+                  @case ('queued') { Waiting in queue }
+                  @case ('processing') { Processing }
                   @case ('completed') { Imported }
                   @case ('failed') { Failed }
                 }

@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type PdfImportJobStatus = 'uploading' | 'queued' | 'completed' | 'failed';
+export type PdfImportJobStatus = 'uploading' | 'queued' | 'processing' | 'completed' | 'failed';
 
 export interface PdfImportJob {
   correlationId: string;
@@ -39,6 +39,12 @@ export class PdfImportJobsService {
     this.updateJob(correlationId, job => (job.status === 'uploading' ? { ...job, status: 'queued' } : job));
   }
 
+  markProcessing(correlationId: string): void {
+    this.updateJob(correlationId, job =>
+      job.status === 'queued' || job.status === 'uploading' ? { ...job, status: 'processing' } : job
+    );
+  }
+
   complete(correlationId: string): void {
     this.updateJob(correlationId, job => ({ ...job, status: 'completed', error: undefined }));
   }
@@ -64,13 +70,17 @@ export class PdfImportJobsService {
 
   private failStaleJobs(): void {
     const cutoff = Date.now() - JOB_PROCESSING_TIMEOUT_MS;
-    if (!this.jobs().some(job => (job.status === 'uploading' || job.status === 'queued') && Date.parse(job.createdAt) <= cutoff)) {
+    if (!this.jobs().some(job =>
+      (job.status === 'uploading' || job.status === 'queued' || job.status === 'processing') &&
+      Date.parse(job.createdAt) <= cutoff
+    )) {
       return;
     }
 
     this.updateJobs(jobs =>
       jobs.map(job =>
-        (job.status === 'uploading' || job.status === 'queued') && Date.parse(job.createdAt) <= cutoff
+        (job.status === 'uploading' || job.status === 'queued' || job.status === 'processing') &&
+        Date.parse(job.createdAt) <= cutoff
           ? { ...job, status: 'failed', error: JOB_PROCESSING_TIMEOUT_MESSAGE }
           : job
       )
@@ -103,6 +113,7 @@ export class PdfImportJobsService {
         job &&
         typeof job.correlationId === 'string' &&
         typeof job.fileName === 'string' &&
+      ['uploading', 'queued', 'processing', 'completed', 'failed'].includes(job.status) &&
         Date.parse(job.createdAt) >= cutoff
     );
   }
