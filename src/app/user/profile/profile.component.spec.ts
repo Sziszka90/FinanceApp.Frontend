@@ -25,7 +25,9 @@ describe('ProfileComponent', () => {
   };
 
   beforeEach(async () => {
-    const userApiSpy = jasmine.createSpyObj('UserApiService', ['getActiveUser', 'updateUser']);
+    const userApiSpy = jasmine.createSpyObj('UserApiService', [
+      'getActiveUser', 'updateUser', 'getBankStatementPrompts', 'updatePassword'
+    ]);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const errorServiceSpy = jasmine.createSpyObj('ComponentErrorService', ['showError', 'showSuccess', 'clearError', 'handleError'], {
       hasError: jasmine.createSpy().and.returnValue(false),
@@ -38,7 +40,7 @@ describe('ProfileComponent', () => {
         { provide: UserApiService, useValue: userApiSpy },
         { provide: AuthenticationService, useValue: jasmine.createSpyObj('AuthenticationService', ['logout']) },
         { provide: Router, useValue: routerSpy },
-        { provide: ComponentErrorService, useValue: errorServiceSpy },
+        { provide: ComponentErrorService, useValue: errorServiceSpy }
       ]
     }).compileComponents();
 
@@ -48,6 +50,8 @@ describe('ProfileComponent', () => {
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     userApiService.getActiveUser.and.returnValue(of(mockUser));
     userApiService.updateUser.and.returnValue(of(mockUser));
+    userApiService.getBankStatementPrompts.and.returnValue(of([]));
+    userApiService.updatePassword.and.returnValue(of(void 0));
   });
 
   afterEach(() => fixture.destroy());
@@ -68,18 +72,12 @@ describe('ProfileComponent', () => {
     ]);
   });
 
-  it('validates username and optional password through field state', () => {
+  it('validates the username through field state', () => {
     component.profileModel.update(model => ({ ...model, userName: 'a' }));
     expect(component.profileForm.userName().invalid()).toBeTrue();
 
-    component.profileModel.update(model => ({ ...model, userName: 'ab', password: '' }));
+    component.profileModel.update(model => ({ ...model, userName: 'ab' }));
     expect(component.profileForm().valid()).toBeTrue();
-
-    component.profileModel.update(model => ({ ...model, password: 'short' }));
-    expect(component.profileForm.password().errors().map(error => error.kind)).toContain('minLength');
-
-    component.profileModel.update(model => ({ ...model, password: 'ValidPass123!' }));
-    expect(component.profileForm.password().valid()).toBeTrue();
   });
 
   it('loads the active user into the signal model', () => {
@@ -104,7 +102,6 @@ describe('ProfileComponent', () => {
     fixture.detectChanges();
     component.profileModel.set({
       userName: 'newusername',
-      password: 'NewPass123!',
       currency: CurrencyEnum.USD
     });
 
@@ -113,7 +110,6 @@ describe('ProfileComponent', () => {
     expect(userApiService.updateUser).toHaveBeenCalledWith({
       id: mockUser.id,
       userName: 'newusername',
-      password: 'NewPass123!',
       baseCurrency: CurrencyEnum.USD
     });
     expect(router.navigate).toHaveBeenCalledWith(['/']);
@@ -123,7 +119,6 @@ describe('ProfileComponent', () => {
     fixture.detectChanges();
     component.profileModel.set({
       userName: '',
-      password: '',
       currency: CurrencyEnum.GBP
     });
 
@@ -132,7 +127,6 @@ describe('ProfileComponent', () => {
     expect(userApiService.updateUser).toHaveBeenCalledWith({
       id: mockUser.id,
       userName: mockUser.userName,
-      password: '',
       baseCurrency: CurrencyEnum.GBP
     });
   });
@@ -142,7 +136,6 @@ describe('ProfileComponent', () => {
     userApiService.updateUser.and.returnValue(throwError(() => new Error('Update Error')));
     component.profileModel.set({
       userName: 'newusername',
-      password: '',
       currency: CurrencyEnum.USD
     });
 

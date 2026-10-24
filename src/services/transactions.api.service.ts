@@ -125,11 +125,11 @@ export class TransactionApiService {
     };
 
     if (userId) {
-      params.userId = userId;
+      params['userId'] = userId;
     }
 
     if (top !== undefined && top !== null) {
-      params.top = top.toString();
+      params['top'] = top.toString();
     }
 
     return this.http.get<TopTransactionGroupDto[]>(`${this.apiUrl}/api/v1/transactiongroups/top`, {

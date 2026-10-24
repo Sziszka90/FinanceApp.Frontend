@@ -346,16 +346,16 @@ describe('TransactionApiService', () => {
   });
 
   describe('File Upload Operations', () => {
-    describe('uploadCsv', () => {
+    describe('uploadPdf', () => {
       const expectedUrl = `${mockEnvironment.apiUrl}/api/v1/transactions/import`;
       const correlationId = 'test-correlation-id';
 
-      it('should upload CSV file', () => {
-        const mockFile = new File(['test,data'], 'test.csv', { type: 'text/csv' });
-        const expectedTransactions = [mockTransaction];
+      it('should upload a PDF file', () => {
+        const mockFile = new File(['test pdf'], 'test.pdf', { type: 'application/pdf' });
+        const result = 'import-123';
 
-        service.uploadCsv(mockFile, correlationId).subscribe((transactions: GetTransactionDto[]) => {
-          expect(transactions).toEqual(expectedTransactions);
+        service.uploadPdf(mockFile, correlationId).subscribe((importId: string) => {
+          expect(importId).toBe(result);
         });
 
         const req = httpMock.expectOne(expectedUrl);
@@ -366,13 +366,13 @@ describe('TransactionApiService', () => {
         expect(formData.get('file')).toBe(mockFile);
         expect(formData.get('correlationId')).toBe(correlationId);
 
-        req.flush(expectedTransactions);
+        req.flush(result);
       });
 
       it('should handle file upload errors', () => {
-        const mockFile = new File(['test,data'], 'test.csv', { type: 'text/csv' });
+        const mockFile = new File(['test pdf'], 'test.pdf', { type: 'application/pdf' });
 
-        service.uploadCsv(mockFile, correlationId).subscribe({
+        service.uploadPdf(mockFile, correlationId).subscribe({
           next: () => fail('Should have failed'),
           error: (error: any) => {
             expect(error.status).toBe(400);
