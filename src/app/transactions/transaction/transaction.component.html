@@ -22,6 +22,7 @@
   (drop)="onDrop($event)">
   <p>Drag and drop a bank statement PDF here, or click to upload</p>
   <input type="file" accept=".pdf,application/pdf" (change)="onFileSelect($event)" hidden #fileInput>
+  <input type="file" accept=".pdf,application/pdf" (change)="onRetryFileSelect($event)" hidden #retryFileInput>
   <button class="custom-button bounce-button" [class.disabled]="loading() || uploadingPdf()" type="button" (click)="!loading() && !uploadingPdf() && fileInput.click()">Upload PDF</button>
   </section>
 
@@ -46,6 +47,9 @@
             </div>
             @if (job.status === 'completed' || job.status === 'failed') {
               <button type="button" class="remove-job-button" aria-label="Remove import from list" (click)="pdfImportJobs.remove(job.correlationId)">Remove</button>
+            }
+            @if (job.status === 'failed') {
+              <button type="button" class="custom-button-inverse" (click)="retryPdfImport(job.correlationId, retryFileInput)">Retry</button>
             }
           </li>
         }

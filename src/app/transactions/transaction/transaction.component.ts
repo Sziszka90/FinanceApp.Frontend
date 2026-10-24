@@ -68,6 +68,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   private readonly filterChanges = new Subject<void>();
   private readonly pageSize = 50;
   private pageRequestVersion = 0;
+  private readonly pdfFilesByCorrelationId = new Map<string, File>();
   dataSource = signal<MatTableDataSource<GetTransactionDto>>(new MatTableDataSource<GetTransactionDto>([]));
 
   typeOptions: { name: string; value: TransactionTypeEnum }[] = [
@@ -324,6 +325,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       const requestId = uuidv4();
       const correlationId = this.correlationService.setCorrelationId(requestId);
 
+      this.pdfFilesByCorrelationId.set(correlationId, file);
       this.pdfImportJobs.add(correlationId, file.name);
       this.uploadingPdf.set(true);
 
@@ -341,6 +343,25 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       });
     } else {
       this.showError('Choose a PDF file smaller than 10 MB.');
+    }
+  }
+
+  retryPdfImport(correlationId: string, fileInput: HTMLInputElement): void {
+    const file = this.pdfFilesByCorrelationId.get(correlationId);
+    if (file) {
+      this.handleFile(file);
+      return;
+    }
+
+    fileInput.click();
+  }
+
+  onRetryFileSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (file) {
+      this.handleFile(file);
     }
   }
 

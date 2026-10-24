@@ -1,4 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
+import { finalize } from 'rxjs';
+import { TransactionApiService } from './transactions.api.service';
+import { PdfImportStatus } from 'src/models/TransactionDtos/pdf-import-status.dto';
 
 export type PdfImportJobStatus = 'uploading' | 'queued' | 'processing' | 'completed' | 'failed';
 
@@ -19,12 +22,15 @@ const JOB_PROCESSING_TIMEOUT_MESSAGE =
 
 @Injectable({ providedIn: 'root' })
 export class PdfImportJobsService {
+  private readonly transactionApi = inject(TransactionApiService);
+  private readonly statusRequests = new Set<string>();
   readonly jobs = signal<PdfImportJob[]>(this.readJobs());
 
   constructor() {
     this.failStaleJobs();
     if (typeof window !== 'undefined') {
       window.setInterval(() => this.failStaleJobs(), 60_000);
+      window.setInterval(() => this.refreshActiveJobs(), 5_000);
     }
   }
 
@@ -43,6 +49,10 @@ export class PdfImportJobsService {
     this.updateJob(correlationId, job =>
       job.status === 'queued' || job.status === 'uploading' ? { ...job, status: 'processing' } : job
     );
+  }
+
+  syncStatus(correlationId: string, status: PdfImportStatus, error?: string | null): void {
+    this.updateJob(correlationId, job => ({ ...job, status, error: error ?? undefined }));
   }
 
   complete(correlationId: string): void {
@@ -85,6 +95,22 @@ export class PdfImportJobsService {
           : job
       )
     );
+  }
+
+  private refreshActiveJobs(): void {
+    for (const job of this.jobs()) {
+      if ((job.status !== 'queued' && job.status !== 'processing') || this.statusRequests.has(job.correlationId)) {
+        continue;
+      }
+
+      this.statusRequests.add(job.correlationId);
+      this.transactionApi.getPdfImportStatus(job.correlationId)
+        .pipe(finalize(() => this.statusRequests.delete(job.correlationId)))
+        .subscribe({
+          next: status => this.syncStatus(job.correlationId, status.status, status.error),
+          error: () => undefined
+        });
+    }
   }
 
   private updateJobs(update: (jobs: PdfImportJob[]) => PdfImportJob[]): void {

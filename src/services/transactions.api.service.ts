@@ -15,6 +15,7 @@ import {
   TransactionCursorPageDto,
   TransactionPageFilter
 } from 'src/models/TransactionDtos/transaction-cursor-page.dto';
+import { PdfImportStatusDto } from 'src/models/TransactionDtos/pdf-import-status.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -144,5 +145,12 @@ export class TransactionApiService {
     formData.append('correlationId', correlationId);
 
     return this.http.post<string>(`${this.apiUrl}/api/v1/transactions/import`, formData, { withCredentials: true });
+  }
+
+  getPdfImportStatus(correlationId: string): Observable<PdfImportStatusDto> {
+    return this.http.get<PdfImportStatusDto>(
+      `${this.apiUrl}/api/v1/transactions/import/${correlationId}/status`,
+      { withCredentials: true }
+    );
   }
 }
