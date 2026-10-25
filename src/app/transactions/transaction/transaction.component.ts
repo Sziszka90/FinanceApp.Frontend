@@ -109,7 +109,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       console.info('Transactions: reloading after SignalR notification');
       this.loadTransactions();
     });
-    this.notificationService.imported$.subscribe(() => this.loadTransactions());
+    this.pdfImportJobs.completed$.subscribe(() => this.loadTransactions());
   }
 
   loadTransactions(): void {

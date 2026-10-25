@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { TransactionApiService } from './transactions.api.service';
 import { PdfImportStatus } from 'src/models/TransactionDtos/pdf-import-status.dto';
 
@@ -21,11 +21,19 @@ const JOB_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 export class PdfImportJobsService {
   private readonly transactionApi = inject(TransactionApiService);
   private readonly statusRequests = new Set<string>();
+  private readonly completedSubject = new Subject<string>();
+  private readonly handleVisibilityChange = (): void => {
+    if (document.visibilityState === 'visible') {
+      this.refreshActiveJobs();
+    }
+  };
   readonly jobs = signal<PdfImportJob[]>(this.readJobs());
+  readonly completed$ = this.completedSubject.asObservable();
 
   constructor() {
     if (typeof window !== 'undefined') {
       window.setInterval(() => this.refreshActiveJobs(), 5_000);
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
 
@@ -47,15 +55,33 @@ export class PdfImportJobsService {
   }
 
   syncStatus(correlationId: string, status: PdfImportStatus, error?: string | null): void {
-    this.updateJob(correlationId, job => {
-      const isTerminal = job.status === 'completed' || job.status === 'failed';
-      const receivedStatusIsTerminal = status === 'completed' || status === 'failed';
-      return isTerminal && !receivedStatusIsTerminal ? job : { ...job, status, error: error ?? undefined };
-    });
+    const job = this.getJob(correlationId);
+    if (!job) {
+      return;
+    }
+
+    const isTerminal = job.status === 'completed' || job.status === 'failed';
+    const receivedStatusIsTerminal = status === 'completed' || status === 'failed';
+    if (isTerminal && !receivedStatusIsTerminal) {
+      return;
+    }
+
+    this.updateJob(correlationId, current => ({ ...current, status, error: error ?? undefined }));
+    if (status === 'completed' && job.status !== 'completed') {
+      this.completedSubject.next(correlationId);
+    }
   }
 
   complete(correlationId: string): void {
+    const job = this.getJob(correlationId);
+    if (!job) {
+      return;
+    }
+
     this.updateJob(correlationId, job => ({ ...job, status: 'completed', error: undefined }));
+    if (job.status !== 'completed') {
+      this.completedSubject.next(correlationId);
+    }
   }
 
   fail(correlationId: string, error: string): void {

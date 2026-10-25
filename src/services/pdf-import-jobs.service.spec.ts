@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { EMPTY } from 'rxjs';
+import { EMPTY, of } from 'rxjs';
 import { PdfImportJobsService } from './pdf-import-jobs.service';
 import { TransactionApiService } from './transactions.api.service';
 
@@ -62,6 +62,28 @@ describe('PdfImportJobsService', () => {
 
     expect(service.getJob('correlation-queue-timeout')?.status).toBe('queued');
     expect(service.getJob('correlation-queue-timeout')?.error).toBeUndefined();
+  });
+
+  it('refreshes active import status when the browser tab becomes visible', () => {
+    const transactionApi = TestBed.inject(TransactionApiService);
+    spyOn(transactionApi, 'getPdfImportStatus').and.returnValue(
+      of({
+        correlationId: 'correlation-visible',
+        status: 'completed',
+        error: null,
+        updatedAt: new Date().toISOString()
+      })
+    );
+    const completed = jasmine.createSpy('completed');
+    service.completed$.subscribe(completed);
+    service.add('correlation-visible', 'statement.pdf');
+    service.markQueued('correlation-visible');
+
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    expect(transactionApi.getPdfImportStatus).toHaveBeenCalledWith('correlation-visible');
+    expect(service.getJob('correlation-visible')?.status).toBe('completed');
+    expect(completed).toHaveBeenCalledOnceWith('correlation-visible');
   });
 
   it('restores valid jobs from browser storage', () => {

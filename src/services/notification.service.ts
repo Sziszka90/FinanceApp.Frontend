@@ -30,6 +30,18 @@ export class NotificationService {
   private isStarting = false;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
+  constructor() {
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }
+  }
+
+  private readonly handleVisibilityChange = (): void => {
+    if (document.visibilityState === 'visible' && this.isLoggedIn) {
+      void this.startConnectionAsync();
+    }
+  };
+
   initializeAsync(): Promise<void> {
     return new Promise<void>(resolve => {
       let initialStateHandled = false;
@@ -50,7 +62,11 @@ export class NotificationService {
   }
 
   async startConnectionAsync(): Promise<void> {
-    if (!this.isLoggedIn || this.isStarting || this.hubConnection?.state === HubConnectionState.Connected) {
+    if (
+      !this.isLoggedIn ||
+      this.isStarting ||
+      (this.hubConnection !== null && this.hubConnection.state !== HubConnectionState.Disconnected)
+    ) {
       return;
     }
 
