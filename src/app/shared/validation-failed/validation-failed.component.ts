@@ -14,4 +14,8 @@ export class ValidationFailedComponent {
   onClose() {
     this.router.navigate(['/']);
   }
+
+  onSignIn() {
+    this.router.navigate(['/login']);
+  }
 }

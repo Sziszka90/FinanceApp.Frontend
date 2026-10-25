@@ -1,0 +1,41 @@
+@use 'base/variables' as variables;
+
+.confirmation-dialog {
+  color: variables.$text-color;
+  padding: 0.5rem;
+}
+
+.confirmation-icon {
+  align-items: center;
+  background: variables.$primary-selected;
+  border-radius: 50%;
+  color: variables.$primary-hover;
+  display: flex;
+  font-size: 1.5rem;
+  height: 3rem;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  width: 3rem;
+}
+
+h2 {
+  color: variables.$text-color;
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem;
+}
+
+p {
+  color: variables.$muted-color;
+  line-height: 1.55;
+  margin: 0 0 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+p strong {
+  color: variables.$text-color;
+}
+
+mat-dialog-actions {
+  margin-top: 1rem;
+  padding: 0;
+}

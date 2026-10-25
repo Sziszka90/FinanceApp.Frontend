@@ -4,9 +4,11 @@ import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { UserApiService } from '../../../services/user.api.service';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDialog } from '@angular/material/dialog';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
 import { BaseComponent } from '../../shared/base-component';
+import { RegistrationConfirmationDialogComponent } from './registration-confirmation-dialog/registration-confirmation-dialog.component';
 
 @Component({
   selector: 'registration',
@@ -19,6 +21,7 @@ import { BaseComponent } from '../../shared/base-component';
 export class RegistrationComponent extends BaseComponent {
   private apiService = inject(UserApiService);
   private router = inject(Router);
+  private matDialog = inject(MatDialog);
 
   readonly registrationModel = signal({
     userName: '',
@@ -60,7 +63,12 @@ export class RegistrationComponent extends BaseComponent {
             baseCurrency: model.currency ?? CurrencyEnum.EUR
           }));
           this.setLoading(false);
-          this.showSuccess('Registration successful! Please confirm email address.');
+          const dialogRef = this.matDialog.open(RegistrationConfirmationDialogComponent, {
+            data: { email: model.email },
+            disableClose: true,
+            width: 'min(28rem, calc(100vw - 2rem))'
+          });
+          await firstValueFrom(dialogRef.afterClosed());
           await this.router.navigate(['/login']);
         } catch (error) {
           this.setLoading(false);

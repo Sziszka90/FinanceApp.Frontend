@@ -1,7 +1,17 @@
 <div class="validation-failed-container">
-  <h1 class="default-font text-color-grey">Validation Failed</h1>
+  <h1 class="default-font text-color-grey">We couldn’t validate this link</h1>
   <p class="default-font text-color-grey">
-    Your session has expired or the validation token is invalid. Please request a new email.
+    The link may be expired, invalid, or already used.
   </p>
-  <button class="custom-button" (click)="onClose()">Return</button>
+  <p class="default-font text-color-grey">
+    If this was an email confirmation link, your email may already be confirmed. Try signing in. If you still need to
+    confirm it, choose <strong>Resend Email Confirmation</strong> on the sign-in page.
+  </p>
+  <p class="default-font text-color-grey">
+    If this was a password reset link, request a new password reset email from the sign-in page.
+  </p>
+  <div class="validation-actions">
+    <button class="custom-button" (click)="onSignIn()">Go to sign in</button>
+    <button class="custom-button-inverse" (click)="onClose()">Return home</button>
+  </div>
 </div>

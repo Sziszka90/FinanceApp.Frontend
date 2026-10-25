@@ -1,0 +1,11 @@
+<section class="confirmation-dialog">
+  <div class="confirmation-icon" aria-hidden="true">✉</div>
+  <h2 mat-dialog-title>Check your email</h2>
+  <mat-dialog-content>
+    <p>We sent an account confirmation link to <strong>{{ data.email }}</strong>.</p>
+    <p>Open the link to activate your account. If it doesn’t arrive soon, check your spam folder.</p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button type="button" class="custom-button" (click)="continueToLogin()">Continue to sign in</button>
+  </mat-dialog-actions>
+</section>
