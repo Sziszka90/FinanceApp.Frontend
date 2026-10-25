@@ -59,15 +59,21 @@ export class UserApiService {
   }
 
   getCategorizationRules(): Observable<CategorizationRuleDto[]> {
-    return this.http.get<CategorizationRuleDto[]>(`${this.apiUrl}/api/v1/categorizationrules`, { withCredentials: true });
+    return this.http.get<CategorizationRuleDto[]>(`${this.apiUrl}/api/v1/categorizationrules`, {
+      withCredentials: true
+    });
   }
 
   createCategorizationRule(rule: SaveCategorizationRuleDto): Observable<CategorizationRuleDto> {
-    return this.http.post<CategorizationRuleDto>(`${this.apiUrl}/api/v1/categorizationrules`, rule, { withCredentials: true });
+    return this.http.post<CategorizationRuleDto>(`${this.apiUrl}/api/v1/categorizationrules`, rule, {
+      withCredentials: true
+    });
   }
 
   updateCategorizationRule(id: string, rule: SaveCategorizationRuleDto): Observable<CategorizationRuleDto> {
-    return this.http.put<CategorizationRuleDto>(`${this.apiUrl}/api/v1/categorizationrules/${id}`, rule, { withCredentials: true });
+    return this.http.put<CategorizationRuleDto>(`${this.apiUrl}/api/v1/categorizationrules/${id}`, rule, {
+      withCredentials: true
+    });
   }
 
   deleteCategorizationRule(id: string): Observable<void> {

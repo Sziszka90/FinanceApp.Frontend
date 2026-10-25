@@ -50,9 +50,7 @@ export class PdfImportJobsService {
     this.updateJob(correlationId, job => {
       const isTerminal = job.status === 'completed' || job.status === 'failed';
       const receivedStatusIsTerminal = status === 'completed' || status === 'failed';
-      return isTerminal && !receivedStatusIsTerminal
-        ? job
-        : { ...job, status, error: error ?? undefined };
+      return isTerminal && !receivedStatusIsTerminal ? job : { ...job, status, error: error ?? undefined };
     });
   }
 
@@ -86,7 +84,8 @@ export class PdfImportJobsService {
       }
 
       this.statusRequests.add(job.correlationId);
-      this.transactionApi.getPdfImportStatus(job.correlationId)
+      this.transactionApi
+        .getPdfImportStatus(job.correlationId)
         .pipe(finalize(() => this.statusRequests.delete(job.correlationId)))
         .subscribe({
           next: status => this.syncStatus(job.correlationId, status.status, status.error),
@@ -121,7 +120,7 @@ export class PdfImportJobsService {
         job &&
         typeof job.correlationId === 'string' &&
         typeof job.fileName === 'string' &&
-      ['uploading', 'queued', 'processing', 'completed', 'failed'].includes(job.status) &&
+        ['uploading', 'queued', 'processing', 'completed', 'failed'].includes(job.status) &&
         Date.parse(job.createdAt) >= cutoff
     );
   }

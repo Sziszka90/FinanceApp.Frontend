@@ -148,9 +148,8 @@ export class TransactionApiService {
   }
 
   getPdfImportStatus(correlationId: string): Observable<PdfImportStatusDto> {
-    return this.http.get<PdfImportStatusDto>(
-      `${this.apiUrl}/api/v1/transactions/import/${correlationId}/status`,
-      { withCredentials: true }
-    );
+    return this.http.get<PdfImportStatusDto>(`${this.apiUrl}/api/v1/transactions/import/${correlationId}/status`, {
+      withCredentials: true
+    });
   }
 }
