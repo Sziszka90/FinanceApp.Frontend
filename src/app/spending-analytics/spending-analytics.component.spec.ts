@@ -6,6 +6,7 @@ import { UserApiService } from 'src/services/user.api.service';
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { of } from 'rxjs';
 import { CurrencyEnum } from 'src/models/Enums/currency.enum';
 import { TransactionTypeEnum } from 'src/models/Enums/transaction-type.enum';
@@ -37,6 +38,7 @@ describe('SpendingAnalyticsComponent', () => {
       providers: [
         provideHttpClient(withXhr()),
         provideHttpClientTesting(),
+        provideNativeDateAdapter(),
         { provide: TransactionApiService, useValue: transactionApiService },
         { provide: UserApiService, useValue: userApiService }
       ]
