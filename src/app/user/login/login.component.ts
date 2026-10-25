@@ -2,6 +2,7 @@ import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/cor
 import { AuthenticationService } from '../../../services/authentication.service';
 import { FormField, FormRoot, email, form, required } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ForgotPasswordRequestModalComponent } from '../forgot-password-modal/forgot-password-modal.component';
 import { LoaderComponent } from '../../shared/loader/loader.component';
@@ -21,7 +22,7 @@ export class LoginComponent extends BaseComponent {
   private matDialog = inject(MatDialog);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  readonly emailConfirmed = signal(this.route.snapshot.queryParamMap.get('emailConfirmed') === 'true');
+  readonly emailConfirmed = signal(false);
   readonly loginModel = signal({
     email: '',
     password: ''
@@ -29,14 +30,9 @@ export class LoginComponent extends BaseComponent {
 
   constructor() {
     super();
-    if (this.emailConfirmed()) {
-      void this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams: { emailConfirmed: null },
-        queryParamsHandling: 'merge',
-        replaceUrl: true
-      });
-    }
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      this.emailConfirmed.set(params.get('emailConfirmed') === 'true');
+    });
   }
 
   readonly loginForm = form(this.loginModel, path => {
