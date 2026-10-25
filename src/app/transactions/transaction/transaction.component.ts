@@ -1,4 +1,14 @@
-import { Component, effect, inject, OnInit, ViewChild, signal, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  effect,
+  HostListener,
+  inject,
+  OnInit,
+  signal,
+  ViewChild
+} from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
@@ -110,6 +120,13 @@ export class TransactionComponent extends BaseComponent implements OnInit {
       this.loadTransactions();
     });
     this.pdfImportJobs.completed$.subscribe(() => this.loadTransactions());
+  }
+
+  @HostListener('document:visibilitychange')
+  refreshTransactionsWhenVisible(): void {
+    if (document.visibilityState === 'visible') {
+      this.loadTransactions();
+    }
   }
 
   loadTransactions(): void {
