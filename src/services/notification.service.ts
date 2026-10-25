@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
   HttpTransportType,
@@ -6,14 +7,16 @@ import {
   HubConnectionState,
   LogLevel
 } from '@microsoft/signalr';
-import { Subject } from 'rxjs';
+import { firstValueFrom, Subject } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
+import { TokenApiService } from './token.api.service';
 import { environment } from 'src/environments/environment';
 import { JOIN_GROUP_METHOD, TRANSACTIONS_MATCHED_NOTIFICATION } from 'src/models/Constants/notification.const';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private authenticationService = inject(AuthenticationService);
+  private tokenApiService = inject(TokenApiService);
 
   private hubConnection: HubConnection | null = null;
   private notificationSubject = new Subject<void>();
@@ -24,8 +27,6 @@ export class NotificationService {
   public importProcessing$ = this.importProcessingSubject.asObservable();
   private importErrorSubject = new Subject<{ correlationId: string; reason: string }>();
   public importErrors$ = this.importErrorSubject.asObservable();
-  private connectionRetryCount = 0;
-  private maxAuthRetries = 2;
   private isLoggedIn = false;
   private isStarting = false;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -74,15 +75,20 @@ export class NotificationService {
     try {
       const connection = this.getOrCreateConnection();
       await connection.start();
-      this.connectionRetryCount = 0;
       await this.joinUserGroup(connection);
     } catch (error) {
       console.error('SignalR: Connection or group join failed', error);
       if (this.isAuthenticationError(error)) {
-        this.connectionRetryCount++;
-        if (this.connectionRetryCount > this.maxAuthRetries) {
-          await this.authenticationService.logoutAsync();
-          return;
+        try {
+          // SignalR requests bypass Angular's HTTP interceptor, so refresh the
+          // HttpOnly access-token cookie explicitly before reconnecting.
+          await firstValueFrom(this.tokenApiService.refreshToken());
+        } catch (refreshError) {
+          console.error('SignalR: Access-token refresh failed', refreshError);
+          if (this.isRefreshTokenRejected(refreshError)) {
+            await this.authenticationService.logoutAsync();
+            return;
+          }
         }
       }
       this.scheduleReconnect();
@@ -169,6 +175,10 @@ export class NotificationService {
     return message.includes('401') || message.includes('Unauthorized');
   }
 
+  private isRefreshTokenRejected(error: unknown): boolean {
+    return error instanceof HttpErrorResponse && (error.status === 400 || error.status === 401 || error.status === 403);
+  }
+
   stopConnection(): void {
     this.isLoggedIn = false;
     if (this.reconnectTimer) {
@@ -178,7 +188,6 @@ export class NotificationService {
 
     const connection = this.hubConnection;
     this.hubConnection = null;
-    this.connectionRetryCount = 0;
     if (connection) {
       void connection.stop().catch(error => {
         console.error('SignalR: Error stopping connection', error);

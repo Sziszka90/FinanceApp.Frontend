@@ -16,6 +16,10 @@ export interface PdfImportJob {
 const STORAGE_KEY = 'finance-app.pdf-import-jobs';
 const MAX_JOBS = 20;
 const JOB_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
+const JOB_TIMEOUT_MS = 10 * 60 * 1000;
+const JOB_PROCESSING_TIMEOUT_MESSAGE =
+  'No completion response arrived within 10 minutes. Check your transactions before retrying this PDF.';
+const JOB_QUEUE_TIMEOUT_MESSAGE = 'The PDF has not started processing after 10 minutes. Retry this import.';
 
 @Injectable({ providedIn: 'root' })
 export class PdfImportJobsService {
@@ -24,6 +28,7 @@ export class PdfImportJobsService {
   private readonly completedSubject = new Subject<string>();
   private readonly handleVisibilityChange = (): void => {
     if (document.visibilityState === 'visible') {
+      this.failStaleJobs();
       this.refreshActiveJobs();
     }
   };
@@ -31,8 +36,10 @@ export class PdfImportJobsService {
   readonly completed$ = this.completedSubject.asObservable();
 
   constructor() {
+    this.failStaleJobs();
     if (typeof window !== 'undefined') {
       window.setInterval(() => this.refreshActiveJobs(), 5_000);
+      window.setInterval(() => this.failStaleJobs(), 60_000);
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
@@ -118,6 +125,36 @@ export class PdfImportJobsService {
           error: () => undefined
         });
     }
+  }
+
+  private failStaleJobs(): void {
+    const now = Date.now();
+    if (!this.jobs().some(job => this.getStaleJobError(job, now) !== undefined)) {
+      return;
+    }
+
+    this.updateJobs(jobs =>
+      jobs.map(job => {
+        const error = this.getStaleJobError(job, now);
+        return error ? { ...job, status: 'failed', error } : job;
+      })
+    );
+  }
+
+  private getStaleJobError(job: PdfImportJob, now: number): string | undefined {
+    if (now - Date.parse(job.createdAt) < JOB_TIMEOUT_MS) {
+      return undefined;
+    }
+
+    if (job.status === 'queued') {
+      return JOB_QUEUE_TIMEOUT_MESSAGE;
+    }
+
+    if (job.status === 'uploading' || job.status === 'processing') {
+      return JOB_PROCESSING_TIMEOUT_MESSAGE;
+    }
+
+    return undefined;
   }
 
   private updateJobs(update: (jobs: PdfImportJob[]) => PdfImportJob[]): void {
