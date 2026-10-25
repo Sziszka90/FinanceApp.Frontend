@@ -1,7 +1,7 @@
 import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { FormField, FormRoot, email, form, required } from '@angular/forms/signals';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ForgotPasswordRequestModalComponent } from '../forgot-password-modal/forgot-password-modal.component';
 import { LoaderComponent } from '../../shared/loader/loader.component';
@@ -20,10 +20,24 @@ export class LoginComponent extends BaseComponent {
   private authService = inject(AuthenticationService);
   private matDialog = inject(MatDialog);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  readonly emailConfirmed = signal(this.route.snapshot.queryParamMap.get('emailConfirmed') === 'true');
   readonly loginModel = signal({
     email: '',
     password: ''
   });
+
+  constructor() {
+    super();
+    if (this.emailConfirmed()) {
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { emailConfirmed: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true
+      });
+    }
+  }
 
   readonly loginForm = form(this.loginModel, path => {
     required(path.email, { message: 'Email is required' });

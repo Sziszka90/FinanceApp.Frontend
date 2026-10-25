@@ -6,6 +6,11 @@
     <form class="form-element" [formRoot]="loginForm">
       <div class="auth-brand"><img src="assets/wallet-logo.svg" alt="" /><span>Finance App</span></div>
       <h3 class="default-font">Log In</h3>
+      @if (emailConfirmed()) {
+        <div class="success-message default-font" role="status" aria-live="polite">
+          Email confirmed. You can now sign in.
+        </div>
+      }
       @if (hasError()) {
         <div class="error-message default-font">
           {{ errorMessage() }}
