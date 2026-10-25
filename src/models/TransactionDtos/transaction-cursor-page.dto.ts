@@ -10,4 +10,5 @@ export interface TransactionPageFilter {
   transactionName?: string;
   transactionDate?: string;
   transactionType?: TransactionTypeEnum;
+  transactionGroupName?: string;
 }

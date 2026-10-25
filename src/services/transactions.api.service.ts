@@ -52,6 +52,9 @@ export class TransactionApiService {
       // The API expects the enum name, while the frontend enum uses numeric values.
       params = params.set('transactionFilter.transactionType', TransactionTypeEnum[filter.transactionType]);
     }
+    if (filter?.transactionGroupName) {
+      params = params.set('transactionFilter.transactionGroupName', filter.transactionGroupName);
+    }
 
     return this.http.get<TransactionCursorPageDto>(`${this.apiUrl}/api/v1/transactions/page`, {
       params,

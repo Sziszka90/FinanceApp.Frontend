@@ -16,6 +16,7 @@ import { Observable, Subject, debounceTime } from 'rxjs';
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { GetTransactionDto } from 'src/models/TransactionDtos/get-transaction.dto';
+import { GetTransactionGroupDto } from 'src/models/TransactionGroupDtos/get-transaction-group.dto';
 import { UpdateTransactionModalComponent } from '../update-transaction-modal/update-transaction-modal.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -69,6 +70,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   public summary$: Observable<Money> | undefined;
   public transactions$: Observable<GetTransactionDto[]> | undefined;
   public allTransactions = signal<GetTransactionDto[]>([]);
+  public transactionGroups = signal<GetTransactionGroupDto[]>([]);
   public total = signal<Money>({ amount: 0, currency: CurrencyEnum.EUR });
   public showSummary = signal<boolean>(false);
   public summary = signal<Money | null>(null);
@@ -88,7 +90,8 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   readonly filterModel = signal({
     name: '',
     date: null as Date | null,
-    type: null as TransactionTypeEnum | null
+    type: null as TransactionTypeEnum | null,
+    transactionGroupName: null as string | null
   });
   readonly filterForm = form(this.filterModel);
   private filterEffect = effect(() => {
@@ -114,6 +117,10 @@ export class TransactionComponent extends BaseComponent implements OnInit {
     this.configureSortingDataAccessor(this.dataSource());
     this.filterChanges.pipe(debounceTime(300)).subscribe(() => this.loadTransactions());
     this.loadTransactions();
+    this.transactionApiService.getAllTransactionGroups().subscribe({
+      next: groups => this.transactionGroups.set(groups),
+      error: error => this.handleError(error, 'Loading transaction groups')
+    });
 
     this.notificationService.notifications$.subscribe(() => {
       console.info('Transactions: reloading after SignalR notification');
@@ -136,14 +143,18 @@ export class TransactionComponent extends BaseComponent implements OnInit {
     this.nextCursor.set(null);
     this.transactionApiService.getTransactionsPage(this.pageSize, null, this.getPageFilter()).subscribe({
       next: page => {
-        if (requestVersion !== this.pageRequestVersion) return;
+        if (requestVersion !== this.pageRequestVersion) {
+          return;
+        }
         this.setLoading(false);
         this.allTransactions.set(page.items);
         this.dataSource().data = page.items;
         this.nextCursor.set(page.nextCursor);
       },
       error: error => {
-        if (requestVersion !== this.pageRequestVersion) return;
+        if (requestVersion !== this.pageRequestVersion) {
+          return;
+        }
         this.setLoading(false);
         this.handleError(error, 'Loading transactions');
       }
@@ -152,13 +163,17 @@ export class TransactionComponent extends BaseComponent implements OnInit {
 
   loadMoreTransactions(): void {
     const cursor = this.nextCursor();
-    if (!cursor || this.loadingMore()) return;
+    if (!cursor || this.loadingMore()) {
+      return;
+    }
 
     const requestVersion = this.pageRequestVersion;
     this.loadingMore.set(true);
     this.transactionApiService.getTransactionsPage(this.pageSize, cursor, this.getPageFilter()).subscribe({
       next: page => {
-        if (requestVersion !== this.pageRequestVersion) return;
+        if (requestVersion !== this.pageRequestVersion) {
+          return;
+        }
         const transactions = [...this.allTransactions(), ...page.items];
         this.allTransactions.set(transactions);
         this.dataSource().data = transactions;
@@ -166,7 +181,9 @@ export class TransactionComponent extends BaseComponent implements OnInit {
         this.loadingMore.set(false);
       },
       error: error => {
-        if (requestVersion !== this.pageRequestVersion) return;
+        if (requestVersion !== this.pageRequestVersion) {
+          return;
+        }
         this.loadingMore.set(false);
         this.handleError(error, 'Loading more transactions');
       }
@@ -192,11 +209,14 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   }
 
   private getPageFilter() {
-    const { name, date, type } = this.filterModel();
+    const { name, date, type, transactionGroupName } = this.filterModel();
     return {
       transactionName: name.trim() || undefined,
-      transactionDate: date ? new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())).toISOString() : undefined,
-      transactionType: type ?? undefined
+      transactionDate: date
+        ? new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())).toISOString()
+        : undefined,
+      transactionType: type ?? undefined,
+      transactionGroupName: transactionGroupName ?? undefined
     };
   }
 
@@ -290,7 +310,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   }
 
   resetFilters() {
-    this.filterModel.set({ name: '', date: null, type: null });
+    this.filterModel.set({ name: '', date: null, type: null, transactionGroupName: null });
 
   }
 

@@ -29,26 +29,30 @@
 
       <div class="filter-group">
         <label>Start Date</label>
-        <input
-          type="text"
-          [formField]="filterForm.startDate"
-          class="form-control date-picker"
-          placeholder="Select start date"
-          bsDatepicker
-          [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }"
-        />
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="date-picker">
+          <input
+            matInput
+            [matDatepicker]="startDatePicker"
+            [formField]="filterForm.startDate"
+            placeholder="Select start date"
+          />
+          <mat-datepicker-toggle matIconSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #startDatePicker></mat-datepicker>
+        </mat-form-field>
       </div>
 
       <div class="filter-group">
         <label>End Date</label>
-        <input
-          type="text"
-          [formField]="filterForm.endDate"
-          class="form-control date-picker"
-          placeholder="Select end date"
-          bsDatepicker
-          [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }"
-        />
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="date-picker">
+          <input
+            matInput
+            [matDatepicker]="endDatePicker"
+            [formField]="filterForm.endDate"
+            placeholder="Select end date"
+          />
+          <mat-datepicker-toggle matIconSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #endDatePicker></mat-datepicker>
+        </mat-form-field>
       </div>
 
       <div class="filter-actions">

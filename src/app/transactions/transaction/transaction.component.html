@@ -87,6 +87,17 @@
               </mat-option>
             }
           </mat-select>
+
+          <mat-select
+            class="select transaction-group-filter"
+            [formField]="filterForm.transactionGroupName"
+            [class.disabled]="loading()"
+            placeholder="All groups">
+            <mat-option [value]="null">All groups</mat-option>
+            @for (group of transactionGroups(); track group.id) {
+              <mat-option [value]="group.name">{{ group.name }}</mat-option>
+            }
+          </mat-select>
         </div>
 
         <div class="button-container">

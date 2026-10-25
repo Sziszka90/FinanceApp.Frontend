@@ -5,8 +5,6 @@ import {
   signal,
   ViewChild,
   ElementRef,
-  AfterViewInit,
-  ChangeDetectorRef,
   ChangeDetectionStrategy
 } from '@angular/core';
 
@@ -21,7 +19,9 @@ import { FormField, form } from '@angular/forms/signals';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
-import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { switchMap } from 'rxjs';
 import { TransactionTypeEnum } from 'src/models/Enums/transaction-type.enum';
@@ -43,7 +43,9 @@ interface SpendingByGroup {
     MatSelectModule,
     MatSlideToggleModule,
     MatButtonModule,
-    BsDatepickerModule
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule
   ],
   templateUrl: './spending-analytics.component.html',
   styleUrl: './spending-analytics.component.scss',
@@ -349,7 +351,9 @@ export class SpendingAnalyticsComponent extends BaseComponent implements OnInit 
 
   getCurrencySymbol(): string {
     const user = this.user();
-    if (!user) return '€';
+    if (!user) {
+      return '€';
+    }
 
     const currency = typeof user.baseCurrency === 'string' ? user.baseCurrency : CurrencyEnum[user.baseCurrency];
 
