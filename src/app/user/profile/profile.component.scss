@@ -2,7 +2,7 @@
 
 .form-container { max-width: 520px; }
 .form-container h3 { color: variables.$text-color; font-size: 1.5rem; font-weight: 700; }
-.profile-heading { align-items: center; display: flex; justify-content: space-between; gap: 1rem; }
+.profile-heading { align-items: center; display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
 .profile-heading h3 { margin: 0; }
 .form-container .button-container { width: 100%; }
 .password-settings {
@@ -34,10 +34,19 @@
 .bank-prompt-settings textarea,
 .bank-prompt-settings select {
   box-sizing: border-box;
+  height: 44px;
+  min-height: 44px;
   width: 100%;
 }
 
+.bank-prompt-settings label[for="bankPromptInstructions"] {
+  display: block;
+  margin-top: 1rem;
+}
+
 .bank-prompt-settings textarea {
+  height: auto;
+  min-height: 160px;
   resize: vertical;
 }
 
@@ -67,3 +76,25 @@
   margin: 0.25rem 0 0;
   white-space: pre-wrap;
 }
+
+.categorization-rule-settings {
+  border-top: 1px solid #444;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+}
+
+.categorization-rule-settings > p { margin: 0 0 1rem; }
+.categorization-rule-settings input,
+.categorization-rule-settings select { box-sizing: border-box; width: 100%; }
+.categorization-rule-settings select { height: 44px; min-height: 44px; }
+.categorization-rule-settings input { margin-bottom: 0.75rem; }
+.saved-categorization-rules { margin: 1rem 0; }
+.saved-categorization-rule {
+  align-items: center;
+  border-bottom: 1px solid #444;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+}
+.saved-rule-actions { display: flex; flex: 0 0 auto; gap: 0.5rem; }

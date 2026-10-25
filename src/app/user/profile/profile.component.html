@@ -13,7 +13,6 @@
       </div>
     }
     <form class="form-element" [formRoot]="profileForm">
-      <label class="default-font" for="currency">Currency</label>
       <label class="default-font" for="userName">User Name</label>
       <div class="form-group">
         <input
@@ -82,6 +81,52 @@
               <button type="button" class="custom-button" [disabled]="!newPasswordIsValid() || !passwordsMatch()" (click)="changePassword()">Save new password</button>
             </div>
           }
+        </section>
+
+        <section class="categorization-rule-settings">
+          <h3 class="default-font">Categorization rules</h3>
+          <p class="default-font">Tell Finance App which category to use when a transaction description contains a merchant name. For example, “TESCO” → “Groceries”. Rules apply during transaction categorization; the longest matching text wins.</p>
+
+          <div class="saved-categorization-rules">
+            @for (rule of categorizationRules(); track rule.id) {
+              <div class="saved-categorization-rule">
+                <div><strong>{{ rule.merchantText }}</strong> → {{ rule.transactionGroupName }}</div>
+                <div class="saved-rule-actions">
+                  <button type="button" class="custom-button-inverse" (click)="editCategorizationRule(rule)">Edit</button>
+                  <button type="button" class="custom-button-inverse" (click)="deleteCategorizationRule(rule)">Delete</button>
+                </div>
+              </div>
+            }
+          </div>
+
+          <label class="default-font" for="ruleMerchantText">Transaction description contains</label>
+          <input
+            id="ruleMerchantText"
+            class="default-font"
+            maxlength="200"
+            [value]="ruleMerchantText()"
+            (input)="ruleMerchantText.set($any($event.target).value)"
+            placeholder="e.g. TESCO" />
+
+          <label class="default-font" for="ruleTransactionGroup">Categorize as</label>
+          <div class="form-group">
+            <select
+              id="ruleTransactionGroup"
+              class="default-font"
+              [value]="ruleTransactionGroupId()"
+              (change)="ruleTransactionGroupId.set($any($event.target).value)">
+              <option value="">Choose a category</option>
+              @for (group of transactionGroups(); track group.id) {
+                <option [value]="group.id">{{ group.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="button-container">
+            <button type="button" class="custom-button" (click)="saveCategorizationRule()">{{ editingRuleId() ? 'Save rule' : 'Add rule' }}</button>
+            @if (editingRuleId()) {
+              <button type="button" class="custom-button-inverse" (click)="cancelRuleEdit()">Cancel</button>
+            }
+          </div>
         </section>
 
         <section class="bank-prompt-settings">

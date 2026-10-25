@@ -10,6 +10,9 @@ import { CurrencyEnum } from 'src/models/Enums/currency.enum';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { BankStatementPromptDto } from 'src/models/UserDtos/bank-statement-prompt.dto';
+import { CategorizationRuleDto } from 'src/models/UserDtos/categorization-rule.dto';
+import { TransactionApiService } from 'src/services/transactions.api.service';
+import { GetTransactionGroupDto } from 'src/models/TransactionGroupDtos/get-transaction-group.dto';
 
 @Component({
   selector: 'profile',
@@ -22,12 +25,18 @@ export class ProfileComponent extends BaseComponent implements OnInit {
   private userApiService = inject(UserApiService);
   private authService = inject(AuthenticationService);
   private router = inject(Router);
+  private transactionApi = inject(TransactionApiService, { optional: true });
 
   readonly bankStatementPrompts = signal<BankStatementPromptDto[]>([]);
   readonly selectedBankStatementPromptId = signal<string | null>(null);
   readonly promptName = signal('');
   readonly promptInstructions = signal('');
   readonly editingPromptId = signal<string | null>(null);
+  readonly categorizationRules = signal<CategorizationRuleDto[]>([]);
+  readonly transactionGroups = signal<GetTransactionGroupDto[]>([]);
+  readonly ruleMerchantText = signal('');
+  readonly ruleTransactionGroupId = signal('');
+  readonly editingRuleId = signal<string | null>(null);
   readonly showPasswordChangeForm = signal(false);
   readonly newPassword = signal('');
   readonly confirmNewPassword = signal('');
@@ -92,6 +101,60 @@ export class ProfileComponent extends BaseComponent implements OnInit {
       }
     });
     this.loadBankStatementPrompts();
+    this.loadCategorizationRules();
+    this.transactionApi?.getAllTransactionGroups().subscribe({
+      next: groups => this.transactionGroups.set(groups),
+      error: error => this.handleError(error, 'Failed to load categories')
+    });
+  }
+
+  loadCategorizationRules(): void {
+    this.userApiService.getCategorizationRules?.()?.subscribe({
+      next: rules => this.categorizationRules.set(rules),
+      error: error => this.handleError(error, 'Failed to load categorization rules')
+    });
+  }
+
+  saveCategorizationRule(): void {
+    const merchantText = this.ruleMerchantText().trim();
+    const transactionGroupId = this.ruleTransactionGroupId();
+    if (merchantText.length < 2 || !transactionGroupId) {
+      this.showError('Enter a merchant description and select a category.');
+      return;
+    }
+
+    const payload = { merchantText, transactionGroupId };
+    const editingId = this.editingRuleId();
+    const request = editingId
+      ? this.userApiService.updateCategorizationRule(editingId, payload)
+      : this.userApiService.createCategorizationRule(payload);
+    request.subscribe({
+      next: () => {
+        this.cancelRuleEdit();
+        this.loadCategorizationRules();
+      },
+      error: error => this.handleError(error, 'Failed to save categorization rule')
+    });
+  }
+
+  editCategorizationRule(rule: CategorizationRuleDto): void {
+    this.editingRuleId.set(rule.id);
+    this.ruleMerchantText.set(rule.merchantText);
+    this.ruleTransactionGroupId.set(rule.transactionGroupId);
+  }
+
+  cancelRuleEdit(): void {
+    this.editingRuleId.set(null);
+    this.ruleMerchantText.set('');
+    this.ruleTransactionGroupId.set('');
+  }
+
+  deleteCategorizationRule(rule: CategorizationRuleDto): void {
+    if (!window.confirm(`Delete the rule for "${rule.merchantText}"?`)) return;
+    this.userApiService.deleteCategorizationRule(rule.id).subscribe({
+      next: () => this.loadCategorizationRules(),
+      error: error => this.handleError(error, 'Failed to delete categorization rule')
+    });
   }
 
   loadBankStatementPrompts(): void {

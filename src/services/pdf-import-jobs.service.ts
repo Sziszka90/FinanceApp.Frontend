@@ -16,12 +16,6 @@ export interface PdfImportJob {
 const STORAGE_KEY = 'finance-app.pdf-import-jobs';
 const MAX_JOBS = 20;
 const JOB_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
-const JOB_QUEUE_TIMEOUT_MS = 5 * 60 * 1000;
-const JOB_PROCESSING_TIMEOUT_MS = 30 * 60 * 1000;
-const JOB_QUEUE_TIMEOUT_MESSAGE =
-  'The PDF has not started processing after 5 minutes. Retry this import.';
-const JOB_PROCESSING_TIMEOUT_MESSAGE =
-  'No completion response arrived within 30 minutes. Check your transactions before retrying this PDF.';
 
 @Injectable({ providedIn: 'root' })
 export class PdfImportJobsService {
@@ -30,9 +24,7 @@ export class PdfImportJobsService {
   readonly jobs = signal<PdfImportJob[]>(this.readJobs());
 
   constructor() {
-    this.failStaleJobs();
     if (typeof window !== 'undefined') {
-      window.setInterval(() => this.failStaleJobs(), 60_000);
       window.setInterval(() => this.refreshActiveJobs(), 5_000);
     }
   }
@@ -85,36 +77,6 @@ export class PdfImportJobsService {
       return;
     }
     this.updateJobs(jobs => jobs.map(job => (job.correlationId === correlationId ? update(job) : job)));
-  }
-
-  private failStaleJobs(): void {
-    const now = Date.now();
-    if (!this.jobs().some(job =>
-      this.getStaleJobError(job, now) !== undefined
-    )) {
-      return;
-    }
-
-    this.updateJobs(jobs =>
-      jobs.map(job =>
-        this.getStaleJobError(job, now)
-          ? { ...job, status: 'failed', error: this.getStaleJobError(job, now) }
-          : job
-      )
-    );
-  }
-
-  private getStaleJobError(job: PdfImportJob, now: number): string | undefined {
-    const age = now - Date.parse(job.createdAt);
-    if (job.status === 'queued' && age >= JOB_QUEUE_TIMEOUT_MS) {
-      return JOB_QUEUE_TIMEOUT_MESSAGE;
-    }
-
-    if ((job.status === 'uploading' || job.status === 'processing') && age >= JOB_PROCESSING_TIMEOUT_MS) {
-      return JOB_PROCESSING_TIMEOUT_MESSAGE;
-    }
-
-    return undefined;
   }
 
   private refreshActiveJobs(): void {

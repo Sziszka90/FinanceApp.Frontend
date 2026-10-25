@@ -8,6 +8,7 @@ import { CreateUserDto } from '../models/UserDtos/create-user.dto';
 import { UpdatePasswordDto } from 'src/models/UserDtos/update-password.dto';
 import { ResendEmailConfirmationResponse } from 'src/models/UserDtos/resend-email-confirmation-response.dto';
 import { BankStatementPromptDto, SaveBankStatementPromptDto } from 'src/models/UserDtos/bank-statement-prompt.dto';
+import { CategorizationRuleDto, SaveCategorizationRuleDto } from 'src/models/UserDtos/categorization-rule.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -55,6 +56,22 @@ export class UserApiService {
 
   deleteBankStatementPrompt(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/api/v1/bankstatementprompts/${id}`, { withCredentials: true });
+  }
+
+  getCategorizationRules(): Observable<CategorizationRuleDto[]> {
+    return this.http.get<CategorizationRuleDto[]>(`${this.apiUrl}/api/v1/categorizationrules`, { withCredentials: true });
+  }
+
+  createCategorizationRule(rule: SaveCategorizationRuleDto): Observable<CategorizationRuleDto> {
+    return this.http.post<CategorizationRuleDto>(`${this.apiUrl}/api/v1/categorizationrules`, rule, { withCredentials: true });
+  }
+
+  updateCategorizationRule(id: string, rule: SaveCategorizationRuleDto): Observable<CategorizationRuleDto> {
+    return this.http.put<CategorizationRuleDto>(`${this.apiUrl}/api/v1/categorizationrules/${id}`, rule, { withCredentials: true });
+  }
+
+  deleteCategorizationRule(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/api/v1/categorizationrules/${id}`, { withCredentials: true });
   }
 
   updatePassword(updatePasswordDto: UpdatePasswordDto): Observable<void> {

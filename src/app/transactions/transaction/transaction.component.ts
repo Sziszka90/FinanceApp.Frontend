@@ -68,7 +68,6 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   private readonly filterChanges = new Subject<void>();
   private readonly pageSize = 50;
   private pageRequestVersion = 0;
-  private readonly pdfFilesByCorrelationId = new Map<string, File>();
   dataSource = signal<MatTableDataSource<GetTransactionDto>>(new MatTableDataSource<GetTransactionDto>([]));
 
   typeOptions: { name: string; value: TransactionTypeEnum }[] = [
@@ -321,48 +320,34 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   }
 
   handleFile(file: File): void {
-    if (file.name.toLowerCase().endsWith('.pdf') && file.size > 0 && file.size <= 10 * 1024 * 1024) {
-      const requestId = uuidv4();
-      const correlationId = this.correlationService.setCorrelationId(requestId);
-
-      this.pdfFilesByCorrelationId.set(correlationId, file);
-      this.pdfImportJobs.add(correlationId, file.name);
-      this.uploadingPdf.set(true);
-
-      this.transactionApiService.uploadPdf(file, correlationId).subscribe({
-        next: () => {
-          this.pdfImportJobs.markQueued(correlationId);
-          this.uploadingPdf.set(false);
-          this.showSuccess('PDF uploaded and added to the import queue.');
-        },
-        error: error => {
-          this.pdfImportJobs.fail(correlationId, 'Upload failed. Please try again.');
-          this.uploadingPdf.set(false);
-          this.handleError(error, 'Uploading PDF file');
-        }
-      });
-    } else {
+    if (!this.isValidPdf(file)) {
       this.showError('Choose a PDF file smaller than 10 MB.');
-    }
-  }
-
-  retryPdfImport(correlationId: string, fileInput: HTMLInputElement): void {
-    const file = this.pdfFilesByCorrelationId.get(correlationId);
-    if (file) {
-      this.handleFile(file);
       return;
     }
 
-    fileInput.click();
+    const correlationId = this.correlationService.setCorrelationId(uuidv4());
+    this.pdfImportJobs.add(correlationId, file.name);
+    this.uploadPdf(file, correlationId);
   }
 
-  onRetryFileSelect(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    input.value = '';
-    if (file) {
-      this.handleFile(file);
-    }
+  private uploadPdf(file: File, correlationId: string): void {
+    this.uploadingPdf.set(true);
+    this.transactionApiService.uploadPdf(file, correlationId).subscribe({
+      next: () => {
+        this.pdfImportJobs.markQueued(correlationId);
+        this.uploadingPdf.set(false);
+        this.showSuccess('PDF uploaded and added to the import queue.');
+      },
+      error: error => {
+        this.pdfImportJobs.fail(correlationId, 'Upload failed. Please try again.');
+        this.uploadingPdf.set(false);
+        this.handleError(error, 'Uploading PDF file');
+      }
+    });
+  }
+
+  private isValidPdf(file: File): boolean {
+    return file.name.toLowerCase().endsWith('.pdf') && file.size > 0 && file.size <= 10 * 1024 * 1024;
   }
 
   syncScroll(event: Event): void {
