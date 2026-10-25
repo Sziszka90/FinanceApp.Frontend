@@ -2,7 +2,7 @@
 
 ## 📦 A sophisticated personal finance management platform with intelligent transaction processing
 
-This is the frontend application for a personal finance management platform that helps users track, categorize, and analyze their financial transactions with AI-powered insights. It features an integrated chat with AI functionalities, allowing users to query and receive information about their own financial data. Built with Angular 20 and TypeScript, it provides a responsive and intuitive user interface for managing personal finances.
+This is the frontend application for a personal finance management platform that helps users track, categorize, and analyze their financial transactions with AI-powered insights. It features an integrated chat with AI functionalities, allowing users to query and receive information about their own financial data. Built with Angular 22 and TypeScript, it provides a responsive and intuitive user interface for managing personal finances.
 
 ## 🎯 Current Features
 
@@ -13,13 +13,25 @@ This is the frontend application for a personal finance management platform that
 
 ✅ **Transactions**
 
-- Create, read, update, and delete transactions with rich UI and filtering
-- Import transactions from CSV files with automatic, asynchronous transaction group matching powered by AI, RabbitMQ and SignalR
+- Create, read, update, and delete transactions
+- Search and filter transactions by name, date, type, and transaction group, with cursor-based pagination
+- Import bank statement PDFs and follow queued, processing, completed, and failed status updates
+- Receive import updates through SignalR, with status polling when returning to the page; imports with no completion response are marked failed by the client after 10 minutes
 
 ✅ **Transaction Groups**
 
 - Create, read, update, and delete transaction groups
 - Organize transactions into categories with visual indicators
+
+✅ **Spending Analytics**
+
+- View spending or income by transaction group over a selected date range
+- Switch between pie and bar chart visualizations
+
+✅ **Profile Settings**
+
+- Manage merchant-based transaction categorization rules
+- Save and select bank-specific instructions for PDF statement imports
 
 ✅ **Responsive Design**
 
@@ -73,6 +85,7 @@ For detailed upcoming features and development progress, please check our [GitHu
       📁 create-transaction-modal/           # Create transaction modal
       📁 transaction/                        # Transaction display component
       📁 update-transaction-modal/           # Edit transaction modal
+    📁 spending-analytics/                   # Spending and income charts by group
     📁 user/                                 # User management features
       📁 forgot-password-modal/              # Password reset modal
       📁 logged-in/                          # Authenticated user component
@@ -108,12 +121,12 @@ For detailed upcoming features and development progress, please check our [GitHu
 
 ### **Frontend Framework**
 
-- **Angular 20** - Latest Angular framework with standalone components
+- **Angular 22** - Angular framework with standalone components
 - **TypeScript** - Strong typing for better code quality and maintainability
 - **Angular CLI** - Development tooling and build optimization
 - **RxJS** - Reactive programming for async data handling
 - **Angular Material** - Professional UI component library
-- **Angular Flex Layout** - Responsive layout system
+- **Chart.js** - Spending analytics charts
 
 ### **Styling & UI**
 
@@ -124,9 +137,7 @@ For detailed upcoming features and development progress, please check our [GitHu
 
 ## 🧪 Testing and Quality
 
-All unit tests are run automatically in the CI/CD pipeline.  
-Test coverage is checked in each build and is consistently above **50%**.
-Code quality is enforced using linting tools to ensure consistent style and catch potential errors.
+Unit tests, coverage reports, and lint checks run in the CI/CD pipeline. Coverage varies by build; the generated report is the source of the current coverage figures.
 
 ## 🚀 Deployment
 
