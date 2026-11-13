@@ -1,7 +1,7 @@
 import { Component, inject, ViewChild, ElementRef, OnInit, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormField, form } from '@angular/forms/signals';
 import { CommonModule } from '@angular/common';
-import { LlmProcessorApiService } from 'src/services/llmprocessor.api.service';
+import { AIAnalyticsApiService } from 'src/services/aianalytics.api.service';
 import { v4 as uuidv4 } from 'uuid';
 import { UserApiService } from 'src/services/user.api.service';
 import { take } from 'rxjs';
@@ -15,7 +15,7 @@ import { AuthenticationService } from 'src/services/authentication.service';
   styleUrls: ['./chat-bubble.component.scss']
 })
 export class ChatBubbleComponent implements OnInit, OnDestroy {
-  llmProcessorApiService = inject(LlmProcessorApiService);
+  aiAnalyticsApiService = inject(AIAnalyticsApiService);
   userApiService = inject(UserApiService);
   authService = inject(AuthenticationService);
 
@@ -99,7 +99,7 @@ export class ChatBubbleComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.messages.push({ text: msgToSend, sender: 'user' });
     this.scrollToBottom();
-    this.llmProcessorApiService
+    this.aiAnalyticsApiService
       .promptRequest({ prompt: msgToSend, userId: this.userId, correlationId: uuidv4() })
       .subscribe({
         next: res => {

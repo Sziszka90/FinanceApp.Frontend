@@ -8,12 +8,12 @@ import { PromptRequestDto } from 'src/models/ChatDtos/prompt-request.dto';
 @Injectable({
   providedIn: 'root'
 })
-export class LlmProcessorApiService {
+export class AIAnalyticsApiService {
   private http = inject(HttpClient);
 
-  private readonly apiUrl = environment?.llmProcessorUrl ?? '';
+  private readonly apiUrl = environment?.aiAnalyticsUrl ?? '';
 
   promptRequest(request: PromptRequestDto): Observable<PromptResponseDto> {
-    return this.http.post<PromptResponseDto>(`${this.apiUrl}/llmprocessor/prompt`, request);
+    return this.http.post<PromptResponseDto>(`${this.apiUrl}/aianalytics/prompt`, request);
   }
 }

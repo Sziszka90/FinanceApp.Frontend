@@ -1,20 +1,20 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
-import { LlmProcessorApiService } from './llmprocessor.api.service';
+import { AIAnalyticsApiService } from './aianalytics.api.service';
 import { environment } from 'src/environments/environment';
 import { PromptRequestDto } from 'src/models/ChatDtos/prompt-request.dto';
 import { PromptResponseDto } from 'src/models/ChatDtos/prompt-response.dto';
 
-describe('LlmProcessorApiService', () => {
-  let service: LlmProcessorApiService;
+describe('AIAnalyticsApiService', () => {
+  let service: AIAnalyticsApiService;
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [LlmProcessorApiService]
+      providers: [AIAnalyticsApiService]
     });
-    service = TestBed.inject(LlmProcessorApiService);
+    service = TestBed.inject(AIAnalyticsApiService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
@@ -34,7 +34,7 @@ describe('LlmProcessorApiService', () => {
       expect(response).toEqual(mockResponse);
     });
 
-    const req = httpMock.expectOne(`${environment.llmProcessorUrl}/llmprocessor/prompt`);
+    const req = httpMock.expectOne(`${environment.aiAnalyticsUrl}/aianalytics/prompt`);
     expect(req.request.method).toBe('POST');
     req.flush(mockResponse);
   });

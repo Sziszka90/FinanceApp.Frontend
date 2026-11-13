@@ -33,8 +33,8 @@ export const provideAuthInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> => {
-  if (req.url.includes('llmprocessor/prompt')) {
-    const token = environment.llmProcessorToken;
+  if (req.url.includes('aianalytics/prompt')) {
+    const token = environment.aiAnalyticsToken;
     const clonedRequest = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`

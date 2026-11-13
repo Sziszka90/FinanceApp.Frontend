@@ -57,6 +57,8 @@ This is the frontend application for a personal finance management platform that
 
 - Integrated chat assistant that provides personalized insights and answers based on your financial data
 
+The chat sends prompts to the AI Analytics service through the `/aianalytics/prompt` route. Configure `aiAnalyticsUrl` for local development and provide `AI_ANALYTICS_URL` and `AI_ANALYTICS_TOKEN` when generating the production environment configuration.
+
 ## 🔮 Upcoming Features
 
 For detailed upcoming features and development progress, please check our [GitHub Issues](https://github.com/Sziszka90/FinanceApp.Frontend/issues).
