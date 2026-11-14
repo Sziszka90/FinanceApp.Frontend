@@ -78,14 +78,11 @@
 
 .ai-insights-section { margin-bottom: 3rem; }
 .ai-insights-heading,.insight-card-topline { align-items: center; display: flex; justify-content: space-between; gap: 1rem; }
-.ai-insights-heading h2 { margin: 0.55rem 0; }
 .ai-insights-heading p,.ai-insight-card p { color: variables.$muted-color; margin: 0; }
 .ai-badge,.insight-icon { align-items: center; background: variables.$primary-selected; border-radius: 9px; color: variables.$primary-hover; display: inline-flex; padding: 0.45rem; }
 .ai-insights-grid { display: grid; gap: 1rem; grid-template-columns: repeat(3, 1fr); }
 .ai-insight-card,.insights-state { background: variables.$surface-background; border: 1px solid variables.$border-color; border-radius: 12px; padding: 1rem; }
 .ai-insight-card h3 { margin: 1rem 0 0.45rem; }
-.severity-label { color: variables.$muted-color; font-size: 0.7rem; }
-.insights-state { color: variables.$muted-color; text-align: center; }
 
 .feature-strip { background: variables.$navigation-background; border: 1px solid variables.$border-color; border-radius: 12px; display: grid; grid-template-columns: repeat(3, 1fr); margin-bottom: 3rem; }
 .feature-item { align-items: flex-start; display: flex; gap: 0.9rem; padding: 1.4rem clamp(1rem, 2.4vw, 2rem); }
