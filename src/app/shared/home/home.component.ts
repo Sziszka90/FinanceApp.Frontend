@@ -9,6 +9,8 @@ import { TransactionApiService } from 'src/services/transactions.api.service';
 import { AuthenticationService } from 'src/services/authentication.service';
 import { NotificationService } from 'src/services/notification.service';
 import { UserApiService } from 'src/services/user.api.service';
+import { AIAnalyticsApiService } from 'src/services/aianalytics.api.service';
+import { MonthlyInsightCardDto } from 'src/models/AIAnalytics/monthly-insights.dto';
 
 interface SnapshotCategory {
   name: string;
@@ -40,6 +42,7 @@ export class HomeComponent implements OnInit {
   private transactionApiService = inject(TransactionApiService);
   private notificationService = inject(NotificationService);
   private userApiService = inject(UserApiService);
+  private aiAnalyticsApiService = inject(AIAnalyticsApiService);
   private destroyRef = inject(DestroyRef);
 
   readonly loading = signal(true);
@@ -48,8 +51,13 @@ export class HomeComponent implements OnInit {
   readonly loadFailed = signal(false);
   readonly selectedMonth = signal(this.monthInputValue(new Date()));
   readonly availableMonths = signal<Array<{ value: string; label: string }>>([]);
+  readonly insights = signal<MonthlyInsightCardDto[]>([]);
+  readonly insightsLoading = signal(false);
+  readonly insightsFailed = signal(false);
+  readonly hasTransactionsInSelectedMonth = signal(false);
   private loadedTransactions: GetTransactionDto[] | null = null;
   private loadedCurrency: string | null = null;
+  private insightsRequestId = 0;
 
   ngOnInit(): void {
     this.loadSnapshot();
@@ -63,7 +71,12 @@ export class HomeComponent implements OnInit {
     this.loadFailed.set(false);
 
     try {
-      const isAuthenticated = await this.authenticationService.isAuthenticatedAsync();
+      // LoginComponent sets this immediately after a successful login. Avoid a
+      // second round-trip here that could render the signed-out home screen
+      // while the just-issued auth cookies are still being applied.
+      const isAuthenticated =
+        this.authenticationService.userLoggedIn.value ||
+        await this.authenticationService.isAuthenticatedAsync();
       this.authenticated.set(isAuthenticated);
 
       if (!isAuthenticated) {
@@ -81,6 +94,7 @@ export class HomeComponent implements OnInit {
           this.loadedCurrency = currency;
           this.availableMonths.set(this.buildMonthOptions(transactions));
           this.snapshot.set(this.buildSnapshot(transactions, currency, this.selectedMonthDate()));
+          this.refreshMonthlyInsights();
           this.loading.set(false);
         },
         error: error => {
@@ -107,6 +121,7 @@ export class HomeComponent implements OnInit {
         this.loadedCurrency,
         this.selectedMonthDate()
       ));
+      this.refreshMonthlyInsights();
     }
   }
 
@@ -116,6 +131,63 @@ export class HomeComponent implements OnInit {
     } catch {
       return `${amount.toFixed(2)} ${currency}`;
     }
+  }
+
+  retryMonthlyInsights(): void {
+    this.refreshMonthlyInsights();
+  }
+
+  insightIcon(category: MonthlyInsightCardDto['category']): string {
+    const icons: Record<MonthlyInsightCardDto['category'], string> = {
+      unusual_transaction: 'warning_amber',
+      additional_income: 'north_east',
+      spending_exceeds_income: 'account_balance_wallet',
+      spending_change: 'show_chart',
+      recurring_payment: 'autorenew',
+      positive_pattern: 'check_circle'
+    };
+    return icons[category];
+  }
+
+  selectedMonthLabel(): string {
+    return this.selectedMonthDate().toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  }
+
+  private refreshMonthlyInsights(): void {
+    const requestId = ++this.insightsRequestId;
+    const transactions = this.loadedTransactions;
+    if (!transactions) return;
+
+    const monthStart = this.selectedMonthDate();
+    const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1);
+    const hasTransactions = transactions.some(transaction => {
+      const date = new Date(transaction.transactionDate);
+      return !Number.isNaN(date.getTime()) && date >= monthStart && date < monthEnd;
+    });
+
+    this.hasTransactionsInSelectedMonth.set(hasTransactions);
+    this.insights.set([]);
+    this.insightsFailed.set(false);
+    this.insightsLoading.set(hasTransactions);
+    if (!hasTransactions) return;
+
+    this.aiAnalyticsApiService.getMonthlyInsights({
+      year: monthStart.getFullYear(),
+      month: monthStart.getMonth() + 1,
+      lookbackMonths: 6
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: response => {
+        if (requestId !== this.insightsRequestId) return;
+        this.insights.set(response.insights ?? []);
+        this.insightsLoading.set(false);
+      },
+      error: error => {
+        if (requestId !== this.insightsRequestId) return;
+        console.error('Unable to load AI monthly insights:', error);
+        this.insightsFailed.set(true);
+        this.insightsLoading.set(false);
+      }
+    });
   }
 
   isFontAwesomeIcon(icon: string): boolean {
@@ -240,16 +312,20 @@ export class HomeComponent implements OnInit {
     const transactionDates = transactions
       .map(transaction => new Date(transaction.transactionDate))
       .filter(date => !Number.isNaN(date.getTime()))
-      .map(date => new Date(date.getFullYear(), date.getMonth(), 1))
-      .filter(date => date <= currentMonth);
+      .map(date => new Date(date.getFullYear(), date.getMonth(), 1));
     const firstTransaction = transactionDates.reduce(
       (earliest, date) => date < earliest ? date : earliest,
       currentMonth
     );
+    const lastTransaction = transactionDates.reduce(
+      (latest, date) => date > latest ? date : latest,
+      currentMonth
+    );
     const firstMonth = new Date(firstTransaction.getFullYear(), firstTransaction.getMonth(), 1);
+    const lastMonth = new Date(lastTransaction.getFullYear(), lastTransaction.getMonth(), 1);
     const months: Array<{ value: string; label: string }> = [];
 
-    for (let month = currentMonth; month >= firstMonth; month = new Date(month.getFullYear(), month.getMonth() - 1, 1)) {
+    for (let month = lastMonth; month >= firstMonth; month = new Date(month.getFullYear(), month.getMonth() - 1, 1)) {
       months.push({
         value: this.monthInputValue(month),
         label: month.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })

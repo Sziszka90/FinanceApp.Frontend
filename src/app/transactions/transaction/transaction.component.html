@@ -20,8 +20,8 @@
   <section class="drag-drop-container"
   (dragover)="onDragOver($event)"
   (drop)="onDrop($event)">
-  <p>Drag and drop a bank statement PDF here, or click to upload</p>
-  <input type="file" accept=".pdf,application/pdf" (change)="onFileSelect($event)" hidden #fileInput>
+  <p>Drag and drop bank statement PDFs here, or select multiple PDFs to upload</p>
+  <input type="file" accept=".pdf,application/pdf" multiple (change)="onFileSelect($event)" hidden #fileInput>
   <button class="custom-button bounce-button" [class.disabled]="loading() || uploadingPdf()" type="button" (click)="!loading() && !uploadingPdf() && fileInput.click()">Upload PDF</button>
   </section>
 

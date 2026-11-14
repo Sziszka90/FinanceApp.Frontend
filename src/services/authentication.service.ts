@@ -17,12 +17,16 @@ export class AuthenticationService {
   private correlationService = inject(CorrelationService);
   private userService = inject(UserApiService);
   private tokenApiService = inject(TokenApiService);
+  private authenticationCheck: Promise<boolean> | null = null;
+  private authenticationStateVersion = 0;
 
   public userLoggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   async logoutAsync(): Promise<void> {
     try {
       await firstValueFrom(this.authApiService.logout());
+      this.authenticationStateVersion++;
+      this.authenticationCheck = null;
       this.correlationService.clearAllCorrelationIds();
       this.userLoggedIn.next(false);
       this.router.navigate(['/login']);
@@ -33,16 +37,53 @@ export class AuthenticationService {
 
   async loginAsync(loginRequestDto: LoginRequestDto): Promise<void> {
     await firstValueFrom(this.authApiService.login(loginRequestDto));
+    // Ignore any startup auth check that began before login completed.
+    this.authenticationStateVersion++;
+    this.authenticationCheck = null;
     this.correlationService.clearAllCorrelationIds();
     this.userLoggedIn.next(true);
   }
 
   async isAuthenticatedAsync(): Promise<boolean> {
+    if (this.authenticationCheck) {
+      return this.authenticationCheck;
+    }
+
+    const check = this.checkAuthenticationAsync(this.authenticationStateVersion);
+    this.authenticationCheck = check;
     try {
-      const result = await firstValueFrom(this.authApiService.isAuthenticated());
+      return await check;
+    } finally {
+      if (this.authenticationCheck === check) {
+        this.authenticationCheck = null;
+      }
+    }
+  }
+
+  private async checkAuthenticationAsync(stateVersion: number): Promise<boolean> {
+    try {
+      let result = await firstValueFrom(this.authApiService.isAuthenticated());
+      if (!result) {
+        // The refresh cookie may still be valid when the short-lived access cookie has expired.
+        try {
+          await firstValueFrom(this.tokenApiService.refreshToken());
+          result = await firstValueFrom(this.authApiService.isAuthenticated());
+        } catch {
+          result = false;
+        }
+      }
+
+      if (stateVersion !== this.authenticationStateVersion) {
+        return this.userLoggedIn.value;
+      }
+
       this.userLoggedIn.next(result);
       return result;
     } catch {
+      if (stateVersion !== this.authenticationStateVersion) {
+        return this.userLoggedIn.value;
+      }
+
       this.userLoggedIn.next(false);
       return false;
     }

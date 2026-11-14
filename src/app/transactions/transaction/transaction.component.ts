@@ -12,7 +12,7 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
-import { Observable, Subject, debounceTime } from 'rxjs';
+import { Observable, Subject, debounceTime, finalize } from 'rxjs';
 import { TransactionApiService } from 'src/services/transactions.api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { GetTransactionDto } from 'src/models/TransactionDtos/get-transaction.dto';
@@ -75,6 +75,7 @@ export class TransactionComponent extends BaseComponent implements OnInit {
   public showSummary = signal<boolean>(false);
   public summary = signal<Money | null>(null);
   public uploadingPdf = signal<boolean>(false);
+  private readonly pdfUploadQueue: { file: File; correlationId: string }[] = [];
   public loadingMore = signal<boolean>(false);
   public nextCursor = signal<string | null>(null);
   private readonly filterChanges = new Subject<void>();
@@ -343,48 +344,78 @@ export class TransactionComponent extends BaseComponent implements OnInit {
     event.stopPropagation();
 
     if (event.dataTransfer?.files.length) {
-      const file = event.dataTransfer.files[0];
-      this.handleFile(file);
+      this.handleFiles(event.dataTransfer.files);
     }
   }
 
   onFileSelect(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      const file = input.files[0];
-      this.handleFile(file);
+    const selectedFiles = Array.from(input.files ?? []);
+    // Snapshot all selections before resetting the input; FileList is live in some browsers.
+    input.value = '';
+    if (selectedFiles.length > 0) {
+      this.handleFiles(selectedFiles);
     }
   }
 
-  handleFile(file: File): void {
-    if (!this.isValidPdf(file)) {
-      this.showError('Choose a PDF file smaller than 10 MB.');
+  private handleFiles(files: FileList | File[]): void {
+    for (const file of Array.from(files)) {
+      const correlationId = this.correlationService.setCorrelationId(uuidv4());
+      this.pdfImportJobs.add(correlationId, file.name);
+
+      const validationError = this.getPdfValidationError(file);
+      if (validationError) {
+        this.pdfImportJobs.fail(correlationId, validationError);
+        continue;
+      }
+
+      this.pdfUploadQueue.push({ file, correlationId });
+    }
+
+    this.uploadNextPdf();
+  }
+
+  private uploadNextPdf(): void {
+    if (this.uploadingPdf()) {
       return;
     }
 
-    const correlationId = this.correlationService.setCorrelationId(uuidv4());
-    this.pdfImportJobs.add(correlationId, file.name);
-    this.uploadPdf(file, correlationId);
-  }
+    const next = this.pdfUploadQueue.shift();
+    if (!next) {
+      return;
+    }
 
-  private uploadPdf(file: File, correlationId: string): void {
     this.uploadingPdf.set(true);
-    this.transactionApiService.uploadPdf(file, correlationId).subscribe({
-      next: () => {
-        this.pdfImportJobs.markQueued(correlationId);
-        this.uploadingPdf.set(false);
-        this.showSuccess('PDF uploaded and added to the import queue.');
-      },
-      error: error => {
-        this.pdfImportJobs.fail(correlationId, 'Upload failed. Please try again.');
-        this.uploadingPdf.set(false);
-        this.handleError(error, 'Uploading PDF file');
-      }
-    });
+    this.transactionApiService
+      .uploadPdf(next.file, next.correlationId)
+      .pipe(
+        finalize(() => {
+          this.uploadingPdf.set(false);
+          this.uploadNextPdf();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.pdfImportJobs.markQueued(next.correlationId);
+        },
+        error: error => {
+          this.pdfImportJobs.fail(next.correlationId, 'Upload failed. Please try again.');
+          this.handleError(error, `Uploading ${next.file.name}`);
+        }
+      });
   }
 
-  private isValidPdf(file: File): boolean {
-    return file.name.toLowerCase().endsWith('.pdf') && file.size > 0 && file.size <= 10 * 1024 * 1024;
+  private getPdfValidationError(file: File): string | undefined {
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      return 'This file is not a PDF.';
+    }
+    if (file.size === 0) {
+      return 'This PDF is empty.';
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      return 'This PDF is larger than the 10 MB limit.';
+    }
+    return undefined;
   }
 
   syncScroll(event: Event): void {

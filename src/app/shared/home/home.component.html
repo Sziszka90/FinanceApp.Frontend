@@ -104,6 +104,52 @@
     </aside>
   </section>
 
+  @if (authenticated() && hasTransactionsInSelectedMonth()) {
+    <section class="ai-insights-section" aria-labelledby="ai-insights-title">
+      <div class="ai-insights-heading">
+        <div>
+          <div class="eyebrow"><span class="eyebrow-dot"></span> AI ANALYSIS</div>
+          <h2 id="ai-insights-title">Money insights for {{ selectedMonthLabel() }}</h2>
+          <p>Observations based on your transactions and recent months.</p>
+        </div>
+        <span class="ai-badge"><span class="material-icons" aria-hidden="true">auto_awesome</span> AI generated</span>
+      </div>
+
+      @if (insightsLoading()) {
+        <div class="insights-state" role="status">Analyzing this month’s transactions…</div>
+      } @else if (insightsFailed()) {
+        <div class="insights-state" role="alert">
+          <span>AI insights couldn’t be loaded right now.</span>
+          <button type="button" class="snapshot-retry" (click)="retryMonthlyInsights()">Try again</button>
+        </div>
+      } @else if (insights().length > 0) {
+        <div class="ai-insights-grid">
+          @for (insight of insights(); track $index) {
+            <article
+              class="ai-insight-card"
+              [class.severity-attention]="insight.severity === 'attention'"
+              [class.severity-notice]="insight.severity === 'notice'">
+              <div class="insight-card-topline">
+                <span class="insight-icon material-icons" aria-hidden="true">{{ insightIcon(insight.category) }}</span>
+                <span class="severity-label">{{ insight.severity === 'attention' ? 'Worth a look' : insight.severity === 'notice' ? 'Notice' : 'Observation' }}</span>
+              </div>
+              <h3>{{ insight.title }}</h3>
+              <p>{{ insight.description }}</p>
+              @if (insight.amount !== null && insight.amount !== undefined) {
+                <div class="insight-amount">{{ formatAmount(insight.amount, insight.currency || snapshot()?.currency || 'EUR') }}</div>
+              }
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="insights-state insights-empty">
+          <span class="material-icons" aria-hidden="true">task_alt</span>
+          <span>No notable patterns stood out for this month.</span>
+        </div>
+      }
+    </section>
+  }
+
   <section class="feature-strip" aria-label="Finance App features">
     <article class="feature-item"><span class="feature-icon material-icons" aria-hidden="true">receipt_long</span><div><h2>Transactions in one place</h2><p>Keep everyday spending organized and easy to review.</p></div></article>
     <article class="feature-item"><span class="feature-icon material-icons" aria-hidden="true">donut_small</span><div><h2>Patterns at a glance</h2><p>See how your spending is distributed by category.</p></div></article>

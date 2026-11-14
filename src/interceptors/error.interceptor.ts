@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError, Observable, switchMap } from 'rxjs';
 import { TokenApiService } from 'src/services/token.api.service';
+import { environment } from 'src/environments/environment';
 
 export const errorInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
@@ -13,6 +14,8 @@ export const errorInterceptor: HttpInterceptorFn = (
 
   const isRefreshRequest = req.url.includes('/refresh');
   const isRetried = req.headers.has('X-Refresh-Attempted');
+  const backendUrl = environment.apiUrl.replace(/\/$/, '');
+  const isBackendRequest = !!backendUrl && (req.url === backendUrl || req.url.startsWith(`${backendUrl}/`));
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -20,7 +23,7 @@ export const errorInterceptor: HttpInterceptorFn = (
 
       const errorWithUrl = { ...error, url: req.url };
 
-      if (error.status === 401 && !isRefreshRequest && !isRetried) {
+      if (error.status === 401 && isBackendRequest && !isRefreshRequest && !isRetried) {
         const retriedReq = req.clone({ setHeaders: { 'X-Refresh-Attempted': 'true' } });
         return authApi.refreshToken().pipe(
           switchMap(() => next(retriedReq)),
