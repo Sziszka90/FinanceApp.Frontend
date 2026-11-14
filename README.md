@@ -27,6 +27,7 @@ This is the frontend application for a personal finance management platform that
 
 - View spending or income by transaction group over a selected date range
 - Switch between pie and bar chart visualizations
+- View AI-generated monthly transaction insight cards on Home, with months inferred from transaction dates
 
 ✅ **Profile Settings**
 
@@ -58,6 +59,8 @@ This is the frontend application for a personal finance management platform that
 - Integrated chat assistant that provides personalized insights and answers based on your financial data
 
 The chat sends prompts to the AI Analytics service through the `/aianalytics/prompt` route. Configure `aiAnalyticsUrl` for local development and provide `AI_ANALYTICS_URL` and `AI_ANALYTICS_TOKEN` when generating the production environment configuration.
+
+Monthly insight requests go to the authenticated backend endpoint `POST /api/v1/transactions/monthly-insights`. The backend forwards the signed-in user's access token to AIAnalytics, which uses it to call the backend's read-only MCP tools. The browser never sends the user's token directly to AIAnalytics.
 
 ## 🔮 Upcoming Features
 
