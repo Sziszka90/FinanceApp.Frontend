@@ -76,24 +76,16 @@
 .snapshot-retry { background: transparent; border: 0; cursor: pointer; margin-top: 0.7rem; padding: 0.35rem 0.5rem; }
 .snapshot-retry:focus-visible, .snapshot-sign-in a:focus-visible { border-radius: 4px; outline: 2px solid variables.$focus-color; outline-offset: 3px; }
 
-.ai-insights-section { margin: 0 0 3rem; }
-.ai-insights-heading { align-items: flex-end; display: flex; gap: 1rem; justify-content: space-between; margin-bottom: 1rem; }
-.ai-insights-heading h2 { color: variables.$text-color; font-family: variables.$title-font; font-size: clamp(1.35rem, 2.4vw, 1.8rem); letter-spacing: -0.035em; margin: 0.55rem 0 0.35rem; }
-.ai-insights-heading p { color: variables.$muted-color; font-size: 0.88rem; margin: 0; }
-.ai-badge { align-items: center; background: variables.$primary-selected; border: 1px solid variables.$border-color; border-radius: 999px; color: variables.$primary-hover; display: inline-flex; flex: 0 0 auto; font-size: 0.75rem; font-weight: 600; gap: 0.4rem; padding: 0.45rem 0.7rem; white-space: nowrap; }
-.ai-badge .material-icons { font-size: 1rem; }
-.ai-insights-grid { display: grid; gap: 1rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.ai-insight-card { background: variables.$surface-background; border: 1px solid variables.$border-color; border-radius: 12px; min-height: 190px; padding: 1.2rem; }
-.insight-card-topline { align-items: center; display: flex; justify-content: space-between; }
-.insight-icon { align-items: center; background: variables.$primary-selected; border-radius: 9px; color: variables.$primary-hover; display: inline-flex; font-size: 1.15rem; height: 38px; justify-content: center; width: 38px; }
-.severity-attention .insight-icon { background: color-mix(in srgb, variables.$red-color 14%, transparent); color: variables.$red-color; }
-.severity-notice .insight-icon { background: color-mix(in srgb, variables.$warning-color 14%, transparent); color: variables.$warning-color; }
-.severity-label { color: variables.$muted-color; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
-.ai-insight-card h3 { color: variables.$text-color; font-size: 0.98rem; letter-spacing: -0.015em; line-height: 1.4; margin: 1rem 0 0.45rem; }
-.ai-insight-card p { color: variables.$muted-color; font-size: 0.82rem; line-height: 1.6; margin: 0; }
-.insight-amount { color: variables.$text-color; font-size: 0.88rem; font-variant-numeric: tabular-nums; font-weight: 700; margin-top: 0.8rem; }
-.insights-state { align-items: center; background: variables.$navigation-background; border: 1px solid variables.$border-color; border-radius: 10px; color: variables.$muted-color; display: flex; flex-wrap: wrap; font-size: 0.88rem; gap: 0.5rem; justify-content: center; min-height: 110px; padding: 1rem; text-align: center; }
-.insights-empty .material-icons { color: variables.$green-color; font-size: 1.2rem; }
+.ai-insights-section { margin-bottom: 3rem; }
+.ai-insights-heading,.insight-card-topline { align-items: center; display: flex; justify-content: space-between; gap: 1rem; }
+.ai-insights-heading h2 { margin: 0.55rem 0; }
+.ai-insights-heading p,.ai-insight-card p { color: variables.$muted-color; margin: 0; }
+.ai-badge,.insight-icon { align-items: center; background: variables.$primary-selected; border-radius: 9px; color: variables.$primary-hover; display: inline-flex; padding: 0.45rem; }
+.ai-insights-grid { display: grid; gap: 1rem; grid-template-columns: repeat(3, 1fr); }
+.ai-insight-card,.insights-state { background: variables.$surface-background; border: 1px solid variables.$border-color; border-radius: 12px; padding: 1rem; }
+.ai-insight-card h3 { margin: 1rem 0 0.45rem; }
+.severity-label { color: variables.$muted-color; font-size: 0.7rem; }
+.insights-state { color: variables.$muted-color; text-align: center; }
 
 .feature-strip { background: variables.$navigation-background; border: 1px solid variables.$border-color; border-radius: 12px; display: grid; grid-template-columns: repeat(3, 1fr); margin-bottom: 3rem; }
 .feature-item { align-items: flex-start; display: flex; gap: 0.9rem; padding: 1.4rem clamp(1rem, 2.4vw, 2rem); }
