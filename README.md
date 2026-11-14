@@ -54,13 +54,22 @@ This is the frontend application for a personal finance management platform that
 
 - Displays a loader while the cloud backend service initializes, ensuring users are informed during startup delays
 
-✅ **AI-Powered Chat**
+## AI Integration
 
-- Integrated chat assistant that provides personalized insights and answers based on your financial data
+One of the main goals of this project was integrating AI into a practical application.
 
-The chat sends prompts to the AI Analytics service through the `/aianalytics/prompt` route. Configure `aiAnalyticsUrl` for local development and provide `AI_ANALYTICS_URL` and `AI_ANALYTICS_TOKEN` when generating the production environment configuration.
+The Python AIAnalytics service uses Azure OpenAI for:
 
-Monthly insight requests go to the authenticated backend endpoint `POST /api/v1/transactions/monthly-insights`. The backend forwards the signed-in user's access token to AIAnalytics, which uses it to call the backend's read-only MCP tools. The browser never sends the user's token directly to AIAnalytics.
+- Extracting transactions from bank statement PDFs
+- Suggesting transaction categories asynchronously
+- Generating monthly spending insights from a user's transaction data
+- Answering natural-language questions about the user's financial data through the AI chat
+
+For analytics, the backend exposes read-only transaction tools through MCP. AIAnalytics can call the supported tools to retrieve data for the authenticated user and generate relevant insights. The AI does not access the database directly; the backend remains responsible for authorization and data access.
+
+The frontend calls the authenticated backend endpoint `POST /api/v1/transactions/monthly-insights` for monthly insight cards. The backend forwards the signed-in user's access token to AIAnalytics for MCP authorization. For chat, the frontend sends prompts to the AIAnalytics `/aianalytics/prompt` route.
+
+AI is part of the application architecture and works alongside traditional application logic.
 
 ## 🔮 Upcoming Features
 
